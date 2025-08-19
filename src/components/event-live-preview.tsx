@@ -212,7 +212,7 @@ const EventLivePreview: React.FC<EventLivePreviewProps> = ({ event, forceMobileL
               (() => {
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
-                const futureOccurrences = event.occurrences.filter((occ: any) => {
+                const futureOccurrences = event.occurrences.filter((occ: Occurrence) => {
                   const start = new Date(occ.startTime);
                   return !isNaN(start.getTime()) && start >= today;
                 });
@@ -225,7 +225,7 @@ const EventLivePreview: React.FC<EventLivePreviewProps> = ({ event, forceMobileL
                     {futureOccurrences.length === 0 ? (
                       <option value="none" disabled>No future dates</option>
                     ) : (
-                      futureOccurrences.map((occ: any) => {
+                      futureOccurrences.map((occ: Occurrence) => {
                         const format = (d: string) => {
                           const date = new Date(d);
                           return isNaN(date.getTime()) ? d : date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });

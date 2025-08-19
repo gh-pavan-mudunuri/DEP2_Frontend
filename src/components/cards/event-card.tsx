@@ -10,12 +10,13 @@ import Image from "next/image";
 import { FaRegClock } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import ReactDOM from "react-dom";
+import { EventInterface } from "@/interfaces/home";
  
  
 interface EventCardProps {
-  event: any;
+  event: EventInterface;
   showActions?: boolean;
-  onDelete?: (eventId: string) => void;
+  onDelete?: (eventId: string | number) => void;
   onEdit?: (event: any) => void;
   hideRegister?: boolean;
   isBookmarked?: boolean;
@@ -115,7 +116,7 @@ function confirmApprove() {
             window.dispatchEvent(new Event("eventApproved"));
           }
           // Send mail to organiser
-                  const organiserEmail = event.OrganizerEmail || event.organiserEmail || event.organizerEmail || event.OrganiserEmail;
+                  const organiserEmail = event.OrganizerEmail || event.organiserEmail || event.organizerEmail;
                   if (!organiserEmail) {
                     setPopup({ message: "Organiser email not found for this event.", type: "error" });
                     return;
@@ -237,7 +238,7 @@ function confirmApprove() {
   // Use event data, fallback to defaults if missing
   // Removed carousel state, always show first image
   // Helper to ensure image URLs are absolute for backend-served images
-  const toAbsoluteUrl = (url: string) => {
+  const toAbsoluteUrl = (url: string | undefined) => {
     if (!url) return "/images/card-top.jpg";
     if (url.startsWith("http://") || url.startsWith("https://")) return url;
     if (url.startsWith("/uploads/")) return `http://localhost:5274${url}`;
@@ -475,7 +476,7 @@ function confirmApprove() {
                     e.preventDefault();
                     e.stopPropagation();
                     // Redirect to /send-email with organiser email and event title as query params
-                    const organiserEmail = event.organiserEmail || event.organizerEmail || event.OrganiserEmail || event.OrganizerEmail;
+                    const organiserEmail = event.organiserEmail || event.organizerEmail || event.OrganizerEmail;
                     const eventTitle = event.title || event.eventTitle || event.name;
                     if (organiserEmail) {
                       window.location.href = `/send-email?to=${encodeURIComponent(organiserEmail)}&event=${encodeURIComponent(eventTitle)}`;
@@ -497,7 +498,7 @@ function confirmApprove() {
                   e.stopPropagation();
                   // Use Next.js router for navigation
                   if (typeof window !== 'undefined') {
-                    window.location.href = `/event/${event.eventId || event.id || event._id}/register`;
+                    window.location.href = `/event/${event.eventId || event.id || event.Id}/register`;
                   }
                 }}
                 className="bg-gradient-to-r text-xs sm:text-sm md:text-base lg:text-lg from-purple-500 to-blue-500 py-1 sm:py-2 px-3 sm:px-4 md:px-6 rounded-full shadow-md hover:from-purple-600 hover:to-blue-600 transition cursor-pointer select-none font-semibold tracking-wide"

@@ -1,54 +1,32 @@
 "use client";
-import { useEffect, useState } from "react";
+import { JSX, useEffect, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import EventForm from "@/components/event-form/page";
+import type { EventFormData, Speaker, Faq, Occurrence, Media, CustomDate } from "@/interfaces/event-form";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5274";
 
-type EventFormData = {
-  title: string;
-  OrganizerName: string;
-  organizerEmail: string;
-  eventStart: string;
-  eventEnd: string;
-  registrationDeadline: string;
-  maxAttendees: string;
-  recurrenceType: string;
-  recurrenceRule: string;
-  customDates: any[];
-  customFields: string;
-  location: string;
-  eventLink: string;
-  description: string;
-  type: string;
-  category: string;
-  otherCategory: string;
-  isPaid: boolean;
-  price: string | number;
-  image: File | null;
-  coverImageUrl: string;
-  vibeVideo: File | null;
-  vibeVideoPreview: string;
-  speakers: any[];
-  faqs: any[];
-  occurrences: any[];
-  media: any[];
-};
-
-export default function EditEventPage() {
+export default function EditEventPage(): JSX.Element | null {
   const router = useRouter();
   const params = useParams();
   const eventId = Array.isArray(params.id) ? params.id[0] : params.id ?? null;
+
   const [initialData, setInitialData] = useState<EventFormData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [editCount, setEditCount] = useState(0);
-  const [isAdminApproved, setIsAdminApproved] = useState(true);
-  const [error, setError] = useState("");
+  const [loading, setLoading] = useState<boolean>(true);
+  const [editCount, setEditCount] = useState<number>(0);
+  const [isAdminApproved, setIsAdminApproved] = useState<boolean>(true);
+  const [error, setError] = useState<string>("");
+
+  // Utility function to ensure proper array type conversion
+  const arr = <T = any>(v: T | T[] | null | undefined): T[] => {
+    return Array.isArray(v) ? v : v ? [v] : [];
+  };
 
   useEffect(() => {
     if (!eventId) return;
     setLoading(true);
-    const token = localStorage.getItem("token"); // Change key if your JWT is stored under a different name
+    const token = localStorage.getItem("token");
+
     fetch(`${API_URL}/api/events/${eventId}`, {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     })
@@ -61,15 +39,12 @@ export default function EditEventPage() {
         return res.json();
       })
       .then((data) => {
-        // Debug: Log the raw backend event data
         console.log('[DEBUG] Raw event data from backend:', data.data);
-        // Support both { data: event } and plain event object
+
         const event = data && typeof data === 'object' && data.data ? data.data : data;
 
         // --- Robust mapping for all event fields ---
-        const arr = (v: any) => Array.isArray(v) ? v : v ? [v] : [];
-        // Speakers
-        const speakers = arr(event.speakers).map((s: any) => {
+        const speakers: Speaker[] = arr(event.speakers).map((s: any) => {
           let photoPath = s.photoUrl || '';
           if (photoPath && !photoPath.startsWith('/')) photoPath = '/' + photoPath;
           if (photoPath.startsWith('/wwwroot/')) photoPath = photoPath.replace('/wwwroot', '');
@@ -81,8 +56,9 @@ export default function EditEventPage() {
             imagePreview: photoPath ? `${API_URL}${photoPath}` : '',
           };
         });
+
         // FAQs (ensure always array, never null)
-        let faqs: { question: string; answer: string }[] = [];
+        let faqs: Faq[] = [];
         if (Array.isArray(event.faqs)) {
           faqs = event.faqs.map((f: any) => ({
             question: f.question || '',
@@ -94,22 +70,24 @@ export default function EditEventPage() {
             answer: event.faqs.answer || '',
           }];
         }
+
         // Occurrences
-        const occurrences = arr(event.occurrences).map((o: any) => ({
-          start: o.startTime ? new Date(o.startTime).toISOString().slice(0,16) : '',
-          end: o.endTime ? new Date(o.endTime).toISOString().slice(0,16) : '',
+        const occurrences: Occurrence[] = arr(event.occurrences).map((o: any) => ({
+          start: o.startTime ? new Date(o.startTime).toISOString().slice(0, 16) : '',
+          end: o.endTime ? new Date(o.endTime).toISOString().slice(0, 16) : '',
           location: o.location || '',
         }));
+
         // Custom Dates for custom recurrence (parse from customFields if present)
-        let customDates: any[] = [];
+        let customDates: CustomDate[] = [];
         if (event.recurrenceType === 'custom') {
           if (typeof event.customFields === 'string' && event.customFields.trim().startsWith('[')) {
             try {
               const parsed = JSON.parse(event.customFields);
               if (Array.isArray(parsed)) {
                 customDates = parsed.map((d: any) => ({
-                  start: d.start ? new Date(d.start).toISOString().slice(0,16) : '',
-                  end: d.end ? new Date(d.end).toISOString().slice(0,16) : '',
+                  start: d.start ? new Date(d.start).toISOString().slice(0, 16) : '',
+                  end: d.end ? new Date(d.end).toISOString().slice(0, 16) : '',
                 }));
               }
             } catch {
@@ -119,6 +97,7 @@ export default function EditEventPage() {
             customDates = occurrences;
           }
         }
+
         // Media (for preview only, not upload)
         let coverPath = event.coverImage || '';
         if (coverPath && !coverPath.startsWith('/')) coverPath = '/' + coverPath;
@@ -128,24 +107,23 @@ export default function EditEventPage() {
           coverPath = '/uploads/covers/' + coverPath;
         }
         const coverImageUrl = coverPath ? `${API_URL}${coverPath}` : '';
+
         let vibePath = event.vibeVideoUrl || '';
         if (vibePath && !vibePath.startsWith('/')) vibePath = '/' + vibePath;
         if (vibePath.startsWith('/wwwroot/')) vibePath = vibePath.replace('/wwwroot', '');
         const vibeVideoPreview = vibePath ? `${API_URL}${vibePath}` : '';
-        // Media array
-        const media = arr(event.media);
+        const media: Media[] = arr(event.media);
 
         // --- Fix description image src URLs to point to uploads/media-images if needed ---
         let description = event.description || '';
-        // Replace src for any uploads/media* or uploads/media-images* with absolute API_URL
         description = description.replace(/src=["']\/?uploads\/(media-images|media)\/(.*?)["']/g, (match: string, folder: string, filename: string) => {
           return `src="${API_URL}/uploads/${folder}/${filename}"`;
         });
-        // Also handle src without leading slash (rare DB cases)
         description = description.replace(/src=["']uploads\/(media-images|media)\/(.*?)["']/g, (match: string, folder: string, filename: string) => {
           return `src="${API_URL}/uploads/${folder}/${filename}"`;
         });
-        // Replace __MEDIA_X__ placeholders with actual media image URLs from event.media
+
+        // Also replace __MEDIA_X__ placeholders with actual media image URLs
         if (Array.isArray(media)) {
           media.forEach((m: any, idx: number) => {
             if (m.mediaType && m.mediaType.toLowerCase() === 'image' && m.mediaUrl) {
@@ -159,9 +137,9 @@ export default function EditEventPage() {
           title: event.title || '',
           OrganizerName: event.organizerName || '',
           organizerEmail: event.organizerEmail || '',
-          eventStart: event.eventStart ? new Date(event.eventStart).toISOString().slice(0,16) : '',
-          eventEnd: event.eventEnd ? new Date(event.eventEnd).toISOString().slice(0,16) : '',
-          registrationDeadline: event.registrationDeadline ? new Date(event.registrationDeadline).toISOString().slice(0,16) : '',
+          eventStart: event.eventStart ? new Date(event.eventStart).toISOString().slice(0, 16) : '',
+          eventEnd: event.eventEnd ? new Date(event.eventEnd).toISOString().slice(0, 16) : '',
+          registrationDeadline: event.registrationDeadline ? new Date(event.registrationDeadline).toISOString().slice(0, 16) : '',
           maxAttendees: event.maxAttendees ? String(event.maxAttendees) : "",
           recurrenceType: event.recurrenceType || 'None',
           recurrenceRule: event.recurrenceRule || '',
@@ -184,6 +162,7 @@ export default function EditEventPage() {
           occurrences,
           media,
         });
+
         setLoading(false);
       })
       .catch((err) => {
@@ -196,5 +175,5 @@ export default function EditEventPage() {
   if (error) return <div>Error: {error}</div>;
   if (!initialData) return <div>No event found.</div>;
 
-  return <EventForm initialData={initialData} isEditMode eventId={eventId} editCount={editCount} verified={isAdminApproved} />;
+  return <EventForm initialData={initialData} isEditMode eventId={eventId} />;
 }

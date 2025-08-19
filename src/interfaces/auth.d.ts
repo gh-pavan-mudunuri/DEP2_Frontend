@@ -35,16 +35,17 @@ export interface APIResponse {
 export interface LoginResponse {
   token: string;
   user: {
-    id: string;
+    id: number;
     name: string;
     email: string;
-    [key: string]: any; 
+    role: number;
   };
 }
 
 export interface APIError {
-  message?: string;
+  message: string;
 }
+
 
 // Verify Email Page
 

@@ -1,11 +1,14 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import axios from 'axios';
+import { useState, useEffect, useRef, JSX } from "react";
+import axios, { AxiosError } from 'axios';
 import { useSearchParams, useRouter } from 'next/navigation';
 
+interface VerifyEmailResponse {
+  message: string;
+}
 
-export default function VerifyEmail(): React.JSX.Element {
+export default function VerifyEmail(): JSX.Element {
   const searchParams = useSearchParams();
   const router = useRouter();
   const token = searchParams.get('token');
@@ -14,16 +17,20 @@ export default function VerifyEmail(): React.JSX.Element {
 
   useEffect(() => {
     if (!token || hasRun.current) return;
-    hasRun.current = true; // prevent second run in dev
-    axios.get<{ message: string }>(`http://localhost:5274/api/Auth/verify-email?token=${token}`)
-      .then(response => { 
+
+    hasRun.current = true;
+
+    axios.get<VerifyEmailResponse>(`http://localhost:5274/api/Auth/verify-email?token=${token}`)
+      .then((response) => {
         setMessage('User Registered Successfully, now you can Login');
         setTimeout(() => {
           router.push('/login');
         }, 2000);
       })
-      .catch((error: any) => { 
-        setMessage(error.response?.data?.message || error.message);
+      .catch((error: AxiosError<{ message?: string }>) => {
+        const errorMessage =
+          error.response?.data?.message || error.message || "An error occurred.";
+        setMessage(errorMessage);
       });
   }, [token, router]);
 

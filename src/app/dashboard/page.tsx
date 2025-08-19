@@ -7,7 +7,7 @@ import IntroSection from "@/components/sections/intro-section";
 import TrendingEvents from "@/components/sections/trending-events";
 import UpcommingEvents from "@/components/sections/upcoming-events";
 import Image from "next/image";
-import Navbar from "@/components/cards/navbar";
+import Navbar from "@/components/cards/Navbar";
 
 
 export default function Home() {

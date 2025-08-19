@@ -2,6 +2,7 @@
 import { EventFormPopupContext } from './layout';
 import ConfirmationDialog from '../common/confirmation-dialog';
 import dynamic from "next/dynamic";
+import { EventFormData } from '@/interfaces/event-form';
 
 const EventLivePreview = dynamic(() => import("@/components/event-live-preview"), { ssr: false });
 // Ensure bullet/number markers always show in description preview
@@ -66,7 +67,7 @@ const tiptapContentClass = 'tiptap-content';
 import StarterKit from '@tiptap/starter-kit';
 import Image from '@tiptap/extension-image';
 import Link from '@tiptap/extension-link';
-import { Node, mergeAttributes, RawCommands, NodeViewProps } from '@tiptap/core';
+import { Node, mergeAttributes, RawCommands, NodeViewProps, CommandProps } from '@tiptap/core';
 import NextImage from 'next/image';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5274";
@@ -75,45 +76,65 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5274";
 const pencilCursor =
   "url('data:image/svg+xml;utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"32\" height=\"32\" viewBox=\"0 0 32 32\"><g><polygon points=\"2,30 8,28 26,10 22,6 4,24\" fill=\"%23fbbf24\" stroke=\"%233b2f13\" stroke-width=\"2\"/><rect x=\"22\" y=\"6\" width=\"4\" height=\"4\" fill=\"%23a3a3a3\" stroke=\"%233b2f13\" stroke-width=\"2\"/><polygon points=\"2,30 8,28 4,24\" fill=\"%23fff\" stroke=\"%233b2f13\" stroke-width=\"1\"/></g></svg>') 0 32, auto";
 
+interface VideoAttrs {
+  src: string
+  controls?: boolean
+  width?: string | number
+  height?: string | number
+}
+
+// extend RawCommands with our custom insertVideo
+declare module '@tiptap/core' {
+  interface Commands<ReturnType> {
+    video: {
+      insertVideo: (attrs: VideoAttrs) => ReturnType
+    }
+  }
+}
+
 const Video = Node.create({
   name: 'video',
   group: 'block',
   selectable: true,
   draggable: true,
   atom: true,
+
   addAttributes() {
-    return {};
+    return {}
   },
+
   parseHTML() {
     return [
       {
         tag: 'video',
       },
-    ];
+    ]
   },
-  renderHTML({ HTMLAttributes }: { HTMLAttributes: Record<string, any> }) {
-    // Video is a leaf node, do not include a content hole (no '0')
-    return ['video', mergeAttributes(HTMLAttributes)];
+
+  renderHTML({ HTMLAttributes }: { HTMLAttributes: Record<string, string | number | boolean | undefined | null> }) {
+    return ['video', mergeAttributes(HTMLAttributes)]
   },
+
   addCommands() {
     return {
       insertVideo:
-        (attrs: Record<string, any>) =>
-        ({ commands }: { commands: RawCommands }) => {
+        (attrs: VideoAttrs) =>
+        ({ commands }: CommandProps) => {
           return commands.insertContent({
             type: this.name,
             attrs,
-          });
+          })
         },
-    } as any;
+    }
   },
-});
+})
+
 
 // import '../app/globals.css'
 
 import { redirect, useRouter } from 'next/navigation';
 
-type Speaker = { name: string; image: File | null; imagePreview: string; bio: string; photoUrl?: string };
+type Speaker = { name: string; image: File | null; imagePreview: string; bio: string; photoUrl: string };
 type Faq = { question: string; answer: string };
 type Occurrence = { date: string; startTime: string; endTime: string; location: string };
 
@@ -146,7 +167,7 @@ type EventData = {
 };
 
 type EventFormProps = {
-  initialData?: Partial<EventData>;
+  initialData?: Partial<EventFormData>;
   isEditMode?: boolean;
   eventId?: string | null;
 };
@@ -180,7 +201,7 @@ export default function EventForm({ initialData, isEditMode = false, eventId }: 
   const handleVibeVideoUpload = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files && e.target.files[0];
     if (file) {
-      setEventData((prev: any) => ({
+      setEventData((prev: EventFormData) => ({
         ...prev,
         vibeVideo: file,
         vibeVideoPreview: URL.createObjectURL(file),
@@ -188,70 +209,97 @@ export default function EventForm({ initialData, isEditMode = false, eventId }: 
     }
   }
   // State for event data, recurrence, and organizer
-  const defaultEventData = {
-    title: '',
-    OrganizerName: '',
-    organizer: '',
-    organizerEmail: '',
-    eventStart: '',
-    eventEnd: '',
-    registrationDeadline: '',
-    maxAttendees: '',
-    recurrenceType: 'None',
-    recurrenceRule: '',
-    customDates: [], // Now array of { start, end }
-    customFields: '',
-    location: '',
-    eventLink: '',
-    description: '',
-    type: 'Venue',
-    category: '',
-    isPaid: false,
-    price: '',
-    image: null,
-    coverImageUrl: '',
-    vibeVideo: null,
-    vibeVideoPreview: '',
-    speakers: [
-      { name: '', image: null, imagePreview: '', bio: '' },
-    ],
-    faqs: [
-      { question: '', answer: '' },
-    ],
-    occurrences: [],
-  };
-  const [eventData, setEventData] = useState<any>({ ...defaultEventData, ...(initialData || {}) });
+
+const defaultEventData = {
+  title: '',
+  OrganizerName: '',
+  organizer: '',
+  organizerEmail: '',
+  eventStart: '',
+  eventEnd: '',
+  registrationDeadline: '',
+  maxAttendees: '',
+  recurrenceType: 'None',
+  recurrenceRule: '',
+  customDates: [], // Now array of { start, end }
+  customFields: '',
+  location: '',
+  eventLink: '',
+  description: '',
+  type: 'Venue',
+  category: '',
+  otherCategory: '', // Make sure this is always an empty string
+  isPaid: false,
+  price: '',
+  image: null,
+  coverImageUrl: '',
+  vibeVideo: null,
+  vibeVideoPreview: '',
+  speakers: [
+    { name: '', image: null, imagePreview: '', bio: '', photoUrl: '' },
+  ],
+  faqs: [
+    { question: '', answer: '' },
+  ],
+  occurrences: [],
+  media: [],
+};
+
+const [eventData, setEventData] = useState<EventFormData>({
+  ...defaultEventData,
+  ...(initialData || {}),
+});
+
+// Ensure the initialData, if present, doesn't have undefined values for properties
 
   // Update eventData when initialData changes (for edit mode prefill)
   useEffect(() => {
-    if (initialData) {
-      setEventData((prev: any) => {
-        // Normalize type
-        let type = initialData.type || initialData.eventType || 'Venue';
-        if (type.toLowerCase() === 'location based' || type.toLowerCase() === 'location' || type.toLowerCase() === 'venue') type = 'Venue';
-        else if (type.toLowerCase() === 'online') type = 'Online';
-        else if (type.toLowerCase().includes('announce')) type = 'TBA';
+  if (initialData) {
+    setEventData((prev) => {
+      // Normalize type
+      let type = initialData.type || 'Venue';
+      if (type.toLowerCase() === 'location based' || type.toLowerCase() === 'location' || type.toLowerCase() === 'venue') {
+        type = 'Venue';
+      } else if (type.toLowerCase() === 'online') {
+        type = 'Online';
+      } else if (type.toLowerCase().includes('announce')) {
+        type = 'TBA';
+      }
 
-        // Normalize speakers for imagePreview
-        const speakers = (initialData.speakers || []).map((s: any) => ({
-          ...s,
-          image: null,
-          imagePreview: s.photoUrl ? (s.photoUrl.startsWith('http') ? s.photoUrl : `${API_URL}${s.photoUrl}`) : '',
-        }));
+      // Normalize speakers for imagePreview
+      const speakers = (initialData.speakers || []).map((s: Partial<Speaker>) => ({
+  ...s,
+  image: null,
+  imagePreview: s.photoUrl
+    ? (s.photoUrl.startsWith('http') ? s.photoUrl : `${API_URL}${s.photoUrl}`)
+    : '',
+  photoUrl: s.photoUrl ?? '',   // ✅ ensure it's always a string
+})) as Speaker[]
+ // ensure final type is Speaker[]
 
-        return {
-          ...defaultEventData,
-          ...initialData,
-          type,
-          recurrenceType: typeof initialData.recurrenceType === 'string' ? initialData.recurrenceType : (initialData.recurrenceType || 'None'),
-          location: typeof initialData.location === 'string' ? initialData.location : (initialData.location || ''),
-          maxAttendees: initialData.maxAttendees !== undefined && initialData.maxAttendees !== null ? String(initialData.maxAttendees) : '',
-          speakers,
-        };
-      });
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialData]);
+      return {
+        ...defaultEventData,
+        ...initialData,
+        type,
+        recurrenceType:
+          typeof initialData.recurrenceType === 'string'
+            ? initialData.recurrenceType
+            : (initialData.recurrenceType || 'None'),
+        location:
+          typeof initialData.location === 'string'
+            ? initialData.location
+            : (initialData.location || ''),
+        maxAttendees:
+          initialData.maxAttendees !== undefined && initialData.maxAttendees !== null
+            ? String(initialData.maxAttendees)
+            : '',
+        speakers,
+      };
+    });
+  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [initialData]);
+
   // State to control live preview visibility on mobile
   const [showMobilePreview, setShowMobilePreview] = useState(false);
   // Confirmation dialog state
@@ -304,7 +352,7 @@ const [showRibbons, setShowRibbons] = useState(false);
       setCoverPreview(URL.createObjectURL(file));
     }
   };
-  const editor = useEditor({
+ const editor = useEditor({
   extensions: [
     StarterKit.configure({
       bulletList: {
@@ -318,7 +366,10 @@ const [showRibbons, setShowRibbons] = useState(false);
   ],
   content: eventData.description || '',
   onUpdate: ({ editor }) => {
-    setEventData((prev: any) => ({ ...prev, description: editor.getHTML() }))
+    setEventData((prev: EventFormData) => ({
+      ...prev,
+      description: editor.getHTML(),
+    }))
   },
   editorProps: {
     attributes: {
@@ -327,6 +378,7 @@ const [showRibbons, setShowRibbons] = useState(false);
   },
   immediatelyRender: false,
 })
+
 
 
   // Only update editor content from eventData.description if editor is NOT focused
@@ -390,33 +442,42 @@ const [showRibbons, setShowRibbons] = useState(false);
     }
   };
   const addSpeaker = () => {
-    setEventData({ ...eventData, speakers: [...eventData.speakers, { name: '', image: null, imagePreview: '', bio: '' }] });
-  };
+  setEventData({ 
+    ...eventData, 
+    speakers: [
+      ...eventData.speakers, 
+      { name: '', image: null, imagePreview: '', bio: '', photoUrl: '' } // Add photoUrl here
+    ] 
+  });
+};
   const removeSpeaker = (idx: number) => {
-    const speakers = eventData.speakers.filter((_: any, i: any) => i !== idx);
-    setEventData({ ...eventData, speakers });
-  };
+  const speakers = eventData.speakers.filter((_, i) => i !== idx);
+  setEventData({ ...eventData, speakers });
+};
+
 
   // FAQ handlers
   const addFaq = () => {
-    setEventData((prev: any) => ({
-      ...prev,
-      faqs: [...(prev.faqs || []), { question: '', answer: '' }]
-    }));
-  };
-  const removeFaq = (idx: number) => {
-    setEventData((prev: any) => ({
-      ...prev,
-      faqs: prev.faqs.filter((_: any, i: any) => i !== idx)
-    }));
-  };
-  const handleFaqChange = (idx: number, field: 'question' | 'answer', value: string) => {
-    setEventData((prev: any) => {
-      const newFaqs = [...prev.faqs];
-      newFaqs[idx][field] = value;
-      return { ...prev, faqs: newFaqs };
-    });
-  };
+  setEventData((prev: EventFormData) => ({
+    ...prev,
+    faqs: [...(prev.faqs || []), { question: '', answer: '' }],
+  }));
+};
+
+const removeFaq = (idx: number) => {
+  setEventData((prev: EventFormData) => ({
+    ...prev,
+    faqs: prev.faqs.filter((_, i) => i !== idx),
+  }));
+};
+
+const handleFaqChange = (idx: number, field: 'question' | 'answer', value: string) => {
+  setEventData((prev: EventFormData) => {
+    const newFaqs = [...prev.faqs];
+    newFaqs[idx][field] = value;
+    return { ...prev, faqs: newFaqs };
+  });
+};
 
   // Actual submit logic, only called after confirmation
   const doSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -475,8 +536,19 @@ const [showRibbons, setShowRibbons] = useState(false);
     console.log('Faqs:', eventData.faqs);
     console.log('Occurrences:', eventData.occurrences);
 
+    type BackendOccurrence = {
+      date?: string;
+      startTime?: string;
+      StartTime?: string;
+      endTime?: string;
+      EndTime?: string;
+      EventTitle?: string;
+      location?: string;
+    };
+
+    // Declare the variable with the explicit type
+    let validOccurrences: BackendOccurrence[] = [];
     // Build validOccurrences and RecurrenceRule/CustomFields for backend
-    let validOccurrences = [];
     let recurrenceRule = '';
     let customFields = '';
 
@@ -535,14 +607,17 @@ const [showRibbons, setShowRibbons] = useState(false);
       return;
     }
   }
+
+  type CustomDate = { start: string; end: string };
+
   // Always send ISO string (date and time) to backend
-  validOccurrences = eventData.customDates.map((occ: any) => ({
+  validOccurrences = eventData.customDates.map((occ: CustomDate) => ({
     StartTime: new Date(occ.start).toISOString(),
     EndTime: new Date(occ.end).toISOString(),
     EventTitle: eventData.title
   }));
   // Also update customFields to use ISO strings
-  customFields = JSON.stringify(eventData.customDates.map((occ: any) => ({
+  customFields = JSON.stringify(eventData.customDates.map((occ: CustomDate) => ({
     start: new Date(occ.start).toISOString(),
     end: new Date(occ.end).toISOString()
   })));
@@ -652,14 +727,15 @@ const [showRibbons, setShowRibbons] = useState(false);
       formData.append('VibeVideo', eventData.vibeVideo);
     }
 
+
     // Speakers (as JSON, without image files)
-    formData.append('Speakers', JSON.stringify(eventData.speakers.map((s: any) => ({
+    formData.append('Speakers', JSON.stringify(eventData.speakers.map((s: Speaker) => ({
       name: s.name,
       bio: s.bio,
       photoUrl: s.photoUrl || undefined
     }))));
     // Attach speaker images as separate fields
-    eventData.speakers.forEach((speaker: any, idx: any) => {
+    eventData.speakers.forEach((speaker: Speaker, idx: number) => {
       if (speaker.image) {
         formData.append(`speakers[${idx}].image`, speaker.image);
       }
@@ -693,14 +769,14 @@ const [showRibbons, setShowRibbons] = useState(false);
           event.mediaUrls.forEach((url: string, idx: number) => {
             updatedDescription = updatedDescription.replace(`__MEDIA_${idx}__`, url);
           });
-          setEventData((prev: any) => ({
+          setEventData((prev: EventFormData) => ({
             ...prev,
             description: updatedDescription,
             coverImageUrl: event.coverImageUrl || '',
             vibeVideoPreview: event.vibeVideoUrl || '',
           }));
         } else {
-          setEventData((prev: any) => ({
+          setEventData((prev: EventFormData) => ({
             ...prev,
             coverImageUrl: event.coverImageUrl || '',
             vibeVideoPreview: event.vibeVideoUrl || '',
@@ -715,12 +791,26 @@ const [showRibbons, setShowRibbons] = useState(false);
         // alert('Submission failed: ' + error);
         if (setPopup) setPopup({ message: 'Submission failed: ' + error, type: 'error' });
       }
-    } catch (error: any) {
-      console.error('[SUBMIT ERROR] Exception during submission:', error);
-      // alert('Submission failed: ' + (error?.message || error));
-      if (setPopup) setPopup({ message: 'Submission failed: ' + (error?.message || error), type: 'error' });
+    } catch (error: unknown) {
+  if (error instanceof Error) {
+    console.error('[SUBMIT ERROR] Exception during submission:', error.message);
+    if (setPopup) {
+      setPopup({
+        message: 'Submission failed: ' + error.message,
+        type: 'error',
+      });
     }
-  } // Close doSubmit function
+  } else {
+    console.error('[SUBMIT ERROR] Unknown exception during submission:', error);
+    if (setPopup) {
+      setPopup({
+        message: 'Submission failed: ' + String(error),
+        type: 'error',
+      });
+    }
+  }
+  }
+ } 
 
   // Handler for form submit: show confirmation dialog
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
@@ -747,7 +837,6 @@ const [showRibbons, setShowRibbons] = useState(false);
       {/* Confirmation Dialog for publishing event */}
       <ConfirmationDialog
         open={showConfirm}
-        title={isEditMode ? "Update Event" : "Publish Event"}
         message={isEditMode ? "Are you sure you want to update this event?" : "Are you sure you want to publish this event?"}
         onConfirm={() => {
           setShowConfirm(false);
@@ -971,12 +1060,13 @@ const [showRibbons, setShowRibbons] = useState(false);
       <div className="mt-2">
         <div className="font-semibold text-gray-700 mb-1">First 10 Occurrences:</div>
         <ul className="list-disc pl-6 text-sm text-gray-800">
-          {(eventData.occurrences || []).slice(0, 10).map((occ: any, idx: number) => (
-            <li key={idx}>
-              {occ.start ? new Date(occ.start).toLocaleString() : ''}
-              {occ.end ? ` to ${new Date(occ.end).toLocaleString()}` : ''}
-            </li>
-          ))}
+          {(eventData.occurrences || []).slice(0, 10).map((occ: { start?: string; end?: string }, idx: number) => (
+  <li key={idx}>
+    {occ.start ? new Date(occ.start).toLocaleString() : ''}
+    {occ.end ? ` to ${new Date(occ.end).toLocaleString()}` : ''}
+  </li>
+))}
+
         </ul>
         {eventData.occurrences.length > 10 && (
           <div className="mt-1 text-xs text-gray-500 italic">Only first 10 occurrences shown.</div>
@@ -992,16 +1082,16 @@ const [showRibbons, setShowRibbons] = useState(false);
     <label className="block font-medium mb-2 italic text-sm md:text-base">
       Custom Occurrences<span className="text-red-500 ml-1">*</span>
     </label>
-    {(eventData.customDates || []).map((occ: any, idx: number) => (
+    {(eventData.customDates || []).map((occ: CustomDate, idx: number) => (
       <div key={idx} className="flex gap-2 mb-2 items-center">
         <input
           type="datetime-local"
           disabled={isEditMode}
           value={occ && occ.start ? occ.start : ''}
           onChange={e => {
-            setEventData((prev: any) => {
+            setEventData((prev: EventFormData) => {
               // Deep copy to avoid reference issues
-              const newDates = prev.customDates.map((item: any, i: number) =>
+              const newDates = prev.customDates.map((item: CustomDate, i: number) =>
                 i === idx ? { ...item, start: e.target.value } : { ...item }
               );
               return { ...prev, customDates: newDates, customFields: JSON.stringify(newDates) };
@@ -1016,9 +1106,9 @@ const [showRibbons, setShowRibbons] = useState(false);
           value={occ && occ.end ? occ.end : ''}
           disabled={isEditMode}
           onChange={e => {
-            setEventData((prev: any) => {
+            setEventData((prev: EventFormData) => {
               // Deep copy to avoid reference issues
-              const newDates = prev.customDates.map((item: any, i: number) =>
+              const newDates = prev.customDates.map((item: CustomDate, i: number) =>
                 i === idx ? { ...item, end: e.target.value } : { ...item }
               );
               return { ...prev, customDates: newDates, customFields: JSON.stringify(newDates) };
@@ -1028,8 +1118,8 @@ const [showRibbons, setShowRibbons] = useState(false);
           placeholder="End Date & Time"
         />
         <button type="button" onClick={() => {
-          setEventData((prev: any) => {
-            const newDates = prev.customDates.filter((_: any, i: number) => i !== idx);
+          setEventData((prev: EventFormData) => {
+            const newDates = prev.customDates.filter((_: CustomDate, i: number) => i !== idx);
             return { ...prev, customDates: newDates, customFields: JSON.stringify(newDates) };
           });
         }} className="px-2 py-1 bg-red-500 text-white rounded">Remove</button>
@@ -1037,7 +1127,7 @@ const [showRibbons, setShowRibbons] = useState(false);
     ))}
     <button type="button" onClick={() => {
       // Always create a new object for each occurrence to avoid reference issues
-      const newDates = [...(eventData.customDates ? eventData.customDates.map((d: any) => ({ ...d })) : []), { start: '', end: '' }];
+      const newDates = [...(eventData.customDates ? eventData.customDates.map((d: CustomDate) => ({ ...d })) : []), { start: '', end: '' }];
       setEventData({ ...eventData, customDates: newDates, customFields: JSON.stringify(newDates) });
     }} className="px-3 py-1 bg-green-500 text-white rounded">+ Add Occurrence</button>
     {/* Debug: Display the customDates array as JSON */}
@@ -1460,18 +1550,19 @@ const [showRibbons, setShowRibbons] = useState(false);
           {/* FAQs Preview */}
           <div className="my-4 md:my-6">
             <strong className="text-[1.1rem] text-[#222] italic">FAQs:</strong>
-            {eventData.faqs.length === 0 || eventData.faqs.every((f: any) => !f.question && !f.answer) ? (
+            {eventData.faqs.length === 0 || eventData.faqs.every((f: Faq) => !f.question && !f.answer) ? (
               <span className="text-gray-500 ml-2">[No FAQs added]</span>
             ) : (
               <div className="mt-2">
-                {eventData.faqs.map((faq: any, idx: any) => (
-                  (faq.question || faq.answer) && (
-                    <div key={idx} className="mb-2 p-2 bg-white rounded shadow text-gray-700">
-                      <strong>Q{idx + 1}:</strong> {faq.question}<br />
-                      <span className="ml-4"><strong>A:</strong> {faq.answer}</span>
-                    </div>
-                  )
-                ))}
+                {eventData.faqs.map((faq: Faq, idx: number) => (
+  (faq.question || faq.answer) && (
+    <div key={idx} className="mb-2 p-2 bg-white rounded shadow text-gray-700">
+      <strong>Q{idx + 1}:</strong> {faq.question}<br />
+      <span className="ml-4"><strong>A:</strong> {faq.answer}</span>
+    </div>
+  )
+))}
+
               </div>
             )}
           </div>
@@ -1524,7 +1615,7 @@ const [showRibbons, setShowRibbons] = useState(false);
                       faqs: eventData.faqs,
                       vibeVideoPreview: eventData.vibeVideoPreview,
                     }}
-                    verticalLayout={true}
+                    
                     forceMobileLayout={true}
                   />
                   {/* Show location map in live preview if location is entered */}
