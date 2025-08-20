@@ -1,16 +1,13 @@
 "use client";
-import React, { useState, createContext } from 'react';
+import React, { useState } from 'react';
 import PopupMessage from "@/components/common/popup-message";
-
-// Context to provide setPopup to children
-export const EditProfilePopupContext = createContext<((popup: { message: string; type?: "success" | "error" | "info" } | null) => void) | undefined>(undefined);
+import EditProfilePopupContext, { PopupType } from "./edit-profile-popup-context";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  const [popup, setPopup] = useState<{ message: string; type?: "success" | "error" | "info" } | null>(null);
+  const [popup, setPopup] = useState<PopupType>(null);
   return (
     <EditProfilePopupContext.Provider value={setPopup}>
       <div className="min-h-screen flex flex-col items-center justify-center relative">
-        {/* PopupMessage always above header/navbar */}
         {popup && (
           <div className="fixed left-0 top-0 w-full flex justify-center z-[100] pointer-events-none">
             <PopupMessage
@@ -20,7 +17,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             />
           </div>
         )}
-        {/* Pink gradient top 2/5th background */}
         <div
           className="absolute top-0 left-0 w-full"
           style={{
