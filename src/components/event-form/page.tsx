@@ -649,15 +649,15 @@ const handleFaqChange = (idx: number, field: 'question' | 'answer', value: strin
     }
     // Only send Location if Venue, only send EventLink if Online
     if (eventData.type === 'Venue') {
-      formData.append('Location', eventData.location);
-      formData.append('EventLink', null);
-    } else if (eventData.type === 'Online') {
-      formData.append('Location', null);
-      formData.append('EventLink', eventData.eventLink || '');
-    } else {
-      formData.append('Location', null);
-      formData.append('EventLink', null);
-    }
+  formData.append('Location', eventData.location);
+  formData.append('EventLink', "");
+} else if (eventData.type === 'Online') {
+  formData.append('Location', "");
+  formData.append('EventLink', eventData.eventLink || '');
+} else {
+  formData.append('Location', "");
+  formData.append('EventLink', "");
+}
     // Ensure event type is sent as both 'EventType' and 'Type' for backend compatibility
     formData.append('EventType', eventData.type);
     formData.append('Type', eventData.type);
