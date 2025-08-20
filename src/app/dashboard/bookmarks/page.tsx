@@ -93,7 +93,7 @@ export default function BookmarksPage(): JSX.Element {
               event={event}
               showActions={false}
               hideRegister={false}
-              onBookmarkToggle={async (_event: BookmarkedEvent, removed: boolean) => {
+              onBookmarkToggle={async (event: EventInterface, removed: boolean) => {
                 if (removed) {
                   setEvents((prev) => prev.filter((e) => e.eventId !== event.eventId));
                   setPopup({ message: "Bookmark removed", type: "info" });

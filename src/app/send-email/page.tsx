@@ -1,38 +1,50 @@
 "use client";
 
-
 import { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import Navbar from "@/components/cards/Navbar";
 import PopupMessage from "@/components/common/popup-message";
+
+type PopupType = "success" | "error";
+
+interface PopupState {
+  message: string;
+  type?: PopupType;
+}
+
+interface UserLocalStorage {
+  email?: string;
+}
 
 export default function SendEmailPage() {
   const searchParams = useSearchParams();
   const organiserEmail = searchParams.get("to") || "";
   const eventTitle = searchParams.get("event") || "";
-  const [from, setFrom] = useState("");
-  const [to, setTo] = useState(organiserEmail);
-  const [subject, setSubject] = useState(eventTitle ? `Regarding: ${eventTitle}` : "");
-  const [body, setBody] = useState("");
-  const [sending, setSending] = useState(false);
-  const [popup, setPopup] = useState<{ message: string; type?: "success" | "error" } | null>(null);
+  const [from, setFrom] = useState<string>("");
+  const [to, setTo] = useState<string>(organiserEmail);
+  const [subject, setSubject] = useState<string>(eventTitle ? `Regarding: ${eventTitle}` : "");
+  const [body, setBody] = useState<string>("");
+  const [sending, setSending] = useState<boolean>(false);
+  const [popup, setPopup] = useState<PopupState | null>(null);
 
   useEffect(() => {
     // Optionally pre-fill 'from' with admin email from localStorage
     const userRaw = typeof window !== 'undefined' ? localStorage.getItem('user') : null;
     if (userRaw) {
       try {
-        const userObj = JSON.parse(userRaw);
+        const userObj: UserLocalStorage = JSON.parse(userRaw);
         setFrom(userObj.email || "");
-      } catch {}
+      } catch {
+        // ignore parse errors
+      }
     }
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSending(true);
-  setPopup(null);
+    setPopup(null);
     try {
       const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
       await axios.post("http://localhost:5274/api/email/send-to-organiser", {
@@ -43,19 +55,24 @@ export default function SendEmailPage() {
       }, {
         headers: token ? { Authorization: `Bearer ${token}` } : {}
       });
-  setPopup({ message: "Email sent successfully!", type: "success" });
-  setBody("");
-    } catch (err: any) {
-  setPopup({ message: err?.response?.data?.message || "Failed to send email.", type: "error" });
+      setPopup({ message: "Email sent successfully!", type: "success" });
+      setBody("");
+    } catch (err) {
+      let errorMsg = "Failed to send email.";
+      if (axios.isAxiosError(err)) {
+        errorMsg = err.response?.data?.message ?? errorMsg;
+      } else if (err instanceof Error) {
+        errorMsg = err.message;
+      }
+      setPopup({ message: errorMsg, type: "error" });
     } finally {
       setSending(false);
     }
   };
 
   return (
-
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-purple-100">
-  <Navbar forceAdminDashboard={true} />
+      <Navbar forceAdminDashboard={true} />
       <div className="flex items-center justify-center py-8 px-2">
         <div className="w-full max-w-lg bg-white rounded-2xl shadow-2xl p-8 border border-blue-100 mt-8">
           <h2 className="text-3xl font-extrabold text-blue-700 mb-2 flex items-center gap-2">

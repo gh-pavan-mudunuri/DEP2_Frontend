@@ -7,6 +7,7 @@ import EventCard from "../cards/event-card";
 import SwipeableCard from "../cards/swipable-card";
 import EventsFilters from "./events-filter";
 import axios from "axios";
+import { EventInterface } from "@/interfaces/home";
 
 interface UpcomingEventsProps {
   disableHorizontalScroll?: boolean;
@@ -15,8 +16,26 @@ interface UpcomingEventsProps {
   limit?: number;
 }
 
-export default function UpcommingEvents({ disableHorizontalScroll, searchQuery, searchCategory = "",limit }: UpcomingEventsProps) {
-  const [showViewAll, setShowViewAll] = useState(true);
+interface FilterState {
+  location: string;
+  online: boolean | null;
+  paid: "paid" | "free" | null;
+  price?: "paid" | "free" | null;
+  category: string;
+  recurrence: string;
+  recurrenceType?: string;
+  eventType?: string;
+}
+
+type EventOrViewAll = EventInterface & { __viewAll?: false } | { __viewAll: true };
+
+export default function UpcommingEvents({
+  disableHorizontalScroll,
+  searchQuery,
+  searchCategory = "",
+  limit,
+}: UpcomingEventsProps) {
+  const [showViewAll, setShowViewAll] = useState<boolean>(true);
   useEffect(() => {
     if (typeof window !== "undefined") {
       setShowViewAll(window.location.pathname !== "/upcoming-events");
@@ -26,19 +45,10 @@ export default function UpcommingEvents({ disableHorizontalScroll, searchQuery, 
   const scrollAmount = 200;
   const scrollInterval = 3000;
 
-  const [isPaused, setIsPaused] = useState(false);
-  const [scrollProgress, setScrollProgress] = useState(0);
-  const [events, setEvents] = useState<any[]>([]);
-  const [filters, setFilters] = useState<{
-    location: string;
-    online: boolean | null;
-    paid: "paid" | "free" | null;
-    price?: "paid" | "free" | null;
-    category: string;
-    recurrence: string;
-    recurrenceType?: string;
-    eventType?: string;
-  }>({
+  const [isPaused, setIsPaused] = useState<boolean>(false);
+  const [scrollProgress, setScrollProgress] = useState<number>(0);
+  const [events, setEvents] = useState<EventInterface[]>([]);
+  const [filters, setFilters] = useState<FilterState>({
     location: "",
     online: null,
     paid: null,
@@ -47,19 +57,18 @@ export default function UpcommingEvents({ disableHorizontalScroll, searchQuery, 
     eventType: ""
   });
 
-  const [categories] = useState<string[]>(["Music", "Tech", "Health", "Education", "Business", "Conference", "Exhibitions","Others"]);
-  // const recurrenceTypes = ["Onetime","Multiple"]; // Removed as recurrence options are now hardcoded in EventsFilters
+  const [categories] = useState<string[]>([
+    "Music", "Tech", "Health", "Education", "Business", "Conference", "Exhibitions", "Others"
+  ]);
 
-
-useEffect(() => {
-  if (searchCategory) {
-    setFilters(prev => ({
-      ...prev,
-      category: searchCategory
-    }));
-  }
-}, [searchCategory]);
-
+  useEffect(() => {
+    if (searchCategory) {
+      setFilters(prev => ({
+        ...prev,
+        category: searchCategory
+      }));
+    }
+  }, [searchCategory]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -90,7 +99,10 @@ useEffect(() => {
   useEffect(() => {
     const fetchFilteredEvents = async () => {
       try {
-        const res = await axios.post("http://localhost:5274/api/Home/filter", filters);
+        const res = await axios.post<{ success: boolean; data: EventInterface[] }>(
+          "http://localhost:5274/api/Home/filter",
+          filters
+        );
         if (res.data && res.data.success && Array.isArray(res.data.data)) {
           setEvents(res.data.data);
         } else {
@@ -107,9 +119,9 @@ useEffect(() => {
   }, [filters]);
 
   // Only show events approved by admin
-  const approvedEvents = events.filter(e => e.isVerifiedByAdmin);
+  const approvedEvents: EventInterface[] = events.filter(e => e.isVerifiedByAdmin === true);
   // Filter events by searchQuery (title or location)
-  let filteredBySearch = (searchQuery && searchQuery.trim())
+  let filteredBySearch: EventInterface[] = (searchQuery && searchQuery.trim())
     ? approvedEvents.filter(e =>
         (e.title && e.title.toLowerCase().includes(searchQuery.toLowerCase())) ||
         (e.location && e.location.toLowerCase().includes(searchQuery.toLowerCase()))
@@ -157,40 +169,41 @@ useEffect(() => {
         ) : disableHorizontalScroll ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {filteredBySearch.slice(0, limit || filteredBySearch.length).map((event, index) => (
-              <EventCard event={{ ...event, registrations: undefined }} key={index} />
-            ))}
+<EventCard event={event} key={event.eventId || index} />            ))}
           </div>
         ) : (
         <div className="relative pl-3 w-full">
           {/* Mobile view */}
-          <div className="block sm:hidden w-full flex items-center justify-center" style={{ minHeight: '100%' }}>
+          <div className="sm:hidden w-full flex items-center justify-center" style={{ minHeight: '100%' }}>
             <SwipeableCard
-              items={[...filteredBySearch, { __viewAll: true }]}
-              render={event =>
-                event.__viewAll ? (
-                  <div className="flex items-center justify-center h-full min-h-[180px]">
-                    <Link
-                      href="/upcoming-events"
-                      className="flex items-center gap-1 px-4 py-2 rounded-full bg-blue-600 text-white font-semibold hover:bg-blue-700 transition shadow-lg min-w-[220px] justify-center"
-                      style={{ whiteSpace: "nowrap", height: "fit-content" }}
-                    >
-                      View All
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        strokeWidth="2"
-                        stroke="currentColor"
-                        className="w-5 h-5"
-                      >
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                      </svg>
-                    </Link>
-                  </div>
-                ) : (
-                  <EventCard event={event} />
-                )
-              }
+              items={[...filteredBySearch, { __viewAll: true } as EventOrViewAll]}
+              // ...existing code...
+render={event =>
+  "__viewAll" in event && event.__viewAll ? (
+    <div className="flex items-center justify-center h-full min-h-[180px]">
+      <Link
+        href="/upcoming-events"
+        className="flex items-center gap-1 px-4 py-2 rounded-full bg-blue-600 text-white font-semibold hover:bg-blue-700 transition shadow-lg min-w-[220px] justify-center"
+        style={{ whiteSpace: "nowrap", height: "fit-content" }}
+      >
+        View All
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth="2"
+          stroke="currentColor"
+          className="w-5 h-5"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+        </svg>
+      </Link>
+    </div>
+  ) : (
+    <EventCard event={event as EventInterface} />
+  )
+}
+// ...existing code...
             />
           </div>
 
@@ -208,14 +221,13 @@ useEffect(() => {
                   {filteredBySearch.map((event, index) => (
                     <div
                       className="flex-shrink-0"
-                      key={index}
+                      key={event.eventId || index}
                       onMouseEnter={handleMouseEnter}
                       onMouseLeave={handleMouseLeave}
                     >
                       <EventCard event={event} />
                     </div>
                   ))}
-                  
                 </>
               )}
             </div>

@@ -7,6 +7,7 @@ export interface NavbarProps {
 }
 
 export interface UserProfile {
+  role?: number | string;
   name?: string;
   username?: string;
   email?: string;

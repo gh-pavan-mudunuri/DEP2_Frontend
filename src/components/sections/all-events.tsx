@@ -3,14 +3,20 @@
 import { useEffect, useState } from "react";
 import EventCard from "../cards/event-card";
 import axios from "axios";
+import { EventInterface } from "@/interfaces/home";
+
+interface EventsApiResponse {
+  success: boolean;
+  data: EventInterface[];
+}
 
 export default function AllEvents() {
-  const [events, setEvents] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
-  const [totalCount, setTotalCount] = useState(0);
+  const [events, setEvents] = useState<EventInterface[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string>("");
+  const [page, setPage] = useState<number>(1);
+  const [pageSize, setPageSize] = useState<number>(10);
+  const [totalCount, setTotalCount] = useState<number>(0);
 
   useEffect(() => {
     async function fetchPagedEvents() {
@@ -18,13 +24,13 @@ export default function AllEvents() {
       setError("");
       try {
         const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-        // Always fetch all events, then filter and paginate unapproved events on frontend
-        const res = await axios.get(`http://localhost:5274/api/events/paged?page=1&pageSize=1000`,
-          { headers: token ? { Authorization: `Bearer ${token}` } : {} });
+        const res = await axios.get<EventsApiResponse>(
+          `http://localhost:5274/api/events/paged?page=1&pageSize=1000`,
+          { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+        );
         if (res.data && res.data.success && Array.isArray(res.data.data)) {
-          const unapprovedEvents = res.data.data.filter((e: any) => !e.isVerifiedByAdmin);
+          const unapprovedEvents = res.data.data.filter((e: EventInterface) => !e.isVerifiedByAdmin);
           setTotalCount(unapprovedEvents.length);
-          // Paginate unapproved events on frontend
           const startIdx = (page - 1) * pageSize;
           const pagedUnapproved = unapprovedEvents.slice(startIdx, startIdx + pageSize);
           setEvents(pagedUnapproved);
@@ -33,7 +39,7 @@ export default function AllEvents() {
           setTotalCount(0);
           setError("No events found.");
         }
-      } catch (err) {
+      } catch {
         setEvents([]);
         setTotalCount(0);
         setError("Failed to fetch events.");

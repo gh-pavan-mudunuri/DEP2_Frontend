@@ -3,13 +3,19 @@
 import { useEffect, useState } from "react";
 import EventCard from "../cards/event-card";
 import axios from "axios";
+import { EventInterface } from "@/interfaces/home";
+
+interface UnapprovedEventsApiResponse {
+  events: EventInterface[];
+  totalCount: number;
+}
 
 export default function UnapprovedEvents() {
-  const [events, setEvents] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [page, setPage] = useState(1);
-  const [totalCount, setTotalCount] = useState(0);
+  const [events, setEvents] = useState<EventInterface[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string>("");
+  const [page, setPage] = useState<number>(1);
+  const [totalCount, setTotalCount] = useState<number>(0);
   const pageSize = 20;
 
   useEffect(() => {
@@ -18,7 +24,8 @@ export default function UnapprovedEvents() {
       setError("");
       try {
         const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-        const res = await axios.get(`http://localhost:5274/api/admin/unapproved-events?page=${page}&pageSize=${pageSize}`,
+        const res = await axios.get<UnapprovedEventsApiResponse>(
+          `http://localhost:5274/api/admin/unapproved-events?page=${page}&pageSize=${pageSize}`,
           { headers: token ? { Authorization: `Bearer ${token}` } : {} }
         );
         if (res.data && Array.isArray(res.data.events)) {
@@ -28,7 +35,7 @@ export default function UnapprovedEvents() {
           setEvents([]);
           setError("No unapproved events found.");
         }
-      } catch (err) {
+      } catch {
         setEvents([]);
         setError("Failed to fetch unapproved events.");
       } finally {

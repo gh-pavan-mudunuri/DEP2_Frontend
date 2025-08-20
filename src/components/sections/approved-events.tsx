@@ -3,11 +3,17 @@
 import { useEffect, useState } from "react";
 import EventCard from "../cards/event-card";
 import axios from "axios";
+import { EventInterface } from "@/interfaces/home";
+
+interface EventsApiResponse {
+  success: boolean;
+  data: EventInterface[];
+}
 
 export default function ApprovedEvents() {
-  const [events, setEvents] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [events, setEvents] = useState<EventInterface[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string>("");
 
   useEffect(() => {
     async function fetchApprovedEvents() {
@@ -15,28 +21,27 @@ export default function ApprovedEvents() {
       setError("");
       try {
         const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-        const res = await axios.get("http://localhost:5274/api/events", {
+        const res = await axios.get<EventsApiResponse>("http://localhost:5274/api/events", {
           headers: token ? { Authorization: `Bearer ${token}` } : {}
         });
         if (res.data && res.data.success && Array.isArray(res.data.data)) {
           // Filter approved events and sort by AdminVerifiedAt desc
-          const approvedRaw = res.data.data.filter((e: any) => e.isVerifiedByAdmin);
+          const approvedRaw = res.data.data.filter((e: EventInterface) => e.isVerifiedByAdmin);
           // Support both adminVerifiedAt and AdminVerifiedAt
-          const getVerifiedAt = (e: any) => e.adminVerifiedAt || e.AdminVerifiedAt || null;
-          console.log('Approved events and their adminVerifiedAt:', approvedRaw.map((e: any) => ({ id: e.eventId, adminVerifiedAt: getVerifiedAt(e) })));
-          const approved = approvedRaw.sort((a: any, b: any) => {
+          const getVerifiedAt = (e: EventInterface) => (e as any).adminVerifiedAt || (e as any).AdminVerifiedAt || null;
+          const approved = approvedRaw.sort((a: EventInterface, b: EventInterface) => {
             const dateA = getVerifiedAt(a) ? new Date(getVerifiedAt(a)).getTime() : 0;
             const dateB = getVerifiedAt(b) ? new Date(getVerifiedAt(b)).getTime() : 0;
             if (dateA !== dateB) return dateB - dateA;
             // Secondary sort by eventId for stability
-            return (b.eventId || 0) - (a.eventId || 0);
+            return Number(b.eventId || 0) - Number(a.eventId || 0);
           });
           setEvents(approved);
         } else {
           setEvents([]);
           setError("No approved events found.");
         }
-      } catch (err) {
+      } catch {
         setEvents([]);
         setError("Failed to fetch approved events.");
       } finally {

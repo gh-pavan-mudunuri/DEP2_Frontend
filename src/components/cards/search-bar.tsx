@@ -3,11 +3,12 @@ import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import EventCard from "./event-card";
+import { EventInterface } from "@/interfaces/home";
 
 export default function SearchBar() {
-  const [query, setQuery] = useState("");
-  const [results, setResults] = useState<any[]>([]);
-  const [showPopup, setShowPopup] = useState(false);
+  const [query, setQuery] = useState<string>("");
+  const [results, setResults] = useState<EventInterface[]>([]);
+  const [showPopup, setShowPopup] = useState<boolean>(false);
   const router = useRouter();
   const popupRef = useRef<HTMLDivElement>(null);
 
@@ -19,11 +20,15 @@ export default function SearchBar() {
     }
     const fetchEvents = async () => {
       try {
-        const res = await axios.post("http://localhost:5274/api/Home/filter", {});
+        const res = await axios.post<{ success: boolean; data: EventInterface[] }>(
+          "http://localhost:5274/api/Home/filter",
+          {}
+        );
         if (res.data && res.data.success && Array.isArray(res.data.data)) {
-          const filtered = res.data.data.filter((e: any) =>
-            (e.title && e.title.toLowerCase().includes(query.toLowerCase())) ||
-            (e.location && e.location.toLowerCase().includes(query.toLowerCase()))
+          const filtered = res.data.data.filter(
+            (e: EventInterface) =>
+              (e.title && e.title.toLowerCase().includes(query.toLowerCase())) ||
+              (e.location && e.location.toLowerCase().includes(query.toLowerCase()))
           );
           setResults(filtered);
           setShowPopup(filtered.length > 0);
@@ -55,7 +60,7 @@ export default function SearchBar() {
     };
   }, [showPopup]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!query.trim()) return;
     setShowPopup(false);

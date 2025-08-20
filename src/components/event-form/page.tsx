@@ -53,7 +53,7 @@ function processDescriptionHtml(html: string | undefined) {
   if (!html) return '<span style="color:#bbb">[Description]</span>';
   // Replace <img src="/uploads/..."> or <img src="uploads/..."> with full API URL
   return html.replace(/<img([^>]+)src=['"](?!(?:https?:|data:))\/?(uploads|wwwroot\/uploads)?\/?([^'">]+)['"]/gi, (match, pre, folder, path) => {
-    let cleanPath = path.replace(/^wwwroot\//, '').replace(/^uploads\//, '');
+    const cleanPath = path.replace(/^wwwroot\//, '').replace(/^uploads\//, '');
     return `<img${pre}src="${API_URL}/uploads/${cleanPath}"`;
   });
 }
@@ -753,7 +753,7 @@ const handleFaqChange = (idx: number, field: 'question' | 'answer', value: strin
       const method = isEditMode && eventId ? 'PUT' : 'POST';
       console.log('[SUBMIT] Submitting event to:', url, 'method:', method);
       console.log('[SUBMIT] FormData entries:');
-      for (let pair of formData.entries()) {
+      for (const pair of formData.entries()) {
         console.log('  ', pair[0], pair[1]);
       }
       const res = await fetch(url, {
@@ -1338,7 +1338,7 @@ const handleFaqChange = (idx: number, field: 'question' | 'answer', value: strin
                     required
                     onChange={handleInputChange}
                     value={eventData.maxAttendees}
-                    className="input input-bordered w-full border-orange-400 bg-orange-50 text-amber-700 font-semibold pr-10 font-normal not-italic"
+                    className="input input-bordered w-full border-orange-400 bg-orange-50 text-amber-700  pr-10 font-normal not-italic"
                   />
                   {eventData.maxAttendees && (
                     <span className="absolute right-3 top-1/2 -translate-y-1/2 text-green-500">

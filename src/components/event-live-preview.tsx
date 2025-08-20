@@ -30,7 +30,7 @@ function processDescriptionHtml(html: string | undefined): string {
       folder: string,
       path: string
     ) => {
-      let cleanPath = path.replace(/^wwwroot\//, '').replace(/^uploads\//, '');
+      const cleanPath = path.replace(/^wwwroot\//, '').replace(/^uploads\//, '');
       return `<img${pre}src="${API_URL}/uploads/${cleanPath}"`;
     }
   );
@@ -42,7 +42,7 @@ function processDescriptionHtml(html: string | undefined): string {
     path: string,
     post: string
   ) => {
-    let cleanPath = path.replace(/^wwwroot\//, '').replace(/^uploads\//, '');
+    const cleanPath = path.replace(/^wwwroot\//, '').replace(/^uploads\//, '');
     return `<video${pre}src="${API_URL}/uploads/${cleanPath}" controls width="100%" height="240"${post}>`;
   });
   return out;
