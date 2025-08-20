@@ -41,7 +41,7 @@ export default function PastOrganizedEventsPage(): JSX.Element {
       if (userId && token) {
         try {
           const res: AxiosResponse<Event[]> = await axios.post(
-            `${process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5274"}/api/Dashboard/past-organized/${userId}`,
+            `${process.env.NEXT_PUBLIC_BACKEND_URL || "https://dep2-backend.onrender.com"}/api/Dashboard/past-organized/${userId}`,
             {},
             {
               headers: {

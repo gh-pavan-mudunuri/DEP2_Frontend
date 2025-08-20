@@ -30,7 +30,7 @@ export default function TrendingEventsPage() {
       setLoading(true);
       setError("");
       try {
-        const res = await axios.get<TrendingEventsApiResponse>("http://localhost:5274/api/Home/trending");
+        const res = await axios.get<TrendingEventsApiResponse>("https://dep2-backend.onrender.com/api/Home/trending");
         if (res.data && res.data.success && Array.isArray(res.data.data)) {
           setEvents(res.data.data);
         } else {

@@ -100,7 +100,7 @@ export default function UpcommingEvents({
     const fetchFilteredEvents = async () => {
       try {
         const res = await axios.post<{ success: boolean; data: EventInterface[] }>(
-          "http://localhost:5274/api/Home/filter",
+          "https://dep2-backend.onrender.com/api/Home/filter",
           filters
         );
         if (res.data && res.data.success && Array.isArray(res.data.data)) {

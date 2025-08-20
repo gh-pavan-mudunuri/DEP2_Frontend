@@ -24,7 +24,7 @@ export default function AdminPayments({ eventId }: Props) {
   useEffect(() => {
     if (!eventId) return;
     setLoading(true);
-    fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5274'}/api/admin/event/${eventId}/payments`)
+    fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://dep2-backend.onrender.com'}/api/admin/event/${eventId}/payments`)
       .then(res => res.ok ? res.json() : Promise.reject('Failed to fetch payments'))
       .then(data => {
         setPayments(Array.isArray(data) ? data : data || []);

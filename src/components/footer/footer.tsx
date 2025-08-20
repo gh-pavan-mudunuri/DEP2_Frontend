@@ -35,7 +35,7 @@ export default function Footer() {
   useEffect(() => {
     async function fetchAvgRating() {
       try {
-        const res = await axios.get("http://localhost:5274/api/WebsiteReview");
+        const res = await axios.get("https://dep2-backend.onrender.com/api/WebsiteReview");
         const data = res.data;
         if (Array.isArray(data) && data.length > 0) {
           const total = data.reduce((sum, r) => sum + r.rating, 0);
@@ -87,7 +87,7 @@ export default function Footer() {
         title: reviewTitle || undefined,
         comments: reviewComments || undefined,
       };
-      await axios.post("http://localhost:5274/api/WebsiteReview", payload);
+      await axios.post("https://dep2-backend.onrender.com/api/WebsiteReview", payload);
       setUserRating(0);
       setReviewTitle("");
       setReviewComments("");

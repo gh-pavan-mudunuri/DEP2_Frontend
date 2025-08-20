@@ -8,7 +8,7 @@ interface ProfileImageProps {
 }
 
 const getImageUrl = (url: string) => {
-  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5274";
+  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "https://dep2-backend.onrender.com";
   if (!url) return "";
   if (url.startsWith("/uploads/")) return backendUrl + url;
   return url;

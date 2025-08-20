@@ -18,7 +18,7 @@ function formatDateTime(dateStr?: string) {
   return `${d}, ${t}`;
 }
  
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5274";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://dep2-backend.onrender.com";
  
 function processDescriptionHtml(html: string | undefined): string {
   if (!html) return '<span style="color:#bbb">[Description]</span>';

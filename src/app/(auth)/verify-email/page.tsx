@@ -23,7 +23,7 @@ export default function VerifyEmail() {
 
     axios
       .get<VerifyEmailResponse>(
-        `http://localhost:5274/api/Auth/verify-email?token=${token}`
+        `https://dep2-backend.onrender.com/api/Auth/verify-email?token=${token}`
       )
       .then(() => {
         setMessage("User Registered Successfully, now you can Login");

@@ -17,7 +17,7 @@ const EventLivePreview = dynamic(
   { ssr: false }
 );
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5274";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://dep2-backend.onrender.com";
 
 // Map occurrences so occurrenceId is always present and required
 function mapOccurrences(occurrences: Occurrence[]): MappedOccurrence[] {

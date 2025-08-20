@@ -58,7 +58,7 @@ export default function MyEventsPage(): JSX.Element {
         }
 
         const res = await axios.post<EventInterface[]>(
-          `http://localhost:5274/api/dashboard/current-organized/${userId}`,
+          `https://dep2-backend.onrender.com/api/dashboard/current-organized/${userId}`,
           {},
           {
             headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -73,7 +73,7 @@ export default function MyEventsPage(): JSX.Element {
             pagedEvents.map(async (event: EventInterface): Promise<EventInterface & { editCount?: number }> => {
               try {
                 const editCountRes = await axios.get<{ editEventCount?: number } | number>(
-                  `http://localhost:5274/api/Events/editeventcount/${event.eventId}`,
+                  `https://dep2-backend.onrender.com/api/Events/editeventcount/${event.eventId}`,
                   {
                     headers: token ? { Authorization: `Bearer ${token}` } : {},
                   }
@@ -158,7 +158,7 @@ export default function MyEventsPage(): JSX.Element {
                   try {
                     const token = localStorage.getItem("token");
                     await axios.delete(
-                      `http://localhost:5274/api/Events/${confirmDialog.eventId}`,
+                      `https://dep2-backend.onrender.com/api/Events/${confirmDialog.eventId}`,
                       {
                         headers: token ? { Authorization: `Bearer ${token}` } : {},
                       }

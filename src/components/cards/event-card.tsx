@@ -47,7 +47,7 @@ useEffect(() => { setApproved(event.isVerifiedByAdmin ?? false); }, [event.isVer
   // Detect admin from localStorage
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
   const router = useRouter();
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5274";
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://dep2-backend.onrender.com";
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const userRaw = localStorage.getItem('user');
@@ -85,7 +85,7 @@ useEffect(() => { setApproved(event.isVerifiedByAdmin ?? false); }, [event.isVer
       }
       try {
         const res = await axios.get<{ eventId: string | number }[]>(
-          `http://localhost:5274/api/Bookmarks/bookmarked-events/${userId}`,
+          `https://dep2-backend.onrender.com/api/Bookmarks/bookmarked-events/${userId}`,
           { headers: token ? { Authorization: `Bearer ${token}` } : {} }
         );
         const data = res.data;
@@ -203,7 +203,7 @@ useEffect(() => { setApproved(event.isVerifiedByAdmin ?? false); }, [event.isVer
       }
       if (isBookmarked) {
         await axios.delete(
-          `http://localhost:5274/api/Bookmarks/delete/${event.eventId}?userId=${userId}`,
+          `https://dep2-backend.onrender.com/api/Bookmarks/delete/${event.eventId}?userId=${userId}`,
           { headers: token ? { Authorization: `Bearer ${token}` } : {} }
         );
         setIsBookmarked(false);
@@ -213,7 +213,7 @@ useEffect(() => { setApproved(event.isVerifiedByAdmin ?? false); }, [event.isVer
         }
       } else {
         await axios.post(
-          `http://localhost:5274/api/Bookmarks/add`,
+          `https://dep2-backend.onrender.com/api/Bookmarks/add`,
           { eventId: event.eventId, userId },
           { headers: token ? { Authorization: `Bearer ${token}` } : {} }
         );
@@ -237,7 +237,7 @@ useEffect(() => { setApproved(event.isVerifiedByAdmin ?? false); }, [event.isVer
   const toAbsoluteUrl = (url: string | undefined) => {
     if (!url) return "/images/card-top.jpg";
     if (url.startsWith("http://") || url.startsWith("https://")) return url;
-    if (url.startsWith("/uploads/")) return `http://localhost:5274${url}`;
+    if (url.startsWith("/uploads/")) return `https://dep2-backend.onrender.com${url}`;
     return url;
   };
 

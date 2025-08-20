@@ -25,7 +25,7 @@ export default function AllEvents() {
       try {
         const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
         const res = await axios.get<EventsApiResponse>(
-          `http://localhost:5274/api/events/paged?page=1&pageSize=1000`,
+          `https://dep2-backend.onrender.com/api/events/paged?page=1&pageSize=1000`,
           { headers: token ? { Authorization: `Bearer ${token}` } : {} }
         );
         if (res.data && res.data.success && Array.isArray(res.data.data)) {

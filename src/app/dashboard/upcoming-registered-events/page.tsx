@@ -27,7 +27,7 @@ export default function UpcomingRegisteredEventsPage() {
       if (userId && token) {
         try {
           const res = await axios.get(
-            `${process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5274"}/api/Dashboard/current-attending-paged/${userId}?page=${page}&pageSize=${pageSize}`,
+            `${process.env.NEXT_PUBLIC_BACKEND_URL || "https://dep2-backend.onrender.com"}/api/Dashboard/current-attending-paged/${userId}?page=${page}&pageSize=${pageSize}`,
             { headers: { Authorization: `Bearer ${token}` } }
           );
           if (res.data && res.data.success && Array.isArray(res.data.data)) {

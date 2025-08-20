@@ -47,7 +47,7 @@ export default function BookmarksPage(): JSX.Element {
         }
 
         const res = await axios.get<BookmarkedEvent[]>(
-          `http://localhost:5274/api/Bookmarks/bookmarked-events/${userId}`,
+          `https://dep2-backend.onrender.com/api/Bookmarks/bookmarked-events/${userId}`,
           {
             headers: token ? { Authorization: `Bearer ${token}` } : {},
           }

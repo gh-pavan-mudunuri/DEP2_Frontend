@@ -43,7 +43,7 @@ export default function MyEventsPaymentsPage() {
           return;
         }
         // Fetch all events organized by this user, with payment details
-        const res = await axios.get(`http://localhost:5274/api/dashboard/organized-events-payments/${userId}`, {
+        const res = await axios.get(`https://dep2-backend.onrender.com/api/dashboard/organized-events-payments/${userId}`, {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
         const events: OrganizedEvent[] = Array.isArray(res.data) ? res.data : [];

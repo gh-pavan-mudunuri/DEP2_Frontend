@@ -54,7 +54,7 @@ export default function TicketsPage() {
         }
 
         const res = await axios.get<Registration[]>(
-          "http://localhost:5274/api/Registrations",
+          "https://dep2-backend.onrender.com/api/Registrations",
           {
             headers: token ? { Authorization: `Bearer ${token}` } : {},
           }

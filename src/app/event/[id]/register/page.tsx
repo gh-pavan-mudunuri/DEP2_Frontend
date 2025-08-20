@@ -70,7 +70,7 @@ export default function RegisterEventPage() {
   useEffect(() => {
     async function fetchEventDetails() {
       try {
-        const res: AxiosResponse<EventApiResponse> = await axios.get(`http://localhost:5274/api/Events/${id}`);
+        const res: AxiosResponse<EventApiResponse> = await axios.get(`https://dep2-backend.onrender.com/api/Events/${id}`);
         const eventData = res.data?.data;
         if (eventData) {
           setTicketPrice(eventData.price ?? 0);
@@ -143,7 +143,7 @@ export default function RegisterEventPage() {
       let registrationId: number | null = null;
       try {
         const regRes: AxiosResponse<RegistrationResponse> = await axios.post(
-          "http://localhost:5274/api/Registrations",
+          "https://dep2-backend.onrender.com/api/Registrations",
           registrationPayload,
           { headers: { "Content-Type": "application/json" } }
         );
@@ -187,7 +187,7 @@ export default function RegisterEventPage() {
         email: email
       };
       const checkoutRes: AxiosResponse<PaymentResponse> = await axios.post(
-        "http://localhost:5274/api/Payments/create-checkout-session",
+        "https://dep2-backend.onrender.com/api/Payments/create-checkout-session",
         paymentPayload,
         { headers: { "Content-Type": "application/json" } }
       );

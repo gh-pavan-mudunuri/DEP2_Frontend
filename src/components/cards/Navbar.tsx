@@ -49,7 +49,7 @@ export default function Navbar({ forceAdminDashboard = false }: NavbarForceAdmin
             if (userId && token) {
               try {
                 const res = await fetch(
-                  `${process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5274"}/api/Users/${userId}`,
+                  `${process.env.NEXT_PUBLIC_BACKEND_URL || "https://dep2-backend.onrender.com"}/api/Users/${userId}`,
                   {
                     headers: { Authorization: `Bearer ${token}` },
                   }
@@ -61,7 +61,7 @@ export default function Navbar({ forceAdminDashboard = false }: NavbarForceAdmin
 
                   let img = data.profileImage ?? data.imageUrl ?? "";
                   if (img.startsWith("/uploads/")) {
-                    img = `${process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5274"}${img}`;
+                    img = `${process.env.NEXT_PUBLIC_BACKEND_URL || "https://dep2-backend.onrender.com"}${img}`;
                   }
 
                   if (!ignore) setProfileImageUrl(img);
@@ -500,7 +500,7 @@ export default function Navbar({ forceAdminDashboard = false }: NavbarForceAdmin
                     }
                     if (userId && token) {
                       try {
-                        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5274"}/api/Users/${userId}`, {
+                        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || "https://dep2-backend.onrender.com"}/api/Users/${userId}`, {
                           method: "DELETE",
                           headers: { 'Authorization': `Bearer ${token}` }
                         });

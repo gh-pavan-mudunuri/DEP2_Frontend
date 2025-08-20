@@ -60,7 +60,7 @@ export default function PasswordReset(): React.JSX.Element {
 
     try {
       const res = await axios.post<ResetPasswordResponse>(
-        "http://localhost:5274/api/Auth/reset-password",
+        "https://dep2-backend.onrender.com/api/Auth/reset-password",
         {
           token,
           newPassword,

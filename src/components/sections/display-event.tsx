@@ -1,6 +1,6 @@
 import React from "react";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5274";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://dep2-backend.onrender.com";
 
 type Speaker = { name: string; imagePreview: string; bio: string; photoUrl?: string };
 type Faq = { question: string; answer: string };

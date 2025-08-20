@@ -25,7 +25,7 @@ export default function UnapprovedEvents() {
       try {
         const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
         const res = await axios.get<UnapprovedEventsApiResponse>(
-          `http://localhost:5274/api/admin/unapproved-events?page=${page}&pageSize=${pageSize}`,
+          `https://dep2-backend.onrender.com/api/admin/unapproved-events?page=${page}&pageSize=${pageSize}`,
           { headers: token ? { Authorization: `Bearer ${token}` } : {} }
         );
         if (res.data && Array.isArray(res.data.events)) {

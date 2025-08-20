@@ -70,7 +70,7 @@ import Link from '@tiptap/extension-link';
 import { Node, mergeAttributes, RawCommands, NodeViewProps, CommandProps } from '@tiptap/core';
 import NextImage from 'next/image';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5274";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://dep2-backend.onrender.com";
 
 // Pencil SVG as data URI for cursor
 const pencilCursor =
@@ -749,7 +749,7 @@ formData.append('Price', String(eventData.price ?? '0'));
     try {
       // Add Authorization header with JWT token
       const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-      const url = isEditMode && eventId ? `http://localhost:5274/api/events/${eventId}` : 'http://localhost:5274/api/events';
+      const url = isEditMode && eventId ? `https://dep2-backend.onrender.com/api/events/${eventId}` : 'https://dep2-backend.onrender.com/api/events';
       const method = isEditMode && eventId ? 'PUT' : 'POST';
       console.log('[SUBMIT] Submitting event to:', url, 'method:', method);
       console.log('[SUBMIT] FormData entries:');

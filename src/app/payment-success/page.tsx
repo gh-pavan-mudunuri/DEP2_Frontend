@@ -12,7 +12,7 @@ export default function PaymentSuccess() {
     // Get registrationId from localStorage (set after registration)
     const registrationId = localStorage.getItem("lastRegistrationId");
     if (registrationId) {
-      fetch(`http://localhost:5274/api/Registrations/${registrationId}`)
+      fetch(`https://dep2-backend.onrender.com/api/Registrations/${registrationId}`)
         .then(res => res.json())
         .then(data => {
           setQrCode(data.qrCode || null);

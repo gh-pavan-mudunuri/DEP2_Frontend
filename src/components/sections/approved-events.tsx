@@ -32,7 +32,7 @@ export default function ApprovedEvents() {
       setError("");
       try {
         const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-        const res = await axios.get<EventsApiResponse>("http://localhost:5274/api/events", {
+        const res = await axios.get<EventsApiResponse>("https://dep2-backend.onrender.com/api/events", {
           headers: token ? { Authorization: `Bearer ${token}` } : {}
         });
         if (res.data && res.data.success && Array.isArray(res.data.data)) {

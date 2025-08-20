@@ -61,7 +61,7 @@ export default function Signup() {
 
     try {
       const { name, email, password } = formData;
-      await axios.post<APIResponse>("http://localhost:5274/api/Auth/register", {
+      await axios.post<APIResponse>("https://dep2-backend.onrender.com/api/Auth/register", {
         name,
         email,
         password

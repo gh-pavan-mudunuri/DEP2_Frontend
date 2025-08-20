@@ -47,7 +47,7 @@ export default function SendEmailPage() {
     setPopup(null);
     try {
       const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-      await axios.post("http://localhost:5274/api/email/send-to-organiser", {
+      await axios.post("https://dep2-backend.onrender.com/api/email/send-to-organiser", {
         from,
         to,
         subject,

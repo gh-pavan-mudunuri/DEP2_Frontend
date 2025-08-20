@@ -11,7 +11,7 @@ import type {
   CustomDate,
 } from "@/interfaces/event-form";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5274";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://dep2-backend.onrender.com";
 
 export default function EditEventPage(): JSX.Element | null {
   const router = useRouter();

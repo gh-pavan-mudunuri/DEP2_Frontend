@@ -61,7 +61,7 @@ export default function EditProfilePage() {
           setLoading(false);
           return;
         }
-        const res = await axios.get(`http://localhost:5274/api/Users/${userId}`, {
+        const res = await axios.get(`https://dep2-backend.onrender.com/api/Users/${userId}`, {
           headers: token ? { 'Authorization': `Bearer ${token}` } : undefined,
         });
         const data = res.data;
@@ -129,7 +129,7 @@ export default function EditProfilePage() {
         if (setPopup) setPopup({ message: 'User not found.', type: 'error' });
         return;
       }
-      await axios.patch(`http://localhost:5274/api/Users/${userId}`, formData, {
+      await axios.patch(`https://dep2-backend.onrender.com/api/Users/${userId}`, formData, {
         headers: {
           ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
         },
@@ -172,7 +172,7 @@ export default function EditProfilePage() {
       const email = user?.email || user?.Email || profile.email;
       if (!userId || !email) throw new Error('User or email not found');
       const res = await axios.post(
-        `http://localhost:5274/api/Users/${userId}/stripe-express-account`,
+        `https://dep2-backend.onrender.com/api/Users/${userId}/stripe-express-account`,
         { email },
         { headers: token ? { 'Authorization': `Bearer ${token}` } : undefined }
       );
@@ -193,7 +193,7 @@ export default function EditProfilePage() {
     setResetMsg('');
     setResetSuccess(false);
     try {
-      await axios.post('http://localhost:5274/api/Auth/forgot-password', { email: resetEmail });
+      await axios.post('https://dep2-backend.onrender.com/api/Auth/forgot-password', { email: resetEmail });
       setResetMsg('Password reset email sent! Redirecting to login...');
       setResetSuccess(true);
       if (setPopup) setPopup({ message: 'Password reset email sent! Redirecting to login...', type: 'success' });
