@@ -2,11 +2,9 @@
 "use client";
 import React, { useState, createContext } from 'react';
 import PopupMessage from "@/components/common/popup-message";
+import EditProfilePopupContext, { PopupType } from "./edit-profile-popup-context";
 
-// Context to provide setPopup to children
-export const EditProfilePopupContext = createContext<((popup: { message: string; type?: "success" | "error" | "info" } | null) => void) | undefined>(undefined);
-
-export default function EditProfileLayout({ children }: { children: React.ReactNode }) {
+export default function Layout({ children }: { children: React.ReactNode }) {
   const [popup, setPopup] = useState<{ message: string; type?: "success" | "error" | "info" } | null>(null);
   return (
     <EditProfilePopupContext.Provider value={setPopup}>
