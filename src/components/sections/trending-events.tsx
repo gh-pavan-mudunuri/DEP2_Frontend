@@ -1,6 +1,7 @@
 "use client";
 import { useRef, useEffect, useState } from "react";
-import EventCard, { UpcomingEvent } from "../cards/event-card";
+import EventCard from "../cards/event-card";
+import { EventInterface } from "@/interfaces/home";
 import axios from "axios";
 import SwipeableCard from "../cards/swipable-card";
 
@@ -14,7 +15,7 @@ export default function TrendingEvents({ limit }: TrendingEventsProps) {
   const scrollInterval = 3000;
   const [isPaused, setIsPaused] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
-  const [events, setEvents] = useState<UpcomingEvent[]>([]);
+  const [events, setEvents] = useState<EventInterface[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -40,8 +41,6 @@ export default function TrendingEvents({ limit }: TrendingEventsProps) {
     }
     fetchEvents();
   }, []);
-
-  // Auto-scroll removed for trending events
 
   // Scroll progress tracking (normalized to first half)
   useEffect(() => {
@@ -91,28 +90,28 @@ export default function TrendingEvents({ limit }: TrendingEventsProps) {
         ) : (
           <div className="relative pl-3 w-full">
             {/* Mobile view */}
-            <div className="block sm:hidden w-full flex items-center justify-center">
+            <div className=" sm:hidden w-full flex items-center justify-center">
               <SwipeableCard
-                items={[...limitedEvents, { __viewAll: true }]}
-                render={event =>
-                  event.__viewAll ? (
-                    <div className="flex items-center justify-center h-full min-h-[180px]">
-                      <a
-                        href="/trending-events"
-                        className="flex items-center gap-1 px-4 py-2 rounded-full bg-purple-600 text-white font-semibold hover:bg-purple-700 transition shadow-lg min-w-[220px] justify-center"
-                        style={{ whiteSpace: "nowrap", height: "fit-content" }}
-                      >
-                        View All
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-5 h-5">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                        </svg>
-                      </a>
-                    </div>
-                  ) : (
-                    <EventCard event={event} />
-                  )
-                }
-              />
+  items={[...limitedEvents, { __viewAll: true }]}
+  render={event =>
+    "__viewAll" in event && event.__viewAll ? (
+      <div className="flex items-center justify-center h-full min-h-[180px]">
+        <a
+          href="/trending-events"
+          className="flex items-center gap-1 px-4 py-2 rounded-full bg-purple-600 text-white font-semibold hover:bg-purple-700 transition shadow-lg min-w-[220px] justify-center"
+          style={{ whiteSpace: "nowrap", height: "fit-content" }}
+        >
+          View All
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-5 h-5">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </a>
+      </div>
+    ) : (
+      <EventCard event={event as EventInterface} />
+    )
+  }
+/>
             </div>
             {/* Desktop/tablet view */}
             <div className="hidden sm:block relative">
@@ -137,7 +136,6 @@ export default function TrendingEvents({ limit }: TrendingEventsProps) {
                         <EventCard event={event} />
                       </div>
                     ))}
-                    
                   </>
                 )}
               </div>
