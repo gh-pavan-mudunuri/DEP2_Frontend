@@ -24,7 +24,7 @@ export default function Login() {
     setMessage('');
 
     try {
-      const response = await axios.post<LoginResponse>('http://localhost:5274/api/Auth/login', {
+      const response = await axios.post<LoginResponse>('https://dep2-backend.onrender.com/api/Auth/login', {
         email,
         password,
       });
@@ -88,7 +88,7 @@ export default function Login() {
     setPopupType('success');
 
     try {
-      await axios.post('http://localhost:5274/api/Auth/forgot-password', { email });
+      await axios.post('https://dep2-backend.onrender.com/api/Auth/forgot-password', { email });
       setPopupType('success');
       setMessage('Password reset email sent!');
     } catch (error) {
