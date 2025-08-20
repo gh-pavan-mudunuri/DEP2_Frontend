@@ -117,22 +117,18 @@ export default function IntroSection() {
           </div>
           <div className="flex md:flex-col gap-1 sm:gap-3 md:gap-0">
             <div className="md:ml-8 md:mb-8 lg:ml-4 lg:mb-4 xl:ml-6 xl:mb-6">
-              <NumbersCard
-                title={
-                  <>
-                    User Reviews
-                    <span className="block mt-2">
-                      <span className="inline-flex items-center gap-1 bg-yellow-100 text-yellow-800 font-bold px-2 py-1 rounded-full text-sm shadow">
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" className="w-4 h-4 text-yellow-400"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.97a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.97c.3.921-.755 1.688-1.54 1.118l-3.38-2.455a1 1 0 00-1.175 0l-3.38 2.455c-.784.57-1.838-.197-1.539-1.118l1.287-3.97a1 1 0 00-.364-1.118L2.049 9.397c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.97z"/></svg>
-                        {stats.avgRating.toFixed(1)} / 5
-                      </span>
-                    </span>
-                  </>
-                }
-                number={stats.reviews}
-                icon="satisfaction"
-              />
-            </div>
+  <NumbersCard
+    title="User Reviews"
+    number={stats.reviews}
+    icon="satisfaction"
+  />
+  <span className="block mt-2">
+    <span className="inline-flex items-center gap-1 bg-yellow-100 text-yellow-800 font-bold px-2 py-1 rounded-full text-sm shadow">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20" className="w-4 h-4 text-yellow-400"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.97a1 1 0 00.95.69h4.175c.969 0 1.371 1.24.588 1.81l-3.38 2.455a1 1 0 00-.364 1.118l1.287 3.97c.3.921-.755 1.688-1.54 1.118l-3.38-2.455a1 1 0 00-1.175 0l-3.38 2.455c-.784.57-1.838-.197-1.539-1.118l1.287-3.97a1 1 0 00-.364-1.118L2.049 9.397c-.783-.57-.38-1.81.588-1.81h4.175a1 1 0 00.95-.69l1.286-3.97z"/></svg>
+      {stats.avgRating.toFixed(1)} / 5
+    </span>
+  </span>
+</div>
             <div className="md:ml-4 lg:ml-2 xl:ml-4">
               <NumbersCard
                 title="Locations Covered"
