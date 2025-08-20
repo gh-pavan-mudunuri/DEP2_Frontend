@@ -5,7 +5,7 @@ import UpcommingEvents from "@/components/sections/upcoming-events";
 import TrendingEvents from "@/components/sections/trending-events";
 import Image from "next/image";
 import { Dancing_Script } from "next/font/google";
-import Navbar from "@/components/cards/navbar";
+import Navbar from "@/components/cards/Navbar";
 
 const dancingScript = Dancing_Script({
   subsets: ["latin"],
