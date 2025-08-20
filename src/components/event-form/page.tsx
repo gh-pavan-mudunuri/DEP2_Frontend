@@ -711,7 +711,7 @@ const handleFaqChange = (idx: number, field: 'question' | 'answer', value: strin
     formData.append('Description', newDescription);
 
     formData.append('IsPaidEvent', eventData.isPaid ? 'true' : 'false');
-    formData.append('Price', eventData.price || '0');
+formData.append('Price', String(eventData.price ?? '0'));
     // Always send EventLink, even if empty
     formData.append('EventLink', eventData.eventLink || '');
     // Add OrganizerId if present
