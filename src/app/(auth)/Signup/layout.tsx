@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import Navbar from "../../../components/cards/navbar";
+import Navbar from "../../../components/cards/Navbar";
 import Footer from "@/components/footer/footer";
 
 export const metadata: Metadata = {

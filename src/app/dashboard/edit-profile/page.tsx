@@ -7,7 +7,7 @@ import ProfileImage from '@/components/profile/profile-image';
 import ProfileDetails from '@/components/profile/profile-details';
 import EditProfileForm from '@/components/profile/edit-profile-form';
 import ChangePasswordModal from '@/components/profile/change-password-modal';
-import { EditProfilePopupContext } from './layout';
+import  EditProfilePopupContext  from './edit-profile-popup-context';
  
 export default function EditProfilePage() {
 
