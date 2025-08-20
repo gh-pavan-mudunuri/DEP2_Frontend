@@ -66,35 +66,35 @@ function mapEventToPreviewProps(event: EventFormView): EventLivePreviewProps {
 }
 
 const ViewEventPage: React.FC = () => {
-  const { eventId } = useParams<{ eventId: string }>();
+  const params = useParams();
+const eventId = Array.isArray(params.id) ? params.id[0] : params.id ?? null;
   const [eventData, setEventData] = useState<EventLivePreviewProps | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchEvent = async () => {
-      try {
-        const response = await fetch(`${API_URL}/api/events/${eventId}`);
-        if (!response.ok) {
-          throw new Error(`Error: ${response.statusText}`);
-        }
-        const data: EventFormView = await response.json();
-        setEventData(mapEventToPreviewProps(data));
-      } catch (err) {
-        if (err instanceof Error) {
-          setError(err.message);
-        } else {
-          setError("An unknown error occurred");
-        }
-      } finally {
-        setLoading(false);
+  // ...existing code...
+useEffect(() => {
+  const fetchEvent = async () => {
+    try {
+      const response = await fetch(`${API_URL}/api/events/${eventId}`);
+      if (!response.ok) {
+        throw new Error(`Error: ${response.statusText}`);
       }
-    };
-
-    if (eventId) {
-      fetchEvent();
+      const json = await response.json();
+      const event: EventFormView = json.data; // <-- extract event from data
+      setEventData(mapEventToPreviewProps(event));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Unknown error");
+    } finally {
+      setLoading(false);
     }
-  }, [eventId]);
+  };
+
+  if (eventId) {
+    fetchEvent();
+  }
+}, [eventId]);
+// ...existing code...
 
   if (loading) {
     return (

@@ -5,8 +5,8 @@ const nextConfig: NextConfig = {
     domains: [
       'localhost',
       '127.0.0.1',
-      // Add your production/staging image domains here
-    ],
+      'https://dep2-backend.onrender.com'
+          ],
   },
 };
 
