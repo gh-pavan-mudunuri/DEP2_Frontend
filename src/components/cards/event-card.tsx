@@ -455,8 +455,8 @@ useEffect(() => { setApproved(event.isVerifiedByAdmin ?? false); }, [event.isVer
                     onClick={e => {
                       e.preventDefault();
                       e.stopPropagation();
-                      const organiserEmail = event.organiserEmail || event.organizerEmail || event.OrganizerEmail || "";
-                      const eventTitle = event.title || event.eventTitle || event.name || "";
+                      const organiserEmail = event.organiserEmail || event.organizerEmail || event.OrganizerEmail || "Organiser Email";
+                      const eventTitle = event.title || event.eventTitle || event.name || "Event Title";
                       if (organiserEmail) {
                         window.location.href = `/send-email?to=${encodeURIComponent(organiserEmail)}&event=${encodeURIComponent(eventTitle)}`;
                       } else {
