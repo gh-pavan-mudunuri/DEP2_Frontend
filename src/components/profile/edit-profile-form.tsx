@@ -18,8 +18,15 @@ interface EditProfileFormProps {
   onSave: (e: React.FormEvent<HTMLFormElement>) => void;
 }
 
-export default function EditProfileForm({ profile, editing, onChange, onImageChange, onCancel, onSave }: EditProfileFormProps) {
-  const [showConfirm, setShowConfirm] = useState(false);
+export default function EditProfileForm({
+  profile,
+  editing,
+  onChange,
+  onImageChange,
+  onCancel,
+  onSave
+}: EditProfileFormProps) {
+  const [showConfirm, setShowConfirm] = useState<boolean>(false);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -29,7 +36,10 @@ export default function EditProfileForm({ profile, editing, onChange, onImageCha
   const handleConfirm = () => {
     setShowConfirm(false);
     // Actually submit the form
-    onSave(new Event('submit') as any);
+    // Create a synthetic submit event for the form
+    const form = document.createElement("form");
+    const event = new Event("submit", { bubbles: true, cancelable: true });
+    onSave(event as unknown as React.FormEvent<HTMLFormElement>);
   };
 
   const handleCancel = () => {

@@ -10,6 +10,17 @@ interface EventsApiResponse {
   data: EventInterface[];
 }
 
+function getVerifiedAt(e: EventInterface): string | null {
+  // Support both adminVerifiedAt and AdminVerifiedAt as string or undefined
+  if ("adminVerifiedAt" in e && typeof (e as { adminVerifiedAt?: string }).adminVerifiedAt === "string") {
+    return (e as { adminVerifiedAt?: string }).adminVerifiedAt ?? null;
+  }
+  if ("AdminVerifiedAt" in e && typeof (e as { AdminVerifiedAt?: string }).AdminVerifiedAt === "string") {
+    return (e as { AdminVerifiedAt?: string }).AdminVerifiedAt ?? null;
+  }
+  return null;
+}
+
 export default function ApprovedEvents() {
   const [events, setEvents] = useState<EventInterface[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -27,11 +38,9 @@ export default function ApprovedEvents() {
         if (res.data && res.data.success && Array.isArray(res.data.data)) {
           // Filter approved events and sort by AdminVerifiedAt desc
           const approvedRaw = res.data.data.filter((e: EventInterface) => e.isVerifiedByAdmin);
-          // Support both adminVerifiedAt and AdminVerifiedAt
-          const getVerifiedAt = (e: EventInterface) => (e as any).adminVerifiedAt || (e as any).AdminVerifiedAt || null;
           const approved = approvedRaw.sort((a: EventInterface, b: EventInterface) => {
-            const dateA = getVerifiedAt(a) ? new Date(getVerifiedAt(a)).getTime() : 0;
-            const dateB = getVerifiedAt(b) ? new Date(getVerifiedAt(b)).getTime() : 0;
+            const dateA = getVerifiedAt(a) ? new Date(getVerifiedAt(a)!).getTime() : 0;
+            const dateB = getVerifiedAt(b) ? new Date(getVerifiedAt(b)!).getTime() : 0;
             if (dateA !== dateB) return dateB - dateA;
             // Secondary sort by eventId for stability
             return Number(b.eventId || 0) - Number(a.eventId || 0);
