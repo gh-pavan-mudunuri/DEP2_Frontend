@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "next/link";
+import { Occurrence } from "@/interfaces/event-form";
 function formatDateTime(dateStr?: string) {
   if (!dateStr) return '';
   const date = new Date(dateStr);
@@ -55,13 +56,7 @@ type Speaker = {
   imagePreview?: string;
 };
 type Faq = { question: string; answer: string };
-type Occurrence = {
-  occurrenceId: number;
-  startTime: string;
-  endTime: string;
-  eventTitle?: string;
-  isCancelled?: boolean;
-};
+
 type EventLivePreviewProps = {
   event: {
     title: string;
@@ -98,7 +93,7 @@ type EventLivePreviewProps = {
   forceMobileLayout?: boolean;
 };
  
-const EventLivePreview: React.FC<EventLivePreviewProps> = ({ event, forceMobileLayout }) => {
+const EventLivePreview: React.FC<EventLivePreviewProps> = ({ event, forceMobileLayout,  }) => {
   // Calculate available tickets
   const ticketsBooked = event.ticketsBooked ?? event.registrationCount ?? 0;
   const maxAttendees = Number(event.maxAttendees) || 0;
@@ -213,9 +208,10 @@ const EventLivePreview: React.FC<EventLivePreviewProps> = ({ event, forceMobileL
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
                 const futureOccurrences = event.occurrences.filter((occ: Occurrence) => {
-                  const start = new Date(occ.startTime);
-                  return !isNaN(start.getTime()) && start >= today;
-                });
+  if (!occ.startTime) return false;
+  const start = new Date(occ.startTime);
+  return !isNaN(start.getTime()) && start >= today;
+});
                 return (
                   <select
                     className="border border-fuchsia-200 rounded-lg px-2 py-1 text-base shadow focus:outline-none focus:ring-2 focus:ring-fuchsia-400 mt-1"
@@ -226,14 +222,19 @@ const EventLivePreview: React.FC<EventLivePreviewProps> = ({ event, forceMobileL
                       <option value="none" disabled>No future dates</option>
                     ) : (
                       futureOccurrences.map((occ: Occurrence) => {
-                        const format = (d: string) => {
-                          const date = new Date(d);
-                          return isNaN(date.getTime()) ? d : date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-                        };
+                        const format = (d?: string) => {
+  if (!d) return "";
+  const date = new Date(d);
+  return isNaN(date.getTime())
+    ? d
+    : date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+};
+
                         return (
-                          <option key={occ.occurrenceId} value={occ.occurrenceId} disabled>
-                            {format(occ.startTime)} - {format(occ.endTime)}
-                          </option>
+                          
+<option key={occ.occurrenceId} value={occ.occurrenceId} disabled>
+  {format(occ.startTime)} - {format(occ.endTime)}
+</option>
                         );
                       })
                     )}

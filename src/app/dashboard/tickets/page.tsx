@@ -1,6 +1,6 @@
 "use client";
-import { useEffect, useState, useRef } from "react";
-import axios from "axios";
+import { useEffect, useState } from "react";
+import axios, { AxiosError } from "axios";
 import TicketCard from "@/components/cards/ticket-card";
 
 interface Registration {
@@ -14,6 +14,13 @@ interface Registration {
   eventTitle?: string;
 }
 
+interface UserData {
+  userId?: number;
+  id?: number;
+  UserId?: number;
+  Id?: number;
+}
+
 export default function TicketsPage() {
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [userId, setUserId] = useState<number | null>(null);
@@ -24,35 +31,58 @@ export default function TicketsPage() {
     async function fetchRegistrations() {
       setLoading(true);
       setError("");
+
       try {
         const token = localStorage.getItem("token");
         const userRaw = localStorage.getItem("user");
-        let uid = null;
+
+        let uid: number | null = null;
+
         if (userRaw) {
           try {
-            const userObj = JSON.parse(userRaw);
-            uid = userObj.userId || userObj.id || userObj.UserId || userObj.Id;
-            setUserId(Number(uid));
-          } catch {}
+            const userObj: UserData = JSON.parse(userRaw);
+            uid =
+              userObj.userId ??
+              userObj.id ??
+              userObj.UserId ??
+              userObj.Id ??
+              null;
+            if (uid !== null) setUserId(uid);
+          } catch {
+            // If parsing fails, uid remains null
+          }
         }
-        const res = await axios.get("http://localhost:5274/api/Registrations", {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        });
-        // Only show tickets booked by the logged-in user
+
+        const res = await axios.get<Registration[]>(
+          "http://localhost:5274/api/Registrations",
+          {
+            headers: token ? { Authorization: `Bearer ${token}` } : {},
+          }
+        );
+
         const allRegs = res.data || [];
-        setRegistrations(uid ? allRegs.filter((r: Registration) => r.userId === Number(uid)) : []);
-      } catch (err: any) {
+
+        setRegistrations(
+          uid !== null
+            ? allRegs.filter((r: Registration) => r.userId === uid)
+            : []
+        );
+      } catch (err) {
+        const axiosError = err as AxiosError;
+        console.error("Error fetching registrations:", axiosError.message);
         setError("Failed to fetch registrations");
       } finally {
         setLoading(false);
       }
     }
+
     fetchRegistrations();
   }, []);
 
   return (
     <div className="p-6 w-full min-h-screen bg-white">
       <h1 className="text-2xl font-bold mb-6">Tickets</h1>
+
       {loading ? (
         <div>Loading...</div>
       ) : error ? (
@@ -69,4 +99,3 @@ export default function TicketsPage() {
     </div>
   );
 }
-

@@ -3,9 +3,11 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import EventCard from "@/components/cards/event-card";
+import { EventFormData } from "@/interfaces/event-form";
+import { EventInterface } from "@/interfaces/home";
 
 export default function UpcomingRegisteredEventsPage() {
-  const [events, setEvents] = useState<any[]>([]);
+  const [events, setEvents] = useState<EventInterface[]>([]);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
