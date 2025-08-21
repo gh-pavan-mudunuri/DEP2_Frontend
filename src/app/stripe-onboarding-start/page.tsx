@@ -13,7 +13,7 @@ export default function StripeOnboardingStart() {
     setLoading(true);
     setError("");
     try {
-      const res = await fetch(`/api/users/${userId}/stripe-express-account`, {
+      const res = await fetch(`https://dep2-backend.onrender.com/api/users/${userId}/stripe-express-account`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(email),

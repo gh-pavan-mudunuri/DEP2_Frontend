@@ -88,7 +88,8 @@ export interface EventFormView {
   isPaid: boolean;
   price: string | number;
   image: File | null;
-  coverImageUrl: string;
+  coverImageUrl?: string;
+  coverImage?: string;
   vibeVideo: string;
   vibeVideoPreview: string;
   editEventCount: number;
