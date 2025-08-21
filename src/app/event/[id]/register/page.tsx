@@ -233,8 +233,243 @@ export default function RegisterEventPage() {
         <div className={showTnC ? "blur-sm pointer-events-none select-none" : ""}>
           <h1 className="text-2xl sm:text-3xl font-extrabold mb-6 text-center leading-tight text-blue-700 tracking-tight drop-shadow">Register for Event</h1>
           <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
-            {/* ...form fields unchanged... */}
-            {/* (You can keep your form fields as in your original code) */}
+            <div className="mb-4">
+              <h2 className="text-lg font-semibold text-gray-700 mb-2 flex items-center gap-2"><span role="img" aria-label="user">👤</span> Contact Information</h2>
+              <hr className="mb-2 border-blue-100" />
+            </div>
+            {/* Name */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-8">
+              <label className=" font-semibold whitespace-nowrap min-w-[100px] sm:min-w-[180px] mb-1 sm:mb-0 text-sm sm:text-base text-gray-800 flex items-center gap-2" htmlFor="name">
+                <span role="img" aria-label="name">📝</span> Name <span className="text-red-600">*</span>
+              </label>
+              <div className="relative w-full">
+                <input
+                  id="name"
+                  type="text"
+                  className={`w-full border-0 border-b-2 px-0 py-2 rounded-none bg-transparent focus:outline-none pr-8 text-sm sm:text-base placeholder-gray-400 text-gray-900 ${touched.name && name ? 'border-green-600 focus:border-green-600' : 'border-gray-300 focus:border-blue-600'}`}
+                  value={name}
+                  onChange={e => setName(e.target.value)}
+                  onBlur={() => setTouched(t => ({ ...t, name: true }))}
+                  required
+                  placeholder="Enter your name"
+                  title="Name"
+                />
+                {touched.name && name && (
+                  <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-600 text-xl sm:text-2xl">&#10003;</span>
+                )}
+              </div>
+            </div>
+            {/* Email */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-8">
+              <label className=" font-semibold whitespace-nowrap min-w-[100px] sm:min-w-[180px] mb-1 sm:mb-0 text-sm sm:text-base text-gray-800 flex items-center gap-2" htmlFor="email">
+                <span role="img" aria-label="email">📧</span> Email <span className="text-red-600">*</span>
+              </label>
+              <div className="relative w-full">
+                <input
+                  id="email"
+                  type="email"
+                  className={`w-full border-0 border-b-2 px-0 py-2 rounded-none bg-transparent focus:outline-none pr-8 text-sm sm:text-base placeholder-gray-400 text-gray-900 ${touched.email && email ? 'border-green-600 focus:border-green-600' : 'border-gray-300 focus:border-blue-600'}`}
+                  value={email}
+                  onChange={e => setEmail(e.target.value)}
+                  onBlur={() => setTouched(t => ({ ...t, email: true }))}
+                  required
+                  placeholder="Enter your email"
+                  title="Email"
+                />
+                {touched.email && email && (
+                  <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-600 text-xl sm:text-2xl">&#10003;</span>
+                )}
+              </div>
+            </div>
+            {/* Phone */}
+            <div>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-8">
+                <label className=" font-semibold whitespace-nowrap min-w-[100px] sm:min-w-[180px] mb-1 sm:mb-0 text-sm sm:text-base text-gray-800 flex items-center gap-2" htmlFor="phone">
+                  <span role="img" aria-label="phone">📱</span> Phone Number <span className="text-red-600">*</span>
+                </label>
+                <div className="w-full flex flex-row relative gap-2">
+                  <select
+                    id="country-code"
+                    className="border rounded-l px-2 py-2 bg-gray-100 text-gray-700 text-sm sm:text-base"
+                    value={countryCode}
+                    onChange={e => setCountryCode(e.target.value)}
+                    style={{ minWidth: "80px" }}
+                    title="Country Code"
+                  >
+                    {/* ...country code options... */}
+                    <option value="+91">+91</option>
+                    <option value="+1">+1</option>
+                    <option value="+44">+44</option>
+                    {/* ...other options... */}
+                  </select>
+                  <input
+                    id="phone"
+                    type="tel"
+                    className={`w-full border-0 border-b-2 px-0 py-2 rounded-none bg-transparent focus:outline-none pr-8 text-sm sm:text-base placeholder-gray-400 text-gray-900 ${touched.phone && phone ? 'border-green-600 focus:border-green-600' : 'border-gray-300 focus:border-blue-600'}`}
+                    value={phone}
+                    onChange={e => setPhone(e.target.value)}
+                    onBlur={() => setTouched(t => ({ ...t, phone: true }))}
+                    required
+                    placeholder="Enter your phone number"
+                    title="Phone Number"
+                    pattern="[0-9]{7,15}"
+                    maxLength={15}
+                  />
+                  {touched.phone && phone && (
+                    <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-600 text-xl sm:text-2xl">&#10003;</span>
+                  )}
+                </div>
+              </div>
+            </div>
+            <div className="my-6">
+              <h2 className="text-lg font-semibold text-gray-700 mb-2 flex items-center gap-2"><span role="img" aria-label="ticket">🎟️</span> Ticket Details</h2>
+              <hr className="mb-2 border-blue-100" />
+            </div>
+            {/* Tickets */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-8">
+              <label className="block font-semibold whitespace-nowrap min-w-[100px] sm:min-w-[180px] mb-1 sm:mb-0 text-sm sm:text-base text-gray-800" htmlFor="tickets">
+                Number of Tickets <span className="text-red-600">*</span>
+              </label>
+              <div className="relative w-full flex flex-col">
+                {/* Show available tickets if both values are present */}
+                {maxAttendees !== null && (
+                  <div className="mb-1 text-xs sm:text-sm text-green-700 font-semibold">
+                    Available tickets: {Math.max(0, maxAttendees - registrationCount)}
+                  </div>
+                )}
+                <div className="flex items-center gap-2">
+                  <input
+                    id="tickets"
+                    type="number"
+                    min={1}
+                    max={maxAttendees !== null ? Math.max(1, maxAttendees - registrationCount) : undefined}
+                    className={`w-full border-0 border-b-2 px-0 py-2 rounded-none bg-transparent focus:outline-none pr-8 text-sm sm:text-base placeholder-gray-400 text-gray-900 ${touched.tickets && tickets && Number(tickets) > 0 ? 'border-green-600 focus:border-green-600' : 'border-gray-300 focus:border-blue-600'}`}
+                    value={tickets}
+                    onChange={e => handleTicketsChange(e.target.value)}
+                    onBlur={() => setTouched(t => ({ ...t, tickets: true }))}
+                    required
+                    placeholder="Number of tickets"
+                    title="Number of Tickets"
+                  />
+                  <span className="text-xs sm:text-sm text-gray-600 font-medium whitespace-nowrap">@ ₹{ticketPrice} per ticket</span>
+                </div>
+                {touched.tickets && tickets && Number(tickets) > 0 && (
+                  <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-600 text-xl sm:text-2xl">&#10003;</span>
+                )}
+                {ticketAlert && <div className="text-red-600 text-xs sm:text-sm mt-1 font-medium">{ticketAlert}</div>}
+              </div>
+            </div>
+            {/* Amount */}
+            <div className="my-6">
+              <h2 className="text-lg font-semibold text-gray-700 mb-2 flex items-center gap-2"><span role="img" aria-label="security">🔒</span> Verification</h2>
+              <hr className="mb-2 border-blue-100" />
+            </div>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-8">
+              <label className="block font-semibold whitespace-nowrap min-w-[100px] sm:min-w-[180px] mb-1 sm:mb-0 text-sm sm:text-base text-gray-800" htmlFor="amount">
+                Total Payable Amount <span className="text-red-600">*</span>
+              </label>
+              <input
+                id="amount"
+                type="text"
+                className="w-full border-0 border-b-2 border-gray-300 focus:border-blue-600 px-0 py-2 rounded-none bg-gray-100 focus:outline-none text-sm sm:text-base text-gray-900 font-semibold"
+                value={`₹${amount}`}
+                readOnly
+                title="Total Payable Amount"
+              />
+            </div>
+            {/* Captcha */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-8">
+              <label className="block font-semibold whitespace-nowrap min-w-[100px] sm:min-w-[180px] mb-1 sm:mb-0 text-sm sm:text-base text-gray-800" htmlFor="captcha">
+                Captcha <span className="text-red-600">*</span>
+              </label>
+              <div className="flex-1">
+                <div className="relative mb-2">
+                  <input
+                    id="captcha"
+                    type="text"
+                    className={`w-full border-0 border-b-2 px-0 py-2 rounded-none bg-transparent focus:outline-none pr-8 text-sm sm:text-base placeholder-gray-400 text-gray-900 ${touched.captcha && captchaInput && captchaInput.trim().toUpperCase() === captcha ? 'border-green-600 focus:border-green-600' : 'border-gray-300 focus:border-blue-600'}`}
+                    value={captchaInput}
+                    onChange={e => setCaptchaInput(e.target.value)}
+                    onBlur={() => setTouched(t => ({ ...t, captcha: true }))}
+                    required
+                    placeholder="Enter the captcha code below"
+                    title="Captcha"
+                    autoComplete="off"
+                  />
+                  {touched.captcha && captchaInput && captchaInput.trim().toUpperCase() === captcha && (
+                    <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-600 text-xl sm:text-2xl">&#10003;</span>
+                  )}
+                  {captchaError && <div className="text-red-600 text-xs sm:text-sm mt-1 font-medium">{captchaError}</div>}
+                </div>
+                <div className="flex items-center space-x-2">
+                  <span className="font-mono bg-gray-200 px-2 py-2 sm:px-3 rounded text-sm sm:text-base tracking-widest select-none">{captcha}</span>
+                  <button
+                    type="button"
+                    className={
+                      `text-blue-600 text-xs sm:text-sm font-semibold flex items-center transition-transform duration-500 ${refreshing ? 'animate-spin' : ''}`
+                    }
+                    onClick={() => {
+                      setRefreshing(true);
+                      setCaptcha((() => {
+                        const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+                        let code = "";
+                        for (let i = 0; i < 6; i++) {
+                          code += chars.charAt(Math.floor(Math.random() * chars.length));
+                        }
+                        return code;
+                      })());
+                      setTimeout(() => setRefreshing(false), 700);
+                    }}
+                    aria-label="Refresh Captcha"
+                  >
+                    {/* Use react-icons for a modern refresh icon */}
+                    <FiRefreshCw className="h-5 w-5" />
+                  </button>
+                </div>
+              </div>
+            </div>
+            {/* Terms and Conditions */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-4">
+              <input
+                type="checkbox"
+                id="terms"
+                checked={acceptTerms}
+                onChange={e => setAcceptTerms(e.target.checked)}
+                className="mr-2 mt-1 sm:mt-0 accent-blue-600"
+                required
+                title="Accept Terms and Conditions"
+              />
+              <label htmlFor="terms" className="text-xs sm:text-xs mb-1 sm:mb-0 font-medium text-gray-700">
+                I accept the{' '}
+                <button
+                  type="button"
+                  className="underline text-blue-600 hover:text-blue-800 focus:outline-none text-xs sm:text-xs font-semibold"
+                  onClick={() => setShowTnC(true)}
+                >
+                  terms and conditions
+                </button>{' '}
+                <span className="text-red-600">*</span>
+              </label>
+            </div>
+            {error && <div className="flex items-center gap-2 bg-red-100 border border-red-300 text-red-700 rounded px-3 py-2 text-xs sm:text-sm font-medium mt-2"><span role="img" aria-label="error">❌</span>{error}</div>}
+            {success && <div className="flex items-center gap-2 bg-green-100 border border-green-300 text-green-700 rounded px-3 py-2 text-xs sm:text-sm font-medium mt-2"><span role="img" aria-label="success">✅</span>{success}</div>}
+            <button
+              type="submit"
+              className={`w-full py-3 rounded-lg text-base sm:text-lg font-bold tracking-wide flex items-center justify-center gap-2 shadow-lg border-2 border-[#bfae3a] bg-gradient-to-r from-[#0a174e] via-[#142a5c] to-[#1a2250] text-[#d4af37] transition hover:scale-105 hover:from-[#142a5c] hover:to-[#1a2250] hover:text-[#e6c200] hover:border-[#e6c200] focus:outline-none focus:ring-4 focus:ring-[#142a5c] ${
+                name && email && phone && tickets && captchaInput && acceptTerms && !loading
+                  ? "cursor-pointer"
+                  : "opacity-60 cursor-not-allowed"
+              }`}
+              disabled={
+                !name || !email || !phone || !tickets || !captchaInput || !acceptTerms || loading
+              }
+            >
+              {loading ? (
+                <span className="flex items-center gap-2"><svg className="animate-spin h-5 w-5 text-[#d4af37]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"></path></svg>Processing...</span>
+              ) : (
+                <span>Pay Now & Register</span>
+              )}
+            </button>
           </form>
         </div>
         {showTnC && (
