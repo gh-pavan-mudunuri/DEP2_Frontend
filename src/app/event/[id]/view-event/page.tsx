@@ -104,7 +104,7 @@ function mapEventData(data: unknown): MappedEvent {
       }
     );
   }
-  let description = processDescriptionHtml(event.description || "");
+  const description = processDescriptionHtml(event.description || "");
 
   return {
     ...event,
