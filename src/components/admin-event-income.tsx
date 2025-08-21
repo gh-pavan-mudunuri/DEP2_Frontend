@@ -15,7 +15,7 @@ export default function AdminEventIncome({ onSelectEvent }: { onSelectEvent: (ev
 
   useEffect(() => {
     setLoading(true);
-    api.get("/api/admin/event-income-summary")
+    api.get("https://dep2-backend.onrender.com/api/admin/event-income-summary")
       .then(res => {
         const incomes: EventIncome[] = Array.isArray(res.data) ? res.data : [];
         setEventIncomes(incomes);
