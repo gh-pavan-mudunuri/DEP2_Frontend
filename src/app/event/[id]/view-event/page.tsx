@@ -97,7 +97,7 @@ function mapEventData(data: unknown): MappedEvent {
     return html.replace(
       /<img([^>]+)src=['"](?!(?:https?:|data:))\/?(uploads|wwwroot\/uploads)?\/?([^'">]+)['"]/gi,
       (match: string, pre: string, folder: string, path: string) => {
-        let cleanPath = path
+        const cleanPath = path
           .replace(/^wwwroot\//, "")
           .replace(/^uploads\//, "");
         return `<img${pre}src="${API_URL}/uploads/${cleanPath}"`;
