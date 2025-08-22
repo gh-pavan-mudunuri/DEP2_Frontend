@@ -162,20 +162,24 @@ export default function Navbar({ forceAdminDashboard = false }: NavbarForceAdmin
   return (
     <>
       <style>{`
+        body {
+          background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+          min-height: 100vh;
+        }
         .main-content {
           margin-top: 81px !important;
         }
       `}</style>
       <nav className="fixed top-0 left-0 w-full z-50">
         {/* Desktop: everything in one row */}
-        <div className="hidden lg:flex flex-row items-center justify-between bg-white bg-opacity-100 px-8 pt-2 pb-2 w-full">
+        <div className="hidden lg:flex flex-row items-center justify-between px-8 pt-1 pb-1 min-h-[67px] w-full" style={{ background: '#0a174e' }}>
           <div className="flex items-center">
-            <img src="/icons/family.png" alt="EventSphere Logo" className="w-10 h-10 object-cover inline-block mr-2" />
+            <img src="/icons/family.png" alt="EventSphere Logo" className="w-10 h-10 object-cover inline-block mr-2 rounded-full" />
             <button
               type="button"
               className={`text-3xl font-bold ${dancingScript.className} focus:outline-none`}
               style={{
-                color: "#0031ac",
+                color: '#ffd700',
                 letterSpacing: "2px",
                 fontWeight: 700,
                 textShadow: "0 2px 8px #fff6, 0 1px 0 #fff",
@@ -198,7 +202,7 @@ export default function Navbar({ forceAdminDashboard = false }: NavbarForceAdmin
           </div>
           {/* Search bar in row */}
           {onSearch && (
-            <div className="flex-1 mx-8">
+            <div className="flex-1 mx-8 mt-4">
               <SearchBar />
             </div>
           )}
@@ -208,14 +212,14 @@ export default function Navbar({ forceAdminDashboard = false }: NavbarForceAdmin
               {/* Admin profile button */}
               {isAdmin && internalLoggedIn ? (
                 <button
-                  className="flex items-center gap-2 px-3 py-2 rounded bg-gray-200 text-gray-700 font-semibold max-w-[180px] hover:bg-gray-300"
+                  className="flex items-center justify-center w-11 h-11 rounded-full text-gray-700 font-semibold border-2"
                   onClick={() => setDashboardOpen((open) => !open)}
                 >
-                  <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-gray-300 text-gray-600 text-lg font-bold overflow-hidden">
+                  <span className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-gray-300 text-gray-600 text-lg font-bold overflow-hidden border-2 border-white">
                     {profileImageUrl ? (
-                      <img src={profileImageUrl} alt="Profile" className="object-cover w-full h-full rounded-full" />
+                      <img src={profileImageUrl} alt="Profile" className="object-cover rounded-full" />
                     ) : (
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 7.5a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.5 19.5a7.5 7.5 0 0115 0v.75a.75.75 0 01-.75.75h-13.5a.75.75 0 01-.75-.75V19.5z" />
                       </svg>
                     )}
@@ -224,7 +228,7 @@ export default function Navbar({ forceAdminDashboard = false }: NavbarForceAdmin
               ) : (
                 <>
                   <button
-                    className="bg-transparent text-green-600 underline underline-offset-4 font-medium px-0 py-0 hover:text-green-800 transition-colors duration-150"
+                    className="bg-transparent text-[#ffd700] underline underline-offset-4 font-medium px-0 py-0 hover:text-white transition-colors duration-150"
                     style={{ boxShadow: "none", border: "none" }}
                     onClick={() => { setMenuOpen(false); if (internalLoggedIn) { router.push("/event/create-event"); } else { router.push("Login"); } }}
                   >
@@ -232,17 +236,17 @@ export default function Navbar({ forceAdminDashboard = false }: NavbarForceAdmin
                   </button>
                   {!internalLoggedIn && (
                     <>
-                      <Link href="/Login" className="bg-transparent text-gray-800 underline underline-offset-4 font-medium px-0 py-0 hover:text-gray-900 transition-colors duration-150" style={{marginLeft: "8px", boxShadow: "none", border: "none"}}>Login</Link>
-                      <Link href="/Signup" className="bg-transparent text-orange-500 underline underline-offset-4 font-medium px-0 py-0 hover:text-orange-600 transition-colors duration-150" style={{marginLeft: "8px", boxShadow: "none", border: "none"}}>Sign Up</Link>
+                      <Link href="/Login" className="bg-transparent text-white underline underline-offset-4 font-medium px-0 py-0 hover:text-[#ffd700] transition-colors duration-150" style={{marginLeft: "8px", boxShadow: "none", border: "none"}}>Login</Link>
+                      <Link href="/Signup" className="bg-transparent text-[#ffd700] underline underline-offset-4 font-medium px-0 py-0 hover:text-white transition-colors duration-150" style={{marginLeft: "8px", boxShadow: "none", border: "none"}}>Sign Up</Link>
                     </>
                   )}
                   {internalLoggedIn && (
-                    <button className="flex items-center gap-2 px-3 py-2 rounded bg-gray-200 text-gray-700 font-semibold max-w-[180px] hover:bg-gray-300" onClick={() => setDashboardOpen((open) => !open)}>
-                      <span className="inline-flex items-center justify-center w-7 h-7 rounded-full bg-gray-300 text-gray-600 text-lg font-bold overflow-hidden">
+                    <button className="flex items-center justify-center w-11 h-11 rounded-full text-gray-700 font-semibold border-2" onClick={() => setDashboardOpen((open) => !open)}>
+                      <span className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-gray-300 text-gray-600 text-lg font-bold overflow-hidden border-2 border-white">
                         {profileImageUrl ? (
                           <img src={profileImageUrl} alt="Profile" className="object-cover w-full h-full rounded-full" />
                         ) : (
-                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-5 h-5">
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 7.5a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.5 19.5a7.5 7.5 0 0115 0v.75a.75.75 0 01-.75.75h-13.5a.75.75 0 01-.75-.75V19.5z" />
                           </svg>
                         )}
@@ -255,7 +259,7 @@ export default function Navbar({ forceAdminDashboard = false }: NavbarForceAdmin
           )}
         </div>
         {/* Tablet/Mobile: logo+menu first row, search bar second row */}
-        <div className="lg:hidden flex flex-col gap-2 bg-white bg-opacity-100 px-4 pt-2 pb-2 w-full">
+        <div className="lg:hidden flex flex-col gap-2 px-4 pt-4 pb-4 min-h-[64px] w-full" style={{ background: '#0a174e' }}>
           <div className="flex flex-row items-center justify-between w-full relative">
             <div className="flex items-center">
               <img src="/icons/family.png" alt="EventSphere Logo" className="w-8 h-8 object-cover inline-block mr-2" />
@@ -263,7 +267,7 @@ export default function Navbar({ forceAdminDashboard = false }: NavbarForceAdmin
                 type="button"
                 className={`text-2xl font-bold ${dancingScript.className} focus:outline-none`}
                 style={{
-                  color: "#0031ac",
+                  color: "#ffd700",
                   letterSpacing: "2px",
                   fontWeight: 700,
                   textShadow: "0 2px 8px #fff6, 0 1px 0 #fff",
@@ -296,9 +300,9 @@ export default function Navbar({ forceAdminDashboard = false }: NavbarForceAdmin
                 }
               }}
             >
-              <span className="block w-6 h-0.5 bg-black mb-1"></span>
-              <span className="block w-6 h-0.5 bg-black mb-1"></span>
-              <span className="block w-6 h-0.5 bg-black"></span>
+              <span className="block w-6 h-0.5 bg-white mb-1"></span>
+              <span className="block w-6 h-0.5 bg-white mb-1"></span>
+              <span className="block w-6 h-0.5 bg-white"></span>
             </button>
           </div>
           {/* Search bar full width below logo/menu */}
@@ -310,21 +314,22 @@ export default function Navbar({ forceAdminDashboard = false }: NavbarForceAdmin
           {/* Main Nav (hamburger) */}
           <ul
             className={`
-              flex flex-col items-center justify-center gap-6 text-black w-full mt-2
+              flex flex-col items-center justify-center gap-6 w-full mt-2
               ${menuOpen ? "flex" : "hidden"}
-              bg-white rounded-lg shadow p-4 absolute top-16 right-0 z-50
+              bg-[#0a174e] rounded-lg shadow p-4 absolute top-16 right-0 z-50
             `}
+            style={{ color: 'white' }}
           >
             {menuOpen && (
               <>
                 {internalLoggedIn && (
                   <li className="w-full flex justify-center mb-2">
                     <button className="flex items-center gap-2 px-3 py-2 rounded bg-gray-200 text-gray-700 font-semibold max-w-[180px] hover:bg-gray-300" onClick={() => setDashboardOpen((open) => !open)}>
-                      <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-gray-300 text-gray-600 text-lg font-bold overflow-hidden">
+                      <span className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-gray-300 text-gray-600 text-lg font-bold overflow-hidden border-2 border-white">
                         {profileImageUrl ? (
                           <img src={profileImageUrl} alt="Profile" className="object-cover w-full h-full rounded-full" />
                         ) : (
-                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-7 h-7">
                             <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 7.5a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.5 19.5a7.5 7.5 0 0115 0v.75a.75.75 0 01-.75.75h-13.5a.75.75 0 01-.75-.75V19.5z" />
                           </svg>
                         )}
@@ -336,35 +341,35 @@ export default function Navbar({ forceAdminDashboard = false }: NavbarForceAdmin
                 {isLogin && (
                   <>
                     <li className="w-full">
-                      <Link href="/" className="block text-center w-full px-4 py-2 rounded font-medium bg-black text-white hover:bg-blue-600" onClick={() => setMenuOpen(false)}>Home</Link>
+                      <Link href="/" className="block text-center w-full px-4 py-2 rounded font-medium bg-[#0a174e] text-white hover:text-[#ffd700]" onClick={() => setMenuOpen(false)}>Home</Link>
                     </li>
                     <li className="w-full">
-                      <Link href="/Signup" className="block text-center w-full px-4 py-2 rounded font-medium bg-black text-white hover:bg-blue-600" onClick={() => setMenuOpen(false)}>Sign Up</Link>
+                      <Link href="/Signup" className="block text-center w-full px-4 py-2 rounded font-medium bg-[#0a174e] text-white hover:text-[#ffd700]" onClick={() => setMenuOpen(false)}>Sign Up</Link>
                     </li>
                   </>
                 )}
                 {isSignup && (
                   <>
                     <li className="w-full">
-                      <Link href="/" className="block text-center w-full px-4 py-2 rounded font-medium bg-black text-white hover:bg-blue-600" onClick={() => setMenuOpen(false)}>Home</Link>
+                      <Link href="/" className="block text-center w-full px-4 py-2 rounded font-medium bg-[#0a174e] text-white hover:text-[#ffd700]" onClick={() => setMenuOpen(false)}>Home</Link>
                     </li>
                     <li className="w-full">
-                      <Link href="/Login" className="block text-center w-full px-4 py-2 rounded font-medium bg-black text-white hover:bg-blue-600" onClick={() => setMenuOpen(false)}>Login</Link>
+                      <Link href="/Login" className="block text-center w-full px-4 py-2 rounded font-medium bg-[#0a174e] text-white hover:text-[#ffd700]" onClick={() => setMenuOpen(false)}>Login</Link>
                     </li>
                   </>
                 )}
                 {!isLogin && !isSignup && (
                   <>
                     <li className="w-full flex justify-center">
-                      <button className="bg-transparent text-green-600 underline underline-offset-4 font-medium px-0 py-2 hover:text-green-800 transition-colors duration-150 text-center w-auto" style={{ boxShadow: "none", border: "none" }} onClick={() => { setMenuOpen(false); if (internalLoggedIn) { router.push("/event/create-event"); } else { router.push("Login"); } }}>Create Event</button>
+                      <button className="bg-transparent text-[#ffd700] underline underline-offset-4 font-medium px-0 py-2 hover:text-white transition-colors duration-150 text-center w-auto" style={{ boxShadow: "none", border: "none" }} onClick={() => { setMenuOpen(false); if (internalLoggedIn) { router.push("/event/create-event"); } else { router.push("Login"); } }}>Create Event</button>
                     </li>
                     {!internalLoggedIn && (
                       <>
                         <li className="w-full flex justify-center">
-                          <Link href="/Login" className="bg-transparent text-gray-800 underline underline-offset-4 font-medium px-0 py-2 hover:text-gray-900 transition-colors duration-150 text-center w-auto" style={{ boxShadow: "none", border: "none" }} onClick={() => setMenuOpen(false)}>Login</Link>
+                          <Link href="/Login" className="bg-transparent text-white underline underline-offset-4 font-medium px-0 py-2 hover:text-[#ffd700] transition-colors duration-150 text-center w-auto" style={{ boxShadow: "none", border: "none" }} onClick={() => setMenuOpen(false)}>Login</Link>
                         </li>
                         <li className="w-full flex justify-center">
-                          <Link href="/Signup" className="bg-transparent text-orange-500 underline underline-offset-4 font-medium px-0 py-2 hover:text-orange-600 transition-colors duration-150 text-center w-auto" style={{ boxShadow: "none", border: "none" }} onClick={() => setMenuOpen(false)}>Sign Up</Link>
+                          <Link href="/Signup" className="bg-transparent text-[#ffd700] underline underline-offset-4 font-medium px-0 py-2 hover:text-white transition-colors duration-150 text-center w-auto" style={{ boxShadow: "none", border: "none" }} onClick={() => setMenuOpen(false)}>Sign Up</Link>
                         </li>
                       </>
                     )}
@@ -386,7 +391,7 @@ export default function Navbar({ forceAdminDashboard = false }: NavbarForceAdmin
             ></div>
 
             {/* Right-side Drawer */}
-            <aside className="fixed top-0 right-0 w-80 max-w-full h-full bg-white shadow-lg p-6 flex flex-col gap-6 z-[101] animate-slideInRight">
+            <aside className="fixed top-0 right-0 w-80 max-w-full h-full shadow-lg p-6 flex flex-col gap-6 z-[101] animate-slideInRight" style={{ background: '#0a174e', color: 'white' }}>
               {/* User info block */}
               <div className="flex flex-col items-center gap-2 border-b pb-4">
                 <div className="w-16 h-16 rounded-full bg-gray-300 flex items-center justify-center text-gray-600 text-2xl overflow-hidden">
@@ -413,57 +418,73 @@ export default function Navbar({ forceAdminDashboard = false }: NavbarForceAdmin
                     </svg>
                   )}
                 </div>
-                <div className="text-center">
-                  <p className="font-bold text-lg">{username}</p>
-                  <p className="text-sm text-gray-600 break-all">
+                <div className="text-center mt-2">
+                  <p className="font-bold text-lg">Hi, {username} !!</p>
+                  <p className="text-sm break-all" style={{ color: 'white' }}>
                     {email || "user@gmail.com"}
                   </p>
                 </div>
               </div>
 
-              {/* Navigation buttons: show only View Profile for admin, all for user */}
+              {/* Navigation buttons */}
               <nav className="flex flex-col gap-3 flex-1">
                 {isAdmin && isAdminDashboardRoute ? (
                   <>
-                    <button
-                      onClick={() => {
-                        router.push("/admin/edit-profile");
-                        setDashboardOpen(false);
-                      }}
-                      className="text-left px-2 py-1 rounded hover:bg-gray-100 font-semibold text-lg"
-                    >
+                    <button onClick={() => { router.push("/admin/edit-profile"); setDashboardOpen(false); }} className="text-left px-2 py-1 rounded font-semibold text-lg hover:bg-[#0a174e] hover:text-white hover:underline" style={{ transition: 'all 0.2s' }}>
                       My Profile
                     </button>
-                    <button
-                      onClick={() => {
-                        router.push("/admin/approved-events");
-                        setDashboardOpen(false);
-                      }}
-                      className="text-left px-2 py-1 rounded hover:bg-gray-100 font-semibold text-lg"
-                    >
+                    <button onClick={() => { router.push("/admin/approved-events"); setDashboardOpen(false); }} className="text-left px-2 py-1 rounded font-semibold text-lg hover:bg-[#0a174e] hover:text-white hover:underline" style={{ transition: 'all 0.2s' }}>
                       Approved Events
                     </button>
-                    <button
-                      onClick={() => {
-                        router.push("/admin/all-payments");
-                        setDashboardOpen(false);
-                      }}
-                      className="text-left px-2 py-1 rounded hover:bg-green-100 font-semibold text-lg"
-                    >
+                    <button onClick={() => { router.push("/admin/all-payments"); setDashboardOpen(false); }} className="text-left px-2 py-1 rounded font-semibold text-lg hover:bg-[#0a174e] hover:text-white hover:underline" style={{ transition: 'all 0.2s' }}>
                       View All Event Payments
                     </button>
                   </>
                 ) : (
                   <>
-                    <button onClick={() => {router.push("/dashboard/edit-profile");setDashboardOpen(false);}} className="text-left px-2 py-1 rounded hover:bg-gray-100 font-semibold text-lg">View Profile</button>
-                    <button onClick={() => {router.push("/event/create-event");setDashboardOpen(false);}} className="text-left px-2 py-1 rounded hover:bg-gray-100 font-semibold text-lg">Create Event</button>
-                    <button onClick={() => {router.push("/dashboard/upcoming-organized-events");setDashboardOpen(false);}} className="text-left px-2 py-1 rounded hover:bg-gray-100 font-semibold text-lg">Upcoming Organized Events</button>
-                    <button onClick={() => {router.push("/dashboard/upcoming-registered-events");setDashboardOpen(false);}} className="text-left px-2 py-1 rounded hover:bg-gray-100 font-semibold text-lg">Upcoming Registered Events</button>
-                    <button onClick={() => {router.push("/dashboard/bookmarks");setDashboardOpen(false);}} className="text-left px-2 py-1 rounded hover:bg-gray-100 font-semibold text-lg">Bookmarked Events</button>
-                    <button onClick={() => {router.push("/dashboard/past-attended-events");setDashboardOpen(false);}} className="text-left px-2 py-1 rounded hover:bg-gray-100 font-semibold text-lg">Past Attended Events</button>
-                    <button onClick={() => {router.push("/dashboard/past-organized-events");setDashboardOpen(false);}} className="text-left px-2 py-1 rounded hover:bg-gray-100 font-semibold text-lg">Past Organized Events</button>
-                    <button onClick={() => {router.push("/dashboard/my-events-payments");setDashboardOpen(false);}} className="text-left px-2 py-1 rounded hover:bg-blue-100 font-semibold text-lg">My Events Payments</button>
-                    <button onClick={() => {router.push("/dashboard/tickets");setDashboardOpen(false);}} className="text-left px-2 py-1 rounded hover:bg-gray-100 font-semibold text-lg">Tickets Booked</button>
+                    <button onClick={() => {router.push("/dashboard/edit-profile");setDashboardOpen(false);}} className="text-left px-2 py-1 rounded font-semibold text-lg hover:bg-[#0a174e] hover:text-white hover:underline" style={{ transition: 'all 0.2s' }}>View Profile</button>
+                    <button onClick={() => {router.push("/event/create-event");setDashboardOpen(false);}} className="text-left px-2 py-1 rounded font-semibold text-lg hover:bg-[#0a174e] hover:text-white hover:underline" style={{ transition: 'all 0.2s' }}>Create Event</button>
+                    <button onClick={() => {router.push("/dashboard/upcoming-organized-events");setDashboardOpen(false);}} className="text-left px-2 py-1 rounded font-semibold text-lg hover:bg-[#0a174e] hover:text-white hover:underline" style={{ transition: 'all 0.2s' }}>Upcoming Organized Events</button>
+                    <button onClick={() => {router.push("/dashboard/upcoming-registered-events");setDashboardOpen(false);}} className="text-left px-2 py-1 rounded font-semibold text-lg hover:bg-[#0a174e] hover:text-white hover:underline" style={{ transition: 'all 0.2s' }}>Upcoming Registered Events</button>
+                    <button onClick={() => {router.push("/dashboard/bookmarks");setDashboardOpen(false);}} className="text-left px-2 py-1 rounded font-semibold text-lg hover:bg-[#0a174e] hover:text-white hover:underline" style={{ transition: 'all 0.2s' }}>Bookmarked Events</button>
+                    <button onClick={() => {router.push("/dashboard/past-attended-events");setDashboardOpen(false);}} className="text-left px-2 py-1 rounded font-semibold text-lg hover:bg-[#0a174e] hover:text-white hover:underline" style={{ transition: 'all 0.2s' }}>Past Attended Events</button>
+                    <button onClick={() => {router.push("/dashboard/past-organized-events");setDashboardOpen(false);}} className="text-left px-2 py-1 rounded font-semibold text-lg hover:bg-[#0a174e] hover:text-white hover:underline" style={{ transition: 'all 0.2s' }}>Past Organized Events</button>
+                    <button onClick={() => {router.push("/dashboard/my-events-payments");setDashboardOpen(false);}} className="text-left px-2 py-1 rounded font-semibold text-lg hover:bg-[#0a174e] hover:text-white hover:underline" style={{ transition: 'all 0.2s' }}>My Events Payments</button>
+                    <button onClick={() => {router.push("/dashboard/tickets");setDashboardOpen(false);}} className="text-left px-2 py-1 rounded font-semibold text-lg hover:bg-[#0a174e] hover:text-white hover:underline" style={{ transition: 'all 0.2s' }}>Tickets Booked</button>
+                    <button onClick={async () => {
+                      setDashboardOpen(false);
+                      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+                      const userStr = typeof window !== 'undefined' ? localStorage.getItem('user') : null;
+                      if (!userStr) {
+                        alert('User not found');
+                        return;
+                      }
+                      const user: UserProfile = JSON.parse(userStr);
+                      const userId = user?.userId || user?.id || user?.UserId || user?.Id;
+                      const userEmail = user?.email || user?.Email;
+                      if (!userId || !userEmail) {
+                        alert('User ID or email not found');
+                        return;
+                      }
+                      try {
+                        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || "https://dep2-backend.onrender.com"}/api/Users/${userId}/stripe-express-account`, {
+                          method: 'POST',
+                          headers: {
+                            'Content-Type': 'application/json',
+                            ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+                          },
+                          body: JSON.stringify({ email: userEmail })
+                        });
+                        const data = await res.json();
+                        if (data.onboardingUrl) {
+                          window.location.href = data.onboardingUrl;
+                        } else {
+                          alert('Stripe onboarding failed.');
+                        }
+                      } catch {
+                        alert('Stripe onboarding failed.');
+                      }
+                    }} className="text-left px-2 py-1 rounded font-semibold text-lg hover:bg-[#0a174e] hover:text-white hover:underline" style={{ transition: 'all 0.2s' }}>Connect to Stripe</button>
                   </>
                 )}
               </nav>

@@ -41,7 +41,7 @@ export default function EventCard({
   onApprove,
 }: EventCardProps): React.JSX.Element {
   const [approved, setApproved] = useState<boolean>(event.isVerifiedByAdmin ?? false);
-useEffect(() => { setApproved(event.isVerifiedByAdmin ?? false); }, [event.isVerifiedByAdmin]);
+  useEffect(() => { setApproved(event.isVerifiedByAdmin ?? false); }, [event.isVerifiedByAdmin]);
   const [showApproveDialog, setShowApproveDialog] = useState<boolean>(false);
 
   // Detect admin from localStorage
@@ -85,7 +85,7 @@ useEffect(() => { setApproved(event.isVerifiedByAdmin ?? false); }, [event.isVer
       }
       try {
         const res = await axios.get<{ eventId: string | number }[]>(
-          `https://dep2-backend.onrender.com/api/Bookmarks/bookmarked-events/${userId}`,
+          `${API_URL}/api/Bookmarks/bookmarked-events/${userId}`,
           { headers: token ? { Authorization: `Bearer ${token}` } : {} }
         );
         const data = res.data;
@@ -99,13 +99,12 @@ useEffect(() => { setApproved(event.isVerifiedByAdmin ?? false); }, [event.isVer
       }
     }
     fetchBookmarkStatus();
-    // Only run on mount or if eventId changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [event.eventId]);
 
   useEffect(() => {
-  setEditCount(event.editEventCount ?? 0);
-}, [event.editEventCount]);
+    setEditCount(event.editEventCount ?? 0);
+  }, [event.editEventCount]);
 
   function handleApprove(e: React.MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
@@ -113,9 +112,9 @@ useEffect(() => { setApproved(event.isVerifiedByAdmin ?? false); }, [event.isVer
     setShowApproveDialog(true);
   }
 
-  // ...existing code...
 async function confirmApprove() {
   setShowApproveDialog(false);
+  setApproving(true);
   const token = localStorage.getItem("token");
   const organiserEmail: string | undefined =
     event.OrganizerEmail || event.organiserEmail || event.organizerEmail;
@@ -124,11 +123,13 @@ async function confirmApprove() {
 
   if (!organiserEmail) {
     setPopup({ message: "Organiser email not found for this event.", type: "error" });
+    setApproving(false);
     return;
   }
-  console.log(editCount);
 
-if ((event.editEventCount ?? 0) >= 0) {
+  // Use the logic that distinguishes between a new event approval and an edit approval
+  if ((event.editEventCount ?? 0) >= 0) {
+    // Standard event approval
     try {
       const res = await fetch(`${API_URL}/api/Admin/event/${event.eventId}/approve`, {
         method: "PUT",
@@ -141,8 +142,8 @@ if ((event.editEventCount ?? 0) >= 0) {
           window.dispatchEvent(new Event("eventApproved"));
         }
         // Send mail to organiser
-        const emailBody = `
-          <div style='font-family:Segoe UI,Arial,sans-serif;background:#f9fafb;padding:32px;border-radius:16px;text-align:center;'>
+        const emailBody =
+          `<div style='font-family:Segoe UI,Arial,sans-serif;background:#f9fafb;padding:32px;border-radius:16px;text-align:center;'>
             <h2 style='color:#16a34a;font-size:2rem;margin-bottom:8px;'>🎉 Congratulations!</h2>
             <p style='font-size:1.1rem;color:#374151;'>
               Your event <b style='color:#2563eb;'>${eventTitle}</b> has been <span style='color:#16a34a;font-weight:bold;'>approved</span> by our admin team.<br/>
@@ -153,20 +154,13 @@ if ((event.editEventCount ?? 0) >= 0) {
                 Wishing you a successful and memorable event!
               </span>
             </div>
-            <p style='color:#64748b;font-size:0.95rem;'>
-              If you need any help, feel free to reach out.<br/>
-              <span style='font-size:1.2rem;'>👍🌟</span>
-            </p>
-            <hr style='margin:24px 0;border:none;border-top:1px solid #e5e7eb;' />
-            <p style='font-size:0.9rem;color:#6b7280;'>Thank you for choosing EventSphere!</p>
-          </div>
-        `;
+          </div>`;
         await axios.post(
           `${API_URL}/api/email/send-to-organiser`,
           {
             from: "admin@eventsphere.com",
             to: organiserEmail,
-            subject: `Your event \"${eventTitle}\" has been approved!`,
+            subject: `Your event "${eventTitle}" has been approved!`,
             body: emailBody,
           },
           { headers: token ? { Authorization: `Bearer ${token}` } : {} }
@@ -183,6 +177,8 @@ if ((event.editEventCount ?? 0) >= 0) {
     } catch {
       setApproved(false);
       setPopup({ message: "Failed to approve event.", type: "error" });
+    } finally {
+        setApproving(false);
     }
   } else {
     // Edit approval branch
@@ -198,8 +194,8 @@ if ((event.editEventCount ?? 0) >= 0) {
           window.dispatchEvent(new Event("eventApproved"));
         }
         // Send mail to organiser about edit approval
-        const emailBody = `
-          <div style='font-family:Segoe UI,Arial,sans-serif;background:#f9fafb;padding:32px;border-radius:16px;text-align:center;'>
+        const emailBody =
+          `<div style='font-family:Segoe UI,Arial,sans-serif;background:#f9fafb;padding:32px;border-radius:16px;text-align:center;'>
             <h2 style='color:#2563eb;font-size:2rem;margin-bottom:8px;'>✏️ Edit Approved!</h2>
             <p style='font-size:1.1rem;color:#374151;'>
               Your recent changes to event <b style='color:#2563eb;'>${eventTitle}</b> have been <span style='color:#16a34a;font-weight:bold;'>approved</span> by our admin team.<br/>
@@ -210,20 +206,13 @@ if ((event.editEventCount ?? 0) >= 0) {
                 Your event details are now updated and live!
               </span>
             </div>
-            <p style='color:#64748b;font-size:0.95rem;'>
-              If you need any help, feel free to reach out.<br/>
-              <span style='font-size:1.2rem;'>👍🌟</span>
-            </p>
-            <hr style='margin:24px 0;border:none;border-top:1px solid #e5e7eb;' />
-            <p style='font-size:0.9rem;color:#6b7280;'>Thank you for keeping your event up to date with EventSphere!</p>
-          </div>
-        `;
+          </div>`;
         await axios.post(
           `${API_URL}/api/email/send-to-organiser`,
           {
             from: "admin@eventsphere.com",
             to: organiserEmail,
-            subject: `Your edits to \"${eventTitle}\" have been approved!`,
+            subject: `Your edits to "${eventTitle}" have been approved!`,
             body: emailBody,
           },
           { headers: token ? { Authorization: `Bearer ${token}` } : {} }
@@ -240,12 +229,12 @@ if ((event.editEventCount ?? 0) >= 0) {
     } catch {
       setApproved(false);
       setPopup({ message: "Failed to approve edited event.", type: "error" });
+    } finally {
+        setApproving(false);
     }
   }
 }
-// ...existing code...
 
-  // Handler for bookmark toggle
   const handleBookmarkToggle = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
     e.stopPropagation();
@@ -263,7 +252,7 @@ if ((event.editEventCount ?? 0) >= 0) {
       }
       if (isBookmarked) {
         await axios.delete(
-          `https://dep2-backend.onrender.com/api/Bookmarks/delete/${event.eventId}?userId=${userId}`,
+          `${API_URL}/api/Bookmarks/delete/${event.eventId}?userId=${userId}`,
           { headers: token ? { Authorization: `Bearer ${token}` } : {} }
         );
         setIsBookmarked(false);
@@ -273,7 +262,7 @@ if ((event.editEventCount ?? 0) >= 0) {
         }
       } else {
         await axios.post(
-          `https://dep2-backend.onrender.com/api/Bookmarks/add`,
+          `${API_URL}/api/Bookmarks/add`,
           { eventId: event.eventId, userId },
           { headers: token ? { Authorization: `Bearer ${token}` } : {} }
         );
@@ -290,18 +279,15 @@ if ((event.editEventCount ?? 0) >= 0) {
     }
   };
 
-  // Registration deadline (assume event.registrationDeadline is ISO string)
   const registrationDeadline = event.registrationDeadline ? new Date(event.registrationDeadline) : null;
 
-  // Helper to ensure image URLs are absolute for backend-served images
   const toAbsoluteUrl = (url: string | undefined) => {
     if (!url) return "/images/card-top.jpg";
     if (url.startsWith("http://") || url.startsWith("https://")) return url;
-    if (url.startsWith("/uploads/")) return `https://dep2-backend.onrender.com${url}`;
+    if (url.startsWith("/uploads/")) return `${API_URL}${url}`;
     return url;
   };
 
-  // If event has Media (array), use first image, else fallback
   const images: string[] = Array.isArray(event?.media) && event.media.length > 0
     ? event.media.filter((m: MediaItem) => m.mediaType === "Image").map((m: MediaItem) => toAbsoluteUrl(m.mediaUrl))
     : [toAbsoluteUrl(event.coverImage)];
@@ -319,16 +305,15 @@ if ((event.editEventCount ?? 0) >= 0) {
   const title = event.title || "Untitled Event";
   const eventStart = event.eventStart ? new Date(event.eventStart) : null;
   const eventEnd = event.eventEnd ? new Date(event.eventEnd) : null;
-  // Calculate duration in hours (rounded to 1 decimal)
+  
   let duration: string | null = null;
   if (eventStart && eventEnd) {
     const diffMs = eventEnd.getTime() - eventStart.getTime();
     if (diffMs > 0) {
-      duration = (diffMs / (1000 * 60 * 60)).toFixed(1); // hours
+      duration = (diffMs / (1000 * 60 * 60)).toFixed(1);
     }
   }
 
-  // Recurrence label for display
   let recurrenceLabel = "";
   if (event.recurrenceType) {
     if (event.recurrenceType.toLowerCase() === "one-time") recurrenceLabel = "Once";
@@ -361,13 +346,10 @@ if ((event.editEventCount ?? 0) >= 0) {
         className="block group focus:outline-none focus:ring-2 focus:ring-blue-400"
         tabIndex={0}
       >
-        <div className="relative bg-white/10 backdrop-blur-lg rounded-3xl border border-white/20 shadow-xl overflow-hidden mx-auto px-2 py-3 sm:px-4 sm:py-4 mb-2 flex flex-col w-full h-auto min-h-[260px] sm:min-h-[340px] md:min-h-[420px] sm:min-w-[280px] sm:max-w-[400px] md:min-w-[350px] md:max-w-[450px] lg:min-w-[370px] lg:max-w-[480px] event-card-responsive
-    sm:w-full md:w-1/2 lg:w-1/3">
-          {/* Glow background */}
+        <div className="relative bg-white/10 backdrop-blur-lg rounded-3xl border border-white/20 shadow-xl overflow-hidden mx-auto px-2 py-3 sm:px-4 sm:py-4 mb-2 flex flex-col w-full h-auto min-h-[260px] sm:min-h-[340px] md:min-h-[420px] sm:min-w-[280px] sm:max-w-[340px] md:min-w-[340px] md:max-w-[340px] lg:min-w-[330px] lg:max-w-[360px] event-card-responsive">
           <div className="absolute -top-10 -left-10 w-40 h-40 bg-blue-500/30 rounded-full blur-3xl opacity-60 z-0" />
           <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-purple-500/30 rounded-full blur-3xl opacity-50 z-0" />
           <div className="relative z-10 flex flex-col h-full">
-            {/* Image Carousel */}
             <div className="relative w-full h-28 sm:h-36 md:h-40 lg:h-44 rounded-2xl overflow-hidden flex-shrink-0">
               <Image
                 src={images[0]}
@@ -378,7 +360,6 @@ if ((event.editEventCount ?? 0) >= 0) {
                 priority
               />
             </div>
-            {/* Location/Online & Type */}
             <div className="flex items-center mt-2 flex-wrap gap-y-1">
               <div className="flex text-xs font-sans items-center max-w-[140px] flex-shrink-0">
                 <Image src="/icons/location.png" alt="Location" width={13} height={13} />
@@ -386,7 +367,7 @@ if ((event.editEventCount ?? 0) >= 0) {
                   className="ml-1 w-[110px] overflow-hidden text-ellipsis whitespace-nowrap inline-block align-middle"
                   title={location}
                 >
-                  {location}
+                  {location && location !== "Venue" ? location : "TBA"}
                 </span>
               </div>
               <div className="mx-2">|</div>
@@ -395,13 +376,12 @@ if ((event.editEventCount ?? 0) >= 0) {
                 <span className="ml-1">{type}</span>
               </div>
             </div>
-            {/* Title */}
             <div className="flex items-center justify-between mb-1 lg:mb-2 flex-wrap gap-y-1">
               <h4
                 className="text-base sm:text-lg md:text-xl lg:text-2xl font-semibold max-w-[150px] md:max-w-[180px] lg:max-w-[220px] overflow-hidden text-ellipsis whitespace-nowrap block"
                 title={title}
               >
-                {title}
+                {title && title !== "Untitled Event" ? title : "TBA"}
               </h4>
               <button
                 type="button"
@@ -418,7 +398,6 @@ if ((event.editEventCount ?? 0) >= 0) {
                 )}
               </button>
             </div>
-            {/* Date, Start Time & Duration */}
             <div className="flex flex-col gap-1 lg:mb-1 w-full text-xs sm:text-sm md:text-base lg:text-base">
               <div className="flex gap-2 items-center font-bold text-xs">
                 <Image src="/icons/calendar.png" alt="Date" width={15} height={20} />
@@ -428,15 +407,14 @@ if ((event.editEventCount ?? 0) >= 0) {
                     <>
                       {" "}
                       <span className="text-gray-500">{eventStart.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        {duration && (
+                        {duration ? (
                           <span className="text-gray-400 ml-1">({duration} hr{Number(duration) !== 1 ? 's' : ''})</span>
-                        )}
+                        ): <span className="text-gray-400 ml-1">(TBA)</span>}
                       </span>
                     </>
                   )}
                 </span>
               </div>
-              {/* Registration Deadline */}
               {registrationDeadline && (
                 <div className="flex items-center gap-1 mt-1 text-xs font-semibold text-red-400">
                   <FaRegClock className="text-red-400" size={15} />
@@ -446,7 +424,6 @@ if ((event.editEventCount ?? 0) >= 0) {
                 </div>
               )}
             </div>
-            {/* Registration info */}
             <div className="text-xs sm:text-sm md:text-base flex items-center gap-2 mb-1 flex-wrap">
               <span className="text-blue-600 text-xs font-bold">{registrations}</span>{" "}
               <span className="text-xs">registrations</span>
@@ -460,7 +437,6 @@ if ((event.editEventCount ?? 0) >= 0) {
                 </span>
               )}
             </div>
-            {/* Category, Recurrence & Share */}
             <div className="flex justify-between items-center text-xs sm:text-sm md:text-base mb-2 lg:mb-4 flex-wrap gap-y-1">
               <div className="flex gap-2 text-xs items-center">
                 <Image src="/icons/businessman.png" alt="Category" width={20} height={20} />
@@ -488,9 +464,7 @@ if ((event.editEventCount ?? 0) >= 0) {
                 <Image src="/icons/send.png" alt="Share" width={16} height={20} />
               </button>
             </div>
-            {/* Register/Approve Button and Actions */}
             <div className="flex flex-col items-center gap-2 mt-2 mb-0 w-full pb-0">
-              {/* Admin Approve Button Logic */}
               {isAdmin && typeof event.isVerifiedByAdmin !== 'undefined' ? (
                 <div className="flex items-center gap-2">
                   {approved ? (
@@ -499,15 +473,17 @@ if ((event.editEventCount ?? 0) >= 0) {
                     </span>
                   ) : (
                     <button
-                      className="bg-orange-500 text-white text-xs lg:text-sm py-1 px-3 lg:py-2 lg:px-6 rounded-full shadow-md font-semibold tracking-wide hover:bg-orange-600 transition cursor-pointer"
+                      className="bg-orange-500 text-white text-xs lg:text-sm py-1 px-3 lg:py-2 lg:px-6 rounded-full shadow-md font-semibold tracking-wide hover:bg-orange-600 transition cursor-pointer flex items-center justify-center gap-2"
                       aria-label="Approve event"
                       onClick={handleApprove}
-                      disabled={approved}
+                      disabled={approved || approving}
                     >
-                      Approve Event
+                      {approving ? (
+                      <span className="animate-spin inline-block" role="img" aria-label="approving" style={{ fontSize: '1.2em' }}>😊</span>
+                    ) : null}
+                    {approving ? 'Approving...' : 'Approve Event'}
                     </button>
                   )}
-                  {/* Mail Icon Button for Admins */}
                   <button
                     className="ml-2 flex items-center justify-center bg-blue-500 hover:bg-blue-600 text-white rounded-full p-2 transition"
                     title="Send Email to Organiser"
@@ -515,8 +491,8 @@ if ((event.editEventCount ?? 0) >= 0) {
                     onClick={e => {
                       e.preventDefault();
                       e.stopPropagation();
-                      const organiserEmail = event.organiserEmail || event.organizerEmail || event.OrganizerEmail || "Organiser Email";
-                      const eventTitle = event.title || event.eventTitle || event.name || "Event Title";
+                      const organiserEmail = event.organiserEmail || event.organizerEmail || event.OrganizerEmail;
+                      const eventTitle = event.title || event.eventTitle || event.name;
                       if (organiserEmail) {
                         window.location.href = `/send-email?to=${encodeURIComponent(organiserEmail)}&event=${encodeURIComponent(eventTitle)}`;
                       } else {
@@ -539,7 +515,7 @@ if ((event.editEventCount ?? 0) >= 0) {
                       window.location.href = `/event/${event.eventId || event.id || event.Id}/register`;
                     }
                   }}
-                  className="bg-gradient-to-r text-xs sm:text-sm md:text-base lg:text-lg from-purple-500 to-blue-500 py-1 sm:py-2 px-3 sm:px-4 md:px-6 rounded-full shadow-md hover:from-purple-600 hover:to-blue-600 transition cursor-pointer select-none font-semibold tracking-wide"
+                  className="text-xs sm:text-sm md:text-base lg:text-lg py-2 px-6 rounded-xl font-bold tracking-wide select-none cursor-pointer transition bg-gradient-to-r from-[#0a174e] via-[#142a5c] to-[#1a2250] text-[#d4af37] border-2 border-[#bfae3a] shadow-lg hover:scale-105 hover:from-[#142a5c] hover:to-[#1a2250] hover:text-[#e6c200] hover:border-[#e6c200] focus:outline-none focus:ring-4 focus:ring-[#142a5c] text-center"
                   aria-label="Register for event"
                 >
                   Register Now
@@ -547,14 +523,10 @@ if ((event.editEventCount ?? 0) >= 0) {
               )}
               {showActions && (
                 <div className="flex gap-2 mt-1">
-                  {/* Edit (Pencil) Button */}
                   {editCount === -1 ? (
                     <button
                       type="button"
-                      onClick={e => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                      }}
+                      onClick={e => { e.preventDefault(); e.stopPropagation(); }}
                       className="flex items-center gap-1 px-3 py-1 bg-yellow-100 hover:bg-yellow-200 rounded-full text-xs font-semibold text-yellow-800 shadow border border-yellow-300 transition focus:outline-none focus:ring-2 focus:ring-yellow-400 cursor-pointer"
                       title="Last Edit Not Approved"
                     ><span>Last Edit Not Approved</span></button>
@@ -571,14 +543,13 @@ if ((event.editEventCount ?? 0) >= 0) {
                     >
                       <FaEdit className="h-4 w-4" />
                       <span>Edit</span>
-                      {((typeof event.editCount === 'number' && !isNaN(event.editCount)) || (typeof event.editCount === 'string' && !isNaN(Number(event.editCount)))) && (
+                      {((typeof event.editEventCount === 'number' && !isNaN(event.editEventCount))) && (
                         <span className="ml-2 px-2 py-0.5 bg-white border border-yellow-300 rounded text-yellow-700 font-bold text-xs" title="Edits left">
                           {event.editEventCount} left
                         </span>
                       )}
                     </button>
                   )}
-                  {/* Delete Button */}
                   <button
                     type="button"
                     className="flex items-center gap-1 px-3 py-1 bg-red-100 hover:bg-red-200 rounded-full text-xs font-semibold text-red-800 shadow border border-red-300 transition focus:outline-none focus:ring-2 focus:ring-red-400 cursor-pointer"
@@ -607,7 +578,7 @@ if ((event.editEventCount ?? 0) >= 0) {
       {showApproveModal && ReactDOM.createPortal(
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/30">
           <div className="bg-white rounded-xl shadow-2xl p-8 min-w-[320px] text-center">
-            <h3 className="text-xl font-bold mb-4 text-blue-700">Are you sure you want to approve event?</h3>
+            <h3 className="text-xl font-bold mb-4 text-blue-700">Are you sure you want to approve this event?</h3>
             <div className="flex justify-center gap-6 mt-6">
               <button
                 className="bg-blue-500 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-600 transition"

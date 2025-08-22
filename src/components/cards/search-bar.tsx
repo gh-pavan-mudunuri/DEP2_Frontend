@@ -3,12 +3,12 @@ import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import axios from "axios";
 import EventCard from "./event-card";
-import { EventInterface } from "@/interfaces/home";
+import { EventInterface } from "@/interfaces/home"; // Keep the original EventInterface import
 
 export default function SearchBar() {
-  const [query, setQuery] = useState<string>("");
-  const [results, setResults] = useState<EventInterface[]>([]);
-  const [showPopup, setShowPopup] = useState<boolean>(false);
+  const [query, setQuery] = useState<string>(""); // Keep string type
+  const [results, setResults] = useState<EventInterface[]>([]); // Keep EventInterface[] type
+  const [showPopup, setShowPopup] = useState<boolean>(false); // Keep boolean type
   const router = useRouter();
   const popupRef = useRef<HTMLDivElement>(null);
 
@@ -20,15 +20,18 @@ export default function SearchBar() {
     }
     const fetchEvents = async () => {
       try {
+        // Keep the original API URL and strong typing for the response
         const res = await axios.post<{ success: boolean; data: EventInterface[] }>(
-          "https://dep2-backend.onrender.com/api/Home/filter",
+          "https://dep2-backend.onrender.com/api/Home/filter", // Original API URL
           {}
         );
         if (res.data && res.data.success && Array.isArray(res.data.data)) {
           const filtered = res.data.data.filter(
             (e: EventInterface) =>
               (e.title && e.title.toLowerCase().includes(query.toLowerCase())) ||
-              (e.location && e.location.toLowerCase().includes(query.toLowerCase()))
+              (e.location && e.location.toLowerCase().includes(query.toLowerCase())) ||
+              // Added e.category to filter logic from the second snippet
+              ("category" in e && typeof e.category === 'string' && e.category.toLowerCase().includes(query.toLowerCase()))
           );
           setResults(filtered);
           setShowPopup(filtered.length > 0);
@@ -60,6 +63,7 @@ export default function SearchBar() {
     };
   }, [showPopup]);
 
+  // Keep original handleSubmit type
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!query.trim()) return;
@@ -69,7 +73,8 @@ export default function SearchBar() {
 
   return (
     <div className="relative w-full">
-      <form onSubmit={handleSubmit} className="flex items-center h-9 sm:h-10 w-full">
+      {/* Updated form className from the second snippet */}
+      <form onSubmit={handleSubmit} className="flex items-center w-full">
         <input
           type="text"
           value={query}
@@ -79,16 +84,19 @@ export default function SearchBar() {
             else setShowPopup(false);
           }}
           placeholder="Search events, organizers, or categories..."
-          className="h-9 sm:h-10 px-2 sm:px-3 border border-gray-300 rounded-l-md focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm sm:text-base w-full"
+          // Updated input className from the second snippet
+          className="px-2 sm:px-3 border-b border-white bg-transparent focus:outline-none focus:border-b-2 focus:border-white text-base w-full text-white placeholder:text-gray-300 focus:text-white"
         />
         <button
           type="submit"
-          className="h-9 sm:h-10 px-2 sm:px-4 bg-blue-600 text-white rounded-r-md font-semibold hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center"
+          // Updated button className from the second snippet
+          className="h-9 sm:h-10 px-2 sm:px-4 bg-transparent text-white font-semibold flex items-center justify-center"
           aria-label="Search"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
-            <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" fill="none" />
-            <line x1="16.5" y1="16.5" x2="21" y2="21" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+          {/* Updated SVG fill, stroke, and added style transform from the second snippet */}
+          <svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 24 24" strokeWidth={2} stroke="white" className="w-5 h-5" style={{ transform: 'scaleX(-1)' }}>
+            <circle cx="11" cy="11" r="7" stroke="white" strokeWidth="2" fill="none" />
+            <line x1="16.5" y1="16.5" x2="21" y2="21" stroke="white" strokeWidth="2" strokeLinecap="round" />
           </svg>
         </button>
       </form>

@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { Occurrence } from "@/interfaces/event-form";
+
 function formatDateTime(dateStr?: string) {
   if (!dateStr) return '';
   const date = new Date(dateStr);
@@ -17,9 +18,9 @@ function formatDateTime(dateStr?: string) {
   });
   return `${d}, ${t}`;
 }
- 
+
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://dep2-backend.onrender.com";
- 
+
 function processDescriptionHtml(html: string | undefined): string {
   if (!html) return '<span style="color:#bbb">[Description]</span>';
   let out = html.replace(
@@ -47,7 +48,7 @@ function processDescriptionHtml(html: string | undefined): string {
   });
   return out;
 }
- 
+
 type Speaker = {
   name: string;
   bio: string;
@@ -92,8 +93,9 @@ type EventLivePreviewProps = {
   /** If true, always use mobile (vertical) layout regardless of screen size */
   forceMobileLayout?: boolean;
 };
- 
-const EventLivePreview: React.FC<EventLivePreviewProps> = ({ event, forceMobileLayout,  }) => {
+
+const EventLivePreview: React.FC<EventLivePreviewProps> = ({ event, forceMobileLayout }) => {
+  const [showImageModal, setShowImageModal] = React.useState(false);
   // Calculate available tickets
   const ticketsBooked = event.ticketsBooked ?? event.registrationCount ?? 0;
   const maxAttendees = Number(event.maxAttendees) || 0;
@@ -114,27 +116,41 @@ const EventLivePreview: React.FC<EventLivePreviewProps> = ({ event, forceMobileL
   const detailsGridClass = forceMobileLayout
     ? 'grid grid-cols-1 gap-4'
     : 'grid grid-cols-1 md:grid-cols-2 gap-4';
+
   return (
-  <div className="w-full mx-auto p-0 md:p-4 lg:p-8 bg-white/90 rounded-3xl shadow-xl mb-4">
+    <div className="w-full mx-auto p-0 md:p-4 lg:p-8 bg-white/90 rounded-3xl shadow-xl mb-4 relative">
+      {/* Modal for image preview */}
+      {showImageModal && event.coverImageUrl && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => setShowImageModal(false)}>
+          <div className="absolute inset-0" />
+          <div className="relative z-10 max-w-2xl w-full flex flex-col items-center justify-center">
+            <img src={event.coverImageUrl} alt="Event Banner" className="rounded-2xl shadow-2xl max-h-[80vh] object-contain border-4 border-yellow-300" />
+            <button className="mt-4 px-6 py-2 bg-yellow-500 text-white rounded-xl font-bold shadow hover:bg-yellow-600" onClick={() => setShowImageModal(false)}>Close</button>
+          </div>
+        </div>
+      )}
       <div className="w-full flex justify-center mb-6">
         <div
-          className="border-2 border-fuchsia-300 bg-white/90 rounded-2xl shadow-lg px-6 py-4 max-w-2xl w-full flex items-center justify-center"
+          className="bg-white rounded-2xl shadow-lg px-8 py-6 max-w-2xl w-full flex items-center justify-center"
           style={{
             wordBreak: 'break-word',
             overflowWrap: 'break-word',
             textAlign: 'center',
-            fontWeight: 800,
-            fontSize: event.title && event.title.length > 50 ? '1.3rem' : event.title && event.title.length > 30 ? '1.7rem' : '2.1rem',
+            fontWeight: 900,
+            fontSize: event.title && event.title.length > 50 ? '1.2rem' : event.title && event.title.length > 30 ? '1.5rem' : '1.8rem',
             lineHeight: 1.18,
-            boxShadow: '0 2px 12px 0 #f59e4299',
-            padding: '1.2rem 1.5rem',
+            boxShadow: '0 4px 24px 0 #0a174e22',
+            padding: '1.5rem 2rem',
             maxWidth: '90vw',
             whiteSpace: 'pre-line',
             overflow: 'hidden',
+            letterSpacing: '0.04em',
+            border: '3px solid #0a174e',
+            borderRadius: '1.25rem',
           }}
           title={event.title}
         >
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-500 via-fuchsia-600 to-indigo-600 drop-shadow-lg break-words whitespace-pre-line w-full overflow-hidden text-ellipsis">
+          <span className="text-[#0a174e] font-extrabold break-words whitespace-pre-line w-full overflow-hidden text-ellipsis" style={{textShadow:'0 2px 12px #ffd70088'}}>
             {event.title}
           </span>
         </div>
@@ -142,15 +158,28 @@ const EventLivePreview: React.FC<EventLivePreviewProps> = ({ event, forceMobileL
       <div className={mainSectionClass}>
         {/* Left: Cover image and vibe video */}
         <div className={leftColClass}>
-          <div className="relative w-full max-h-[180px] md:max-h-[220px] rounded-xl overflow-hidden flex items-center justify-center border border-orange-100 shadow bg-gradient-to-br from-orange-50 via-white to-indigo-100">
-            {event.coverImageUrl ? (
-              <img src={event.coverImageUrl} alt="Event Banner Preview" className="object-cover w-full h-full transition-transform duration-300 hover:scale-105" style={{maxHeight:'220px'}} />
-            ) : (
-              <span className="text-gray-400 italic">No banner uploaded yet</span>
-            )}
+          <div className="mb-2">
+            <span className="block font-semibold text-gray-700 text-sm md:text-base mb-1">🖼 Event Banner:</span>
+            <div className="relative w-full max-h-[180px] md:max-h-[220px] rounded-xl overflow-hidden flex items-center justify-center shadow bg-gradient-to-br from-orange-50 via-white to-indigo-100">
+              {event.coverImageUrl ? (
+                <img
+                  src={event.coverImageUrl}
+                  alt="Event Banner Preview"
+                  className="object-cover w-full h-full transition-transform duration-300 hover:scale-105 cursor-pointer"
+                  style={{maxHeight:'220px'}}
+                  onClick={() => setShowImageModal(true)}
+                  title="Click to enlarge"
+                />
+              ) : (
+                <span className="text-gray-400 italic">No banner uploaded yet</span>
+              )}
+            </div>
           </div>
           {event.vibeVideoUrl && event.vibeVideoUrl.trim() !== '' && (
-            <video src={event.vibeVideoUrl} controls className="w-full max-w-xs md:max-w-full rounded-xl border border-orange-200 shadow bg-black aspect-video" style={{maxHeight:'180px'}} />
+            <div className="mt-2">
+              <span className="block font-semibold text-gray-700 text-sm md:text-base mb-1">🎬 Event Video:</span>
+              <video src={event.vibeVideoUrl} controls className="w-full max-w-xs md:max-w-full rounded-xl shadow bg-black aspect-video" style={{maxHeight:'180px'}} />
+            </div>
           )}
         </div>
         {/* Right: Event details */}
@@ -159,91 +188,90 @@ const EventLivePreview: React.FC<EventLivePreviewProps> = ({ event, forceMobileL
             <div className="flex items-center gap-3 bg-orange-50/60 border border-orange-100 rounded-xl px-4 py-3 shadow-sm">
               <span className="text-orange-500 text-xl">👤</span>
               <div>
-                <div className="text-xs font-semibold text-gray-500 uppercase">Organizer</div>
+                <div className="text-xs font-semibold text-[#0a174e] uppercase">Organizer</div>
                 <div className="text-base font-bold text-gray-800 break-all whitespace-pre-line" title={event.organizerName}>{event.organizerName}</div>
               </div>
             </div>
-            <div className="flex items-center gap-3 bg-indigo-50/60 border border-indigo-100 rounded-xl px-4 py-3 shadow-sm">
-              <span className="text-indigo-500 text-xl">✉️</span>
+            <div className="flex items-center gap-3 bg-yellow-50 rounded-xl px-4 py-3 shadow-sm">
+              <span className="text-yellow-500 text-xl">✉️</span>
               <div>
-                <div className="text-xs font-semibold text-gray-500 uppercase">Organizer Email</div>
+                <div className="text-xs font-semibold text-[#0a174e] uppercase">Organizer Email</div>
                 <div className="text-base font-medium text-gray-800 break-all whitespace-pre-line" title={event.organizerEmail}>{event.organizerEmail}</div>
               </div>
             </div>
-            <div className="flex items-center gap-3 bg-fuchsia-50/60 border border-fuchsia-100 rounded-xl px-4 py-3 shadow-sm">
-              <span className="text-fuchsia-500 text-xl">📅</span>
+            <div className="flex items-center gap-3 bg-yellow-50 rounded-xl px-4 py-3 shadow-sm">
+              <span className="text-yellow-500 text-xl">📅</span>
               <div>
-                <div className="text-xs font-semibold text-gray-500 uppercase">Event Start</div>
+                <div className="text-xs font-semibold text-[#0a174e] uppercase">Event Start</div>
                 <div className="text-base font-medium text-gray-800">{formatDateTime(event.eventStart)}</div>
               </div>
             </div>
-            <div className="flex items-center gap-3 bg-fuchsia-50/60 border border-fuchsia-100 rounded-xl px-4 py-3 shadow-sm">
-              <span className="text-fuchsia-500 text-xl">⏰</span>
+            <div className="flex items-center gap-3 bg-orange-50/60 border border-orange-100 rounded-xl px-4 py-3 shadow-sm">
+              <span className="text-orange-500 text-xl">⏰</span>
               <div>
-                <div className="text-xs font-semibold text-gray-500 uppercase">Event End</div>
+                <div className="text-xs font-semibold text-[#0a174e] uppercase">Event End</div>
                 <div className="text-base font-medium text-gray-800">{formatDateTime(event.eventEnd)}</div>
               </div>
             </div>
             <div className="flex items-center gap-3 bg-orange-50/60 border border-orange-100 rounded-xl px-4 py-3 shadow-sm">
               <span className="text-orange-500 text-xl">📝</span>
               <div>
-                <div className="text-xs font-semibold text-gray-500 uppercase">Registration Deadline</div>
+                <div className="text-xs font-semibold text-[#0a174e] uppercase">Registration Deadline</div>
                 <div className="text-base font-medium text-gray-800">{formatDateTime(event.registrationDeadline)}</div>
               </div>
             </div>
-            <div className="flex items-center gap-3 bg-indigo-50/60 border border-indigo-100 rounded-xl px-4 py-3 shadow-sm">
-              <span className="text-indigo-500 text-xl">🔁</span>
+            <div className="flex items-center gap-3 bg-yellow-50 rounded-xl px-4 py-3 shadow-sm">
+              <span className="text-yellow-500 text-xl">🔁</span>
               <div>
-                <div className="text-xs font-semibold text-gray-500 uppercase">Recurrence Dates</div>
-            {event.recurrenceType === "None" ? (
-              <select
-                className="border border-fuchsia-200 rounded-lg px-2 py-1 text-base shadow focus:outline-none focus:ring-2 focus:ring-fuchsia-400 mt-1 text-gray-400 bg-gray-100"
-                style={{ maxWidth: 260 }}
-                disabled
-              >
-                <option value="none">None</option>
-              </select>
-            ) : Array.isArray(event.occurrences) && event.occurrences.length > 0 ? (
-              (() => {
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-                const futureOccurrences = event.occurrences.filter((occ: Occurrence) => {
-  if (!occ.startTime) return false;
-  const start = new Date(occ.startTime);
-  return !isNaN(start.getTime()) && start >= today;
-});
-                return (
+                <div className="text-xs font-semibold text-[#0a174e] uppercase">Recurrence Dates</div>
+                {event.recurrenceType === "None" ? (
                   <select
-                    className="border border-fuchsia-200 rounded-lg px-2 py-1 text-base shadow focus:outline-none focus:ring-2 focus:ring-fuchsia-400 mt-1"
-                    defaultValue={futureOccurrences[0]?.occurrenceId}
+                    className="border border-fuchsia-200 rounded-lg px-2 py-1 text-base shadow focus:outline-none focus:ring-2 focus:ring-fuchsia-400 mt-1 text-gray-400 bg-gray-100"
                     style={{ maxWidth: 260 }}
+                    disabled
                   >
-                    {futureOccurrences.length === 0 ? (
-                      <option value="none" disabled>No future dates</option>
-                    ) : (
-                      futureOccurrences.map((occ: Occurrence) => {
-                        const format = (d?: string) => {
-  if (!d) return "";
-  const date = new Date(d);
-  return isNaN(date.getTime())
-    ? d
-    : date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
-};
-
-                        return (
-                          
-<option key={occ.occurrenceId} value={occ.occurrenceId} disabled>
-  {format(occ.startTime)} - {format(occ.endTime)}
-</option>
-                        );
-                      })
-                    )}
+                    <option value="none">None</option>
                   </select>
-                );
-              })()
-            ) : (
-              <div className="text-base font-medium text-gray-800">{event.recurrenceType}</div>
-            )}
+                ) : Array.isArray(event.occurrences) && event.occurrences.length > 0 ? (
+                  (() => {
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    const futureOccurrences = event.occurrences.filter((occ: Occurrence) => {
+                      if (!occ.startTime) return false;
+                      const start = new Date(occ.startTime);
+                      return !isNaN(start.getTime()) && start >= today;
+                    });
+                    return (
+                      <select
+                        className="border border-fuchsia-200 rounded-lg px-2 py-1 text-base shadow focus:outline-none focus:ring-2 focus:ring-fuchsia-400 mt-1"
+                        defaultValue={futureOccurrences[0]?.occurrenceId}
+                        style={{ maxWidth: 260 }}
+                      >
+                        {futureOccurrences.length === 0 ? (
+                          <option value="none" disabled>No future dates</option>
+                        ) : (
+                          futureOccurrences.map((occ: Occurrence) => {
+                            const format = (d?: string) => {
+                              if (!d) return "";
+                              const date = new Date(d);
+                              return isNaN(date.getTime())
+                                ? d
+                                : date.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+                            };
+
+                            return (
+                              <option key={occ.occurrenceId} value={occ.occurrenceId} disabled>
+                                {format(occ.startTime)} - {format(occ.endTime)}
+                              </option>
+                            );
+                          })
+                        )}
+                      </select>
+                    );
+                  })()
+                ) : (
+                  <div className="text-base font-medium text-gray-800">{event.recurrenceType}</div>
+                )}
               </div>
             </div>
             {eventType === 'Venue' && (
@@ -254,7 +282,7 @@ const EventLivePreview: React.FC<EventLivePreviewProps> = ({ event, forceMobileL
                     <div className="text-xs font-semibold text-gray-500 uppercase">Location</div>
                     <button
                       type="button"
-                      className="flex items-center gap-2 bg-gradient-to-r from-orange-400 via-fuchsia-500 to-indigo-500 text-white font-bold text-base py-1.5 px-4 rounded-lg shadow transition hover:scale-105 focus:outline-none focus:ring-2 focus:ring-fuchsia-400 border border-orange-300 mt-1"
+                      className="flex items-center gap-2 bg-navy-blue-400 text-white font-bold text-base py-1.5 px-4 rounded-lg shadow transition hover:scale-105 focus:outline-none focus:ring-2 focus:ring-yellow-300 border border-yellow-400 mt-1"
                       style={{ letterSpacing: '0.03em', animation: 'blink-location 1.2s linear infinite', width: 'fit-content', maxWidth: '100%' }}
                       title="View on Map"
                       onClick={() => {
@@ -263,27 +291,25 @@ const EventLivePreview: React.FC<EventLivePreviewProps> = ({ event, forceMobileL
                         }
                       }}
                     >
-                      <span className="truncate max-w-[50vw] md:max-w-[180px]">{event.location}</span>
-                      <span className="ml-2 text-xs font-semibold bg-white/20 rounded px-2 py-1 border border-white/30">View on Map</span>
+                      <span className="truncate text-black max-w-[50vw] md:max-w-[180px]">{event.location}</span>
+                      <span className="ml-2 text-xs font-semibold text-[#0a174e] rounded px-2 py-1 border border-yellow-300">View on Map</span>
                     </button>
                   </div>
                 </div>
-      {/* Blinking animation for location button */}
-      <style jsx>{`
-        @keyframes blink-location {
-          0%, 100% { filter: brightness(1); }
-          50% { filter: brightness(1.25); }
-        }
-        .animate-blink-location {
-          animation: blink-location 1.2s linear infinite;
-        }
-      `}</style>
-                {/* Map removed as requested; only clickable location grid remains */}
+                <style jsx>{`
+                  @keyframes blink-location {
+                    0%, 100% { filter: brightness(1); }
+                    50% { filter: brightness(1.25); }
+                  }
+                  .animate-blink-location {
+                    animation: blink-location 1.2s linear infinite;
+                  }
+                `}</style>
               </>
             )}
             {eventType === 'Online' && (
-              <div className="flex items-center gap-3 bg-indigo-50/60 border border-indigo-100 rounded-xl px-4 py-3 shadow-sm">
-                <span className="text-indigo-500 text-xl">🔗</span>
+              <div className="flex items-center gap-3 bg-yellow-50 rounded-xl px-4 py-3 shadow-sm">
+                <span className="text-yellow-500 text-xl">🔗</span>
                 <div>
                   <div className="text-xs font-semibold text-gray-500 uppercase">Event Link</div>
                   {event.eventLink ? (
@@ -294,15 +320,14 @@ const EventLivePreview: React.FC<EventLivePreviewProps> = ({ event, forceMobileL
                 </div>
               </div>
             )}
-            <div className="flex items-center gap-3 bg-fuchsia-50/60 border border-fuchsia-100 rounded-xl px-4 py-3 shadow-sm">
-              <span className="text-fuchsia-500 text-xl">🏷️</span>
+            <div className="flex items-center gap-3 bg-orange-50/60 border border-orange-100 rounded-xl px-4 py-3 shadow-sm">
+              <span className="text-orange-500 text-xl">🏷️</span>
               <div>
-                <div className="text-xs font-semibold text-gray-500 uppercase">Type</div>
+                <div className="text-xs font-semibold text-[#0a174e] uppercase">Type</div>
                 <div className="text-base font-medium text-gray-800">
                   {(() => {
                     const typeRaw = eventType;
                     const type = typeRaw?.toString().toLowerCase();
-                    // Handle numeric values from backend
                     if (type === '0') return <span>Online</span>;
                     if (type === '1') return <span>Venue</span>;
                     if (type === '2') return <span className="italic text-gray-500">To Be Announced</span>;
@@ -315,7 +340,6 @@ const EventLivePreview: React.FC<EventLivePreviewProps> = ({ event, forceMobileL
                     if (type === 'online') {
                       return <span>Online</span>;
                     }
-                    // fallback for any other type
                     return <span>{eventType}</span>;
                   })()}
                 </div>
@@ -328,42 +352,36 @@ const EventLivePreview: React.FC<EventLivePreviewProps> = ({ event, forceMobileL
                 <div className="text-base font-medium text-gray-800">{event.category}</div>
               </div>
             </div>
-            <div className="flex items-center gap-3 bg-indigo-50/60 border border-indigo-100 rounded-xl px-4 py-3 shadow-sm">
-              <span className="text-indigo-500 text-xl">🎟️</span>
+            <div className="flex items-center gap-3 bg-yellow-50 rounded-xl px-4 py-3 shadow-sm">
+              <span className="text-yellow-500 text-xl">🎟️</span>
               <div>
                 <div className="text-xs font-semibold text-gray-500 uppercase">Ticket Type</div>
                 {event.isPaid ? (
-                  <span className="inline-block ml-2 bg-orange-400 text-white rounded-lg px-4 py-0.5 font-bold text-[16px] tracking-wide shadow-[0_1px_4px_#f59e4222]">Paid - ₹{event.price || '0'}</span>
+                  <span className="inline-block ml-2 bg-yellow-400 text-white rounded-lg px-4 py-0.5 font-bold text-[16px] tracking-wide shadow-[0_1px_4px_#f59e4222]">Paid - ₹{event.price || '0'}</span>
                 ) : (
                   <span className="inline-block ml-2 bg-green-500 text-white rounded-lg px-4 py-0.5 font-bold text-[16px] tracking-wide shadow-[0_1px_4px_#22c55e22]">Free</span>
                 )}
               </div>
             </div>
-            <div className="flex flex-col sm:flex-row sm:items-center gap-3 bg-orange-50/60 border border-orange-100 rounded-xl px-4 py-3 shadow-sm">
-              <span className="text-orange-500 text-xl">👥</span>
+            <div className="flex items-center gap-3 bg-yellow-50 rounded-xl px-4 py-3 shadow-sm">
+              <span className="text-yellow-500 text-xl">👥</span>
               <div className="flex-1">
                 <div className="text-xs font-semibold text-gray-500 uppercase">Max People Can Attend</div>
                 <div className="text-base font-bold text-gray-800">{event.maxAttendees}</div>
               </div>
             </div>
-            {/* Available Tickets and Register Now button together */}
-            <div className="flex flex-col sm:flex-row sm:items-center gap-3 bg-blue-50/60 border border-blue-100 rounded-xl px-4 py-3 shadow-sm mt-2">
-              <span className="text-blue-500 text-xl">🎫</span>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 bg-orange-50/60 border border-orange-100 rounded-xl px-4 py-3 shadow-sm mt-2">
+              <span className="text-orange-500 text-xl">🎫</span>
               <div className="flex-1">
                 <div className="text-xs font-semibold text-gray-500 uppercase">Available Tickets</div>
                 <div className="text-base font-bold text-gray-800">{availableTickets}</div>
               </div>
               <Link
                 href={`/event/${event.eventId || event.id || event._id}/register`}
-                className="w-full sm:w-auto mt-2 sm:mt-0 sm:ml-6 px-6 py-2 rounded-xl font-bold text-base text-white bg-gradient-to-r from-blue-600 via-blue-400 to-blue-700 shadow-lg focus:outline-none focus:ring-4 focus:ring-blue-300 animate-blink text-center"
+                className="w-full sm:w-auto mt-2 sm:mt-0 sm:ml-6 px-6 py-2 rounded-xl font-bold text-base text-[#ffd700] bg-[#0a174e] border-2 border-[#ffd700] shadow-lg focus:outline-none focus:ring-4 focus:ring-[#0a174e] text-center transition-all duration-150 hover:underline hover:bg-[#142a5c] hover:text-[#ffd700] hover:border-[#ffd700]"
                 style={{
-                  animation: 'blink 1.2s linear infinite',
-                  boxShadow: '0 2px 16px 0 #2563eb55',
                   letterSpacing: '0.04em',
-                  border: 'none',
-                  outline: 'none',
                   cursor: 'pointer',
-                  transition: 'transform 0.15s',
                   display: 'inline-block',
                   textAlign: 'center',
                 }}
@@ -371,19 +389,17 @@ const EventLivePreview: React.FC<EventLivePreviewProps> = ({ event, forceMobileL
                 Register Now
               </Link>
             </div>
-          {/* ...existing code... */}
           </div>
-          {/* Register button is now beside max people can attend */}
         </div>
       </div>
       {/* Bottom: Description, Speakers, FAQs */}
       <div className="my-6">
-        <div className="font-bold text-2xl text-orange-700 mb-2 tracking-wide">Description</div>
+        <div className="font-bold text-lg text-[#0a174e] mb-2 tracking-wide">Description</div>
         <div
-          className="prose prose-lg max-w-none bg-white/80 border border-gray-200 rounded-xl p-6 mt-2 shadow-sm description-preview text-[1.13rem] leading-[1.8] text-gray-800 min-h-[80px] tracking-[.01em] font-sans break-words whitespace-pre-line w-full overflow-auto"
+          className="prose max-w-none bg-white/80 border border-gray-200 rounded-xl p-6 mt-2 shadow-sm description-preview text-[16px] leading-[1.6] text-gray-800 min-h-[80px] tracking-[.01em] font-sans break-words whitespace-pre-line w-full overflow-auto"
           style={{
             listStyleType: 'disc',
-            paddingLeft: '1.5em',
+            paddingLeft: '1.2em',
             wordBreak: 'break-word',
             overflowWrap: 'break-word',
             maxHeight: 'none',
@@ -391,28 +407,41 @@ const EventLivePreview: React.FC<EventLivePreviewProps> = ({ event, forceMobileL
           }}
           dangerouslySetInnerHTML={{ __html: processDescriptionHtml(event.description) }}
         />
+        <style jsx global>{`
+          .description-preview img {
+            max-width: 400px;
+            max-height: 300px;
+            width: auto;
+            height: auto;
+            object-fit: contain;
+            border-radius: 0.75rem;
+            box-shadow: 0 2px 12px #f59e4299;
+            margin: 1em auto;
+            display: block;
+          }
+        `}</style>
       </div>
       <div className="my-6">
-        <div className="font-bold text-2xl text-orange-700 mb-2 tracking-wide">Speakers</div>
+        <div className="font-bold text-lg text-[#0a174e] mb-2 tracking-wide">Speakers</div>
         {(!event.speakers || event.speakers.length === 0) ? (
           <span className="text-gray-400 ml-2">[No speakers added]</span>
         ) : (
-          <div className="flex flex-col gap-6 mt-2">
+          <div className="flex flex-col gap-3 mt-2">
             {event.speakers?.map((speaker: Speaker, idx: number) =>
               (speaker.name || speaker.bio || speaker.imagePreview) ? (
-                <div key={idx} className="flex items-start gap-4 bg-white rounded-xl shadow p-4 border border-orange-100">
-                  <div className="w-16 h-16 md:w-20 md:h-20 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center border-2 border-orange-200">
+                <div key={idx} className="flex items-start gap-2 bg-white rounded-xl shadow p-2 border border-orange-100">
+                  <div className="w-10 h-10 md:w-12 md:h-12 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center border-2 border-orange-200">
                     {speaker.imagePreview ? (
                       <img src={speaker.imagePreview} alt={`Speaker ${idx + 1}`} className="w-full h-full object-cover" />
                     ) : speaker.photoUrl ? (
                       <img src={`${API_URL}${speaker.photoUrl}`} alt={`Speaker ${idx + 1}`} className="w-full h-full object-cover" />
                     ) : (
-                      <span className="text-gray-400 text-3xl">👤</span>
+                      <span className="text-gray-400 text-xl">👤</span>
                     )}
                   </div>
                   <div className="flex-1">
-                    <div className="font-semibold text-lg text-gray-800 break-all whitespace-pre-wrap">{speaker.name || <span className="text-gray-400">[Name]</span>}</div>
-                    <div className="text-[15px] text-gray-700 mt-1 leading-6 break-all whitespace-pre-wrap">{speaker.bio || <span className="text-gray-300">[Bio]</span>}</div>
+                    <div className="font-semibold text-[13px] text-gray-800 break-all whitespace-pre-wrap">{speaker.name || <span className="text-gray-400">[Name]</span>}</div>
+                    <div className="text-[12px] text-gray-700 mt-1 leading-5 break-all whitespace-pre-wrap">{speaker.bio || <span className="text-gray-300">[Bio]</span>}</div>
                   </div>
                 </div>
               ) : null
@@ -421,25 +450,28 @@ const EventLivePreview: React.FC<EventLivePreviewProps> = ({ event, forceMobileL
         )}
       </div>
       <div className="my-6">
-        <div className="font-bold text-2xl text-orange-700 mb-2 tracking-wide">FAQs</div>
+        <div className="font-bold text-lg text-[#0a174e] mb-2 tracking-wide">FAQs</div>
         {(!event.faqs || event.faqs.length === 0) ? (
           <span className="text-gray-400 ml-2">[No FAQs added]</span>
         ) : (
-          <div className="flex flex-col gap-6 mt-2">
+          <div className="flex flex-col gap-3 mt-2">
             {event.faqs?.map((faq: Faq, idx: number) => (
               (faq.question || faq.answer) && (
-                <div key={idx} className="p-4 bg-white rounded-xl shadow text-gray-700 border border-orange-100 break-all whitespace-pre-wrap">
-                  <strong className="text-orange-700">Q{idx + 1}:</strong> <span className="break-all whitespace-pre-wrap">{faq.question}</span><br />
-                  <span className="ml-4 break-all whitespace-pre-wrap"><strong className="text-indigo-700">A:</strong> {faq.answer}</span>
-                </div>
+                <React.Fragment key={idx}>
+                  <div className="font-semibold text-base text-orange-700 break-all whitespace-pre-wrap">
+                    Q{idx + 1}: {faq.question || <span className='text-gray-400'>[Question]</span>}
+                  </div>
+                  <div className="text-base text-indigo-700 font-bold break-all whitespace-pre-wrap">
+                    A: {faq.answer || <span className='text-gray-400'>[Answer]</span>}
+                  </div>
+                </React.Fragment>
               )
             ))}
           </div>
         )}
       </div>
-      {/* Only one Vibe Video section at the top; removed duplicate at the bottom */}
     </div>
   );
 }
- 
+
 export default EventLivePreview;
