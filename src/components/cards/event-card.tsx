@@ -128,7 +128,7 @@ async function confirmApprove() {
   }
   console.log(editCount);
 
-  if (event.editEventCount >= 0) {
+if ((event.editEventCount ?? 0) >= 0) {
     try {
       const res = await fetch(`${API_URL}/api/Admin/event/${event.eventId}/approve`, {
         method: "PUT",
