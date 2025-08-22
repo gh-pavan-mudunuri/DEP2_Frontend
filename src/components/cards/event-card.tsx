@@ -126,8 +126,9 @@ async function confirmApprove() {
     setPopup({ message: "Organiser email not found for this event.", type: "error" });
     return;
   }
+  console.log(editCount);
 
-  if (editCount >= 0) {
+  if (event.editEventCount >= 0) {
     try {
       const res = await fetch(`${API_URL}/api/Admin/event/${event.eventId}/approve`, {
         method: "PUT",
