@@ -103,87 +103,146 @@ useEffect(() => { setApproved(event.isVerifiedByAdmin ?? false); }, [event.isVer
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [event.eventId]);
 
+  useEffect(() => {
+  setEditCount(event.editEventCount ?? 0);
+}, [event.editEventCount]);
+
   function handleApprove(e: React.MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
     e.stopPropagation();
     setShowApproveDialog(true);
   }
 
-  async function confirmApprove() {
-    setShowApproveDialog(false);
-    if (editCount >= 0) {
-      const token = localStorage.getItem("token");
-      try {
-        const res = await fetch(`${API_URL}/api/Admin/event/${event.eventId}/approve`, {
-          method: "PUT",
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        });
-        const data: { success?: boolean; message?: string } = await res.json();
-        if (data && data.success) {
-          setApproved(true);
-          if (typeof window !== "undefined") {
-            window.dispatchEvent(new Event("eventApproved"));
-          }
-          // Send mail to organiser
-          const organiserEmail: string | undefined =
-            event.OrganizerEmail || event.organiserEmail || event.organizerEmail;
-          if (!organiserEmail) {
-            setPopup({ message: "Organiser email not found for this event.", type: "error" });
-            return;
-          }
-          const eventTitle: string =
-            event.title || event.eventTitle || event.name || "";
-          const emailBody = `
-            <div style='font-family:Segoe UI,Arial,sans-serif;background:#f9fafb;padding:32px;border-radius:16px;text-align:center;'>
-              <h2 style='color:#16a34a;font-size:2rem;margin-bottom:8px;'>🎉 Congratulations!</h2>
-              <p style='font-size:1.1rem;color:#374151;'>
-                Your event <b style='color:#2563eb;'>${eventTitle}</b> has been <span style='color:#16a34a;font-weight:bold;'>approved</span> by our admin team.<br/>
-                <span style='font-size:1.5rem;'>🥳✨</span>
-              </p>
-              <div style='margin:18px 0;'>
-                <span style='display:inline-block;background:#e0f2fe;color:#0ea5e9;padding:8px 18px;border-radius:8px;font-size:1rem;'>
-                  Wishing you a successful and memorable event!
-                </span>
-              </div>
-              <p style='color:#64748b;font-size:0.95rem;'>
-                If you need any help, feel free to reach out.<br/>
-                <span style='font-size:1.2rem;'>👍🌟</span>
-              </p>
-              <hr style='margin:24px 0;border:none;border-top:1px solid #e5e7eb;' />
-              <p style='font-size:0.9rem;color:#6b7280;'>Thank you for choosing EventSphere!</p>
-            </div>
-          `;
-          await axios.post(
-            `${API_URL}/api/email/send-to-organiser`,
-            {
-              from: "admin@eventsphere.com",
-              to: organiserEmail,
-              subject: `Your event \"${eventTitle}\" has been approved!`,
-              body: emailBody,
-            },
-            { headers: token ? { Authorization: `Bearer ${token}` } : {} }
-          );
-          setShowSuccessPopup(true);
-          setTimeout(() => setShowSuccessPopup(false), 3000);
-          if (typeof onApprove === 'function') {
-            onApprove();
-          }
-        } else {
-          setApproved(false);
-          setPopup({ message: data?.message || "Failed to approve event.", type: "error" });
+  // ...existing code...
+async function confirmApprove() {
+  setShowApproveDialog(false);
+  const token = localStorage.getItem("token");
+  const organiserEmail: string | undefined =
+    event.OrganizerEmail || event.organiserEmail || event.organizerEmail;
+  const eventTitle: string =
+    event.title || event.eventTitle || event.name || "";
+
+  if (!organiserEmail) {
+    setPopup({ message: "Organiser email not found for this event.", type: "error" });
+    return;
+  }
+
+  if (editCount >= 0) {
+    try {
+      const res = await fetch(`${API_URL}/api/Admin/event/${event.eventId}/approve`, {
+        method: "PUT",
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      const data: { success?: boolean; message?: string } = await res.json();
+      if (data && data.success) {
+        setApproved(true);
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new Event("eventApproved"));
         }
-      } catch {
+        // Send mail to organiser
+        const emailBody = `
+          <div style='font-family:Segoe UI,Arial,sans-serif;background:#f9fafb;padding:32px;border-radius:16px;text-align:center;'>
+            <h2 style='color:#16a34a;font-size:2rem;margin-bottom:8px;'>🎉 Congratulations!</h2>
+            <p style='font-size:1.1rem;color:#374151;'>
+              Your event <b style='color:#2563eb;'>${eventTitle}</b> has been <span style='color:#16a34a;font-weight:bold;'>approved</span> by our admin team.<br/>
+              <span style='font-size:1.5rem;'>🥳✨</span>
+            </p>
+            <div style='margin:18px 0;'>
+              <span style='display:inline-block;background:#e0f2fe;color:#0ea5e9;padding:8px 18px;border-radius:8px;font-size:1rem;'>
+                Wishing you a successful and memorable event!
+              </span>
+            </div>
+            <p style='color:#64748b;font-size:0.95rem;'>
+              If you need any help, feel free to reach out.<br/>
+              <span style='font-size:1.2rem;'>👍🌟</span>
+            </p>
+            <hr style='margin:24px 0;border:none;border-top:1px solid #e5e7eb;' />
+            <p style='font-size:0.9rem;color:#6b7280;'>Thank you for choosing EventSphere!</p>
+          </div>
+        `;
+        await axios.post(
+          `${API_URL}/api/email/send-to-organiser`,
+          {
+            from: "admin@eventsphere.com",
+            to: organiserEmail,
+            subject: `Your event \"${eventTitle}\" has been approved!`,
+            body: emailBody,
+          },
+          { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+        );
+        setShowSuccessPopup(true);
+        setTimeout(() => setShowSuccessPopup(false), 3000);
+        if (typeof onApprove === 'function') {
+          onApprove();
+        }
+      } else {
         setApproved(false);
-        setPopup({ message: "Failed to approve event.", type: "error" });
+        setPopup({ message: data?.message || "Failed to approve event.", type: "error" });
       }
-    } else {
-      try {
-        router.push(`/event/${event.eventId}/view-event`);
-      } catch {
-        setPopup({ message: "Failed to approve event.", type: "error" });
+    } catch {
+      setApproved(false);
+      setPopup({ message: "Failed to approve event.", type: "error" });
+    }
+  } else {
+    // Edit approval branch
+    try {
+      const res = await fetch(`${API_URL}/api/Admin/event-edit/${event.eventId}/approve`, {
+        method: "PUT",
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
+      });
+      const data: { success?: boolean; message?: string } = await res.json();
+      if (data && data.success) {
+        setApproved(true);
+        if (typeof window !== "undefined") {
+          window.dispatchEvent(new Event("eventApproved"));
+        }
+        // Send mail to organiser about edit approval
+        const emailBody = `
+          <div style='font-family:Segoe UI,Arial,sans-serif;background:#f9fafb;padding:32px;border-radius:16px;text-align:center;'>
+            <h2 style='color:#2563eb;font-size:2rem;margin-bottom:8px;'>✏️ Edit Approved!</h2>
+            <p style='font-size:1.1rem;color:#374151;'>
+              Your recent changes to event <b style='color:#2563eb;'>${eventTitle}</b> have been <span style='color:#16a34a;font-weight:bold;'>approved</span> by our admin team.<br/>
+              <span style='font-size:1.5rem;'>🎉📝</span>
+            </p>
+            <div style='margin:18px 0;'>
+              <span style='display:inline-block;background:#e0f2fe;color:#0ea5e9;padding:8px 18px;border-radius:8px;font-size:1rem;'>
+                Your event details are now updated and live!
+              </span>
+            </div>
+            <p style='color:#64748b;font-size:0.95rem;'>
+              If you need any help, feel free to reach out.<br/>
+              <span style='font-size:1.2rem;'>👍🌟</span>
+            </p>
+            <hr style='margin:24px 0;border:none;border-top:1px solid #e5e7eb;' />
+            <p style='font-size:0.9rem;color:#6b7280;'>Thank you for keeping your event up to date with EventSphere!</p>
+          </div>
+        `;
+        await axios.post(
+          `${API_URL}/api/email/send-to-organiser`,
+          {
+            from: "admin@eventsphere.com",
+            to: organiserEmail,
+            subject: `Your edits to \"${eventTitle}\" have been approved!`,
+            body: emailBody,
+          },
+          { headers: token ? { Authorization: `Bearer ${token}` } : {} }
+        );
+        setShowSuccessPopup(true);
+        setTimeout(() => setShowSuccessPopup(false), 3000);
+        if (typeof onApprove === 'function') {
+          onApprove();
+        }
+      } else {
+        setApproved(false);
+        setPopup({ message: data?.message || "Failed to approve edited event.", type: "error" });
       }
+    } catch {
+      setApproved(false);
+      setPopup({ message: "Failed to approve edited event.", type: "error" });
     }
   }
+}
+// ...existing code...
 
   // Handler for bookmark toggle
   const handleBookmarkToggle = async (e: React.MouseEvent<HTMLButtonElement>) => {
