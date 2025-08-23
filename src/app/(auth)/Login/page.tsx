@@ -233,26 +233,7 @@ export default function Login() {
           </div>
         </div>
       </div>
-      {message && (
-        <div className="fixed top-0 left-0 w-full flex justify-center z-50">
-          <div
-            className={`mt-6 px-8 py-4 min-w-[320px] max-w-[90vw] rounded-lg shadow-lg text-center text-lg font-semibold transition-all duration-300
-              ${
-                message.toLowerCase().includes('login successful') ||
-                message.toLowerCase().includes('password reset email sent') ||
-                message.toLowerCase().includes('reset email sent') ||
-                message.toLowerCase().includes('reset link sent') ||
-                message.toLowerCase().includes('verification email') ||
-                message.toLowerCase().includes('success')
-                  ? 'bg-green-500 text-white'
-                  : 'bg-red-500 text-white'
-              }
-            `}
-          >
-            {message}
-          </div>
-        </div>
-      )}
+      e
     </>
   );
 }
