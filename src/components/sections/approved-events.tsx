@@ -40,7 +40,7 @@ export default function ApprovedEvents() {
       try {
         const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
         // Updated API endpoint to the local development server
-        const res = await axios.get<EventsApiResponse>("http://localhost:5274/api/events", {
+        const res = await axios.get<EventsApiResponse>("https://dep2-backend.onrender.com/api/events", {
           headers: token ? { Authorization: `Bearer ${token}` } : {}
         });
 

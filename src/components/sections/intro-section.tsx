@@ -24,7 +24,7 @@ export default function IntroSection() {
   useEffect(() => {
     async function fetchStats() {
       try {
-        const res = await axios.get("http://localhost:5274/api/stats/intro");
+        const res = await axios.get("https://dep2-backend.onrender.com/api/stats/intro");
         const data = res.data;
         setStats({
           users: data.users || 0,
@@ -45,7 +45,7 @@ export default function IntroSection() {
     async function fetchReviews() {
       try {
         // Fetch reviews from backend
-        const res = await axios.get("http://localhost:5274/api/WebsiteReview");
+        const res = await axios.get("https://dep2-backend.onrender.com/api/WebsiteReview");
         const reviews = res.data;
         let avgRating = 0;
         if (Array.isArray(reviews) && reviews.length > 0) {
