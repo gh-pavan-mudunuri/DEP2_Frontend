@@ -8,12 +8,18 @@ import SwipeableCard from "../cards/swipable-card";
 import EventsFilters from "./events-filter";
 import axios from "axios";
 import { EventInterface } from "@/interfaces/home";
+import { FaSpinner } from "react-icons/fa";
 
 interface UpcomingEventsProps {
   disableHorizontalScroll?: boolean;
   searchQuery?: string;
   searchCategory?: string;
   limit?: number;
+  showBackground?: boolean;
+  page?: number;
+  pageSize?: number;
+  onPageChange?: (page: number) => void;
+  setTotalCount?: (count: number) => void;
 }
 
 interface FilterState {
@@ -34,6 +40,11 @@ export default function UpcommingEvents({
   searchQuery,
   searchCategory = "",
   limit,
+  showBackground,
+  page = 1,
+  pageSize = 20,
+  onPageChange,
+  setTotalCount,
 }: UpcomingEventsProps) {
   const [showViewAll, setShowViewAll] = useState<boolean>(true);
   useEffect(() => {
@@ -42,12 +53,11 @@ export default function UpcommingEvents({
     }
   }, []);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const scrollAmount = 200;
-  const scrollInterval = 3000;
 
   const [isPaused, setIsPaused] = useState<boolean>(false);
   const [scrollProgress, setScrollProgress] = useState<number>(0);
   const [events, setEvents] = useState<EventInterface[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [filters, setFilters] = useState<FilterState>({
     location: "",
     online: null,
@@ -76,7 +86,7 @@ export default function UpcommingEvents({
         const container = scrollRef.current;
         const progress =
           (container.scrollLeft /
-            ((container.scrollWidth / 2) - container.offsetWidth)) *
+            (container.scrollWidth - container.offsetWidth)) *
           100;
         setScrollProgress(Math.min(progress, 100));
       }
@@ -98,25 +108,30 @@ export default function UpcommingEvents({
   // Fetch filtered events from backend when filters change, with debounce
   useEffect(() => {
     const fetchFilteredEvents = async () => {
+      setIsLoading(true);
       try {
-        const res = await axios.post<{ success: boolean; data: EventInterface[] }>(
-          "https://dep2-backend.onrender.com/api/Home/filter",
+        const res = await axios.post<{ success: boolean; data: EventInterface[]; totalCount?: number }>(
+          `https://dep2-backend.onrender.com/api/Home/filter-paged?page=${page}&pageSize=${pageSize}`,
           filters
         );
         if (res.data && res.data.success && Array.isArray(res.data.data)) {
           setEvents(res.data.data);
+          if (setTotalCount) setTotalCount(res.data.totalCount || res.data.data.length);
         } else {
           setEvents([]);
+          if (setTotalCount) setTotalCount(0);
         }
       } catch (err) {
         setEvents([]);
         console.error("Failed to fetch filtered events", err);
+      } finally {
+        setIsLoading(false);
       }
     };
     const debouncedFetch = debounce(fetchFilteredEvents, 400);
     debouncedFetch();
     return () => debouncedFetch.cancel();
-  }, [filters]);
+  }, [filters, page, pageSize, setTotalCount]);
 
   // Only show events approved by admin
   const approvedEvents: EventInterface[] = events.filter(e => e.isVerifiedByAdmin === true);
@@ -128,13 +143,13 @@ export default function UpcommingEvents({
       )
     : approvedEvents;
 
-  // Always enforce event limit for all users and views
-  if (limit) {
+  // Always enforce event limit for all users and views, but not on dedicated page
+  if (limit && showViewAll) {
     filteredBySearch = filteredBySearch.slice(0, limit);
   }
 
   return (
-    <div className="mx-5">
+    <div className={showBackground ? "min-h-screen bg-gradient-to-b from-[#f5f8ff] to-[#eaf0fa] mx-5" : "mx-5"}>
       <div className="mt-10 mb-2 relative">
         <h2 className="text-xl sm:text-2xl md:text-3xl mt-2 mb-3 font-sans font-bold">Upcoming Events:</h2>
         {/* Hide 'View All' button on upcoming-events page (hydration safe) */}
@@ -164,46 +179,51 @@ export default function UpcommingEvents({
             })}
           />
         </div>
-        {filteredBySearch.length === 0 ? (
-          <div className="text-gray-500">Loading..</div>
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center py-8 text-blue-600">
+            <FaSpinner className="animate-spin text-3xl mb-2" />
+            <span>Loading events...</span>
+          </div>
+        ) : filteredBySearch.length === 0 && !isLoading && (filters.category || filters.location || filters.paid || filters.recurrence || searchQuery) ? (
+          <div className="text-gray-500 text-center py-8">No events found for the selected filters.</div>
         ) : disableHorizontalScroll ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {filteredBySearch.slice(0, limit || filteredBySearch.length).map((event, index) => (
-<EventCard event={event} key={event.eventId || index} />            ))}
+          <div className="grid grid-cols-1 xs:grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
+            {filteredBySearch.map((event, index) => (
+              <div key={event.eventId || index} className="flex justify-center items-center w-full">
+<EventCard event={event} />              </div>
+            ))}
           </div>
         ) : (
         <div className="relative pl-3 w-full">
           {/* Mobile view */}
-          <div className="sm:hidden w-full flex items-center justify-center" style={{ minHeight: '100%' }}>
+          <div className=" sm:hidden w-full flex flex-col items-center justify-center space-y-4 px-2" style={{ minHeight: '100%' }}>
             <SwipeableCard
               items={[...filteredBySearch, { __viewAll: true } as EventOrViewAll]}
-              // ...existing code...
-render={event =>
-  "__viewAll" in event && event.__viewAll ? (
-    <div className="flex items-center justify-center h-full min-h-[180px]">
-      <Link
-        href="/upcoming-events"
-        className="flex items-center gap-1 px-4 py-2 rounded-full bg-blue-600 text-white font-semibold hover:bg-blue-700 transition shadow-lg min-w-[220px] justify-center"
-        style={{ whiteSpace: "nowrap", height: "fit-content" }}
-      >
-        View All
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          fill="none"
-          viewBox="0 0 24 24"
-          strokeWidth="2"
-          stroke="currentColor"
-          className="w-5 h-5"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-        </svg>
-      </Link>
-    </div>
-  ) : (
-    <EventCard event={event as EventInterface} />
-  )
-}
-// ...existing code...
+              render={item =>
+                "__viewAll" in item && item.__viewAll ? (
+                  <div className="flex items-center justify-center h-full min-h-[180px]">
+                    <Link
+                      href="/upcoming-events"
+                      className="flex items-center gap-1 px-4 py-2 rounded-full bg-blue-600 text-white font-semibold hover:bg-blue-700 transition shadow-lg min-w-[220px] justify-center"
+                      style={{ whiteSpace: "nowrap", height: "fit-content" }}
+                    >
+                      View All
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth="2"
+                        stroke="currentColor"
+                        className="w-5 h-5"
+                      >
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                      </svg>
+                    </Link>
+                  </div>
+                ) : (
+                  <EventCard event={item as EventInterface} />
+                )
+              }
             />
           </div>
 
@@ -214,32 +234,28 @@ render={event =>
               className="flex gap-4 items-center overflow-x-auto scroll-smooth rounded-lg no-scrollbar px-2"
               style={{ scrollbarWidth: "none" }}
             >
-              {filteredBySearch.length === 0 ? (
-                <div className="text-gray-500">Loading.</div>
-              ) : (
-                <>
-                  {filteredBySearch.map((event, index) => (
-                    <div
-                      className="flex-shrink-0"
-                      key={event.eventId || index}
-                      onMouseEnter={handleMouseEnter}
-                      onMouseLeave={handleMouseLeave}
-                    >
-                      <EventCard event={event} />
-                    </div>
-                  ))}
-                </>
-              )}
+              {filteredBySearch.map((event, index) => (
+                <div
+                  className="flex-shrink-0"
+                  key={event.eventId || index}
+                  onMouseEnter={handleMouseEnter}
+                  onMouseLeave={handleMouseLeave}
+                >
+                  <EventCard event={event} />
+                </div>
+              ))}
             </div>
           </div>
 
           {/* Scroll progress bar */}
-          <div className="mt-2 h-1 w-full bg-gray-300 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-blue-600 transition-all duration-300"
-              style={{ width: `${scrollProgress}%` }}
-            />
-          </div>
+          {!disableHorizontalScroll && (
+            <div className="mt-2 h-1 w-full bg-gray-300 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-blue-600 transition-all duration-300"
+                style={{ width: `${scrollProgress}%` }}
+              />
+            </div>
+          )}
         </div>
         )}
       </div>

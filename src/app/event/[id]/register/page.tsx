@@ -228,10 +228,10 @@ export default function RegisterEventPage() {
   };
 
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-blue-50 to-purple-100 flex flex-col items-center justify-center py-8">
+    <div className="relative min-h-screen bg-white border-t-8 border-[#0a174e] flex flex-col items-center justify-center py-2 -mt-8">
       <div className="max-w-[900px] w-full mx-auto p-2 sm:p-8 bg-white rounded-2xl shadow-2xl relative border border-blue-100">
         <div className={showTnC ? "blur-sm pointer-events-none select-none" : ""}>
-          <h1 className="text-2xl sm:text-3xl font-extrabold mb-6 text-center leading-tight text-blue-700 tracking-tight drop-shadow">Register for Event</h1>
+          <h1 className="text-2xl sm:text-3xl font-extrabold mb-6 text-center leading-tight tracking-tight drop-shadow text-[#0a174e] underline">Register for Event</h1>
           <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
             <div className="mb-4">
               <h2 className="text-lg font-semibold text-gray-700 mb-2 flex items-center gap-2"><span role="img" aria-label="user">👤</span> Contact Information</h2>
@@ -248,7 +248,7 @@ export default function RegisterEventPage() {
                   type="text"
                   className={`w-full border-0 border-b-2 px-0 py-2 rounded-none bg-transparent focus:outline-none pr-8 text-sm sm:text-base placeholder-gray-400 text-gray-900 ${touched.name && name ? 'border-green-600 focus:border-green-600' : 'border-gray-300 focus:border-blue-600'}`}
                   value={name}
-                  onChange={e => setName(e.target.value)}
+                  onChange={e => setName(String(e.target.value))}
                   onBlur={() => setTouched(t => ({ ...t, name: true }))}
                   required
                   placeholder="Enter your name"
@@ -270,7 +270,7 @@ export default function RegisterEventPage() {
                   type="email"
                   className={`w-full border-0 border-b-2 px-0 py-2 rounded-none bg-transparent focus:outline-none pr-8 text-sm sm:text-base placeholder-gray-400 text-gray-900 ${touched.email && email ? 'border-green-600 focus:border-green-600' : 'border-gray-300 focus:border-blue-600'}`}
                   value={email}
-                  onChange={e => setEmail(e.target.value)}
+                  onChange={e => setEmail(String(e.target.value))}
                   onBlur={() => setTouched(t => ({ ...t, email: true }))}
                   required
                   placeholder="Enter your email"
@@ -284,7 +284,7 @@ export default function RegisterEventPage() {
             {/* Phone */}
             <div>
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-8">
-                <label className=" font-semibold whitespace-nowrap min-w-[100px] sm:min-w-[180px] mb-1 sm:mb-0 text-sm sm:text-base text-gray-800 flex items-center gap-2" htmlFor="phone">
+                <label className="font-semibold whitespace-nowrap min-w-[100px] sm:min-w-[180px] mb-1 sm:mb-0 text-sm sm:text-base text-gray-800 flex items-center gap-2" htmlFor="phone">
                   <span role="img" aria-label="phone">📱</span> Phone Number <span className="text-red-600">*</span>
                 </label>
                 <div className="w-full flex flex-row relative gap-2">
@@ -307,7 +307,7 @@ export default function RegisterEventPage() {
                     type="tel"
                     className={`w-full border-0 border-b-2 px-0 py-2 rounded-none bg-transparent focus:outline-none pr-8 text-sm sm:text-base placeholder-gray-400 text-gray-900 ${touched.phone && phone ? 'border-green-600 focus:border-green-600' : 'border-gray-300 focus:border-blue-600'}`}
                     value={phone}
-                    onChange={e => setPhone(e.target.value)}
+                    onChange={e => setPhone(String(e.target.value))}
                     onBlur={() => setTouched(t => ({ ...t, phone: true }))}
                     required
                     placeholder="Enter your phone number"
@@ -345,7 +345,7 @@ export default function RegisterEventPage() {
                     max={maxAttendees !== null ? Math.max(1, maxAttendees - registrationCount) : undefined}
                     className={`w-full border-0 border-b-2 px-0 py-2 rounded-none bg-transparent focus:outline-none pr-8 text-sm sm:text-base placeholder-gray-400 text-gray-900 ${touched.tickets && tickets && Number(tickets) > 0 ? 'border-green-600 focus:border-green-600' : 'border-gray-300 focus:border-blue-600'}`}
                     value={tickets}
-                    onChange={e => handleTicketsChange(e.target.value)}
+                    onChange={e => handleTicketsChange(String(e.target.value))}
                     onBlur={() => setTouched(t => ({ ...t, tickets: true }))}
                     required
                     placeholder="Number of tickets"
@@ -389,7 +389,7 @@ export default function RegisterEventPage() {
                     type="text"
                     className={`w-full border-0 border-b-2 px-0 py-2 rounded-none bg-transparent focus:outline-none pr-8 text-sm sm:text-base placeholder-gray-400 text-gray-900 ${touched.captcha && captchaInput && captchaInput.trim().toUpperCase() === captcha ? 'border-green-600 focus:border-green-600' : 'border-gray-300 focus:border-blue-600'}`}
                     value={captchaInput}
-                    onChange={e => setCaptchaInput(e.target.value)}
+                    onChange={e => setCaptchaInput(String(e.target.value))}
                     onBlur={() => setTouched(t => ({ ...t, captcha: true }))}
                     required
                     placeholder="Enter the captcha code below"

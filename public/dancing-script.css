@@ -1,0 +1,11 @@
+/* Dancing Script font import for Next.js */
+@font-face {
+  font-family: 'Dancing Script';
+  src: url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap');
+  font-weight: 700;
+  font-style: normal;
+}
+
+.dancing-script {
+  font-family: 'Dancing Script', cursive;
+}

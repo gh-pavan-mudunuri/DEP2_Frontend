@@ -23,7 +23,6 @@ interface User {
   email?: string;
   role?: number | string;
   isAdminVerified?: boolean;
-  // Add other fields if needed from your user object in localStorage
 }
 
 interface MappedEvent extends EventFormView {
@@ -37,27 +36,24 @@ interface MappedEvent extends EventFormView {
 }
 
 function mapEventData(data: unknown): MappedEvent {
-  // Support both { data: event } and plain event object
   const event = typeof data === "object" && data !== null && "data" in data
     ? (data as { data: EventFormView }).data
     : (data as EventFormView);
 
-  // Speakers
-  const speakers: MappedSpeaker[] = Array.isArray(event.speakers)
-    ? event.speakers.map((s) => {
-        let photoPath = s.photoUrl || "";
-        if (photoPath && !photoPath.startsWith("/")) photoPath = "/" + photoPath;
-        if (photoPath.startsWith("/wwwroot/"))
-          photoPath = photoPath.replace("/wwwroot", "");
-        return {
-          ...s,
-          image: null,
-          imagePreview: photoPath ? `${API_URL}${photoPath}` : "",
-        };
-      })
-    : [];
+  const arr = (v: any) => (Array.isArray(v) ? v : v ? [v] : []);
 
-  // FAQs
+  const speakers: MappedSpeaker[] = arr(event.speakers).map((s: Speaker) => {
+    let photoPath = s.photoUrl || "";
+    if (photoPath && !photoPath.startsWith("/")) photoPath = "/" + photoPath;
+    if (photoPath.startsWith("/wwwroot/"))
+      photoPath = photoPath.replace("/wwwroot", "");
+    return {
+      ...s,
+      image: null,
+      imagePreview: photoPath ? `${API_URL}${photoPath}` : "",
+    };
+  });
+
   let faqs: Faq[] = [];
   if (Array.isArray(event.faqs)) {
     faqs = event.faqs.map((f) => ({
@@ -73,7 +69,6 @@ function mapEventData(data: unknown): MappedEvent {
     ];
   }
 
-  // Cover image
   let coverPath = event.coverImage || "";
   if (coverPath && !coverPath.startsWith("/")) coverPath = "/" + coverPath;
   if (coverPath.startsWith("/wwwroot/"))
@@ -84,14 +79,12 @@ function mapEventData(data: unknown): MappedEvent {
   }
   const coverImageUrl = coverPath ? `${API_URL}${coverPath}` : "";
 
-  // Vibe video
   let vibePath = event.vibeVideo || "";
   if (vibePath && !vibePath.startsWith("/")) vibePath = "/" + vibePath;
   if (vibePath.startsWith("/wwwroot/"))
     vibePath = vibePath.replace("/wwwroot", "");
   const vibeVideoUrl = vibePath ? `${API_URL}${vibePath}` : "";
 
-  // Description image src fix
   function processDescriptionHtml(html: string | undefined): string {
     if (!html) return '<span style="color:#bbb">[Description]</span>';
     return html.replace(
@@ -113,8 +106,8 @@ function mapEventData(data: unknown): MappedEvent {
     coverImageUrl,
     vibeVideoUrl,
     description,
-    isPaid: event.isPaid ?? event.isPaid ?? false,
-    price: event.price ?? event.price ?? 0,
+    isPaid: event.isPaid ?? false,
+    price: event.price ?? 0,
   };
 }
 

@@ -3,6 +3,7 @@
 import React, { JSX, useEffect, useState } from "react";
 import axios, { AxiosResponse } from "axios";
 import EventCard from "@/components/cards/event-card";
+import { FaSpinner } from "react-icons/fa"; // Assuming you are using react-icons
 
 // Define the Event interface based on your backend model
 interface Event {
@@ -79,22 +80,26 @@ export default function PastOrganizedEventsPage(): JSX.Element {
       <h1 className="text-3xl font-bold mb-6">Past Organized Events</h1>
 
       {loading ? (
-        <div className="text-gray-500 mb-4">Loading...</div>
+        <div className="flex flex-col items-center justify-center py-8 text-blue-600">
+          <FaSpinner className="animate-spin text-3xl mb-2" />
+          <span>Loading events...</span>
+        </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-8 px-4 py-2 w-full overflow-x-auto">
             {events.length === 0 ? (
               <div className="col-span-full text-center text-gray-500">
                 No past organized events found.
               </div>
             ) : (
               events.map((event: Event) => (
-                <EventCard
-                  key={event.eventId}
-                  event={event}
-                  hideRegister={true}
-                  hideLive={true}
-                />
+                <div key={event.eventId} className="flex justify-center items-center min-w-[260px] max-w-[360px]">
+                  <EventCard
+                    event={event}
+                    hideRegister={true}
+                    hideLive={true}
+                  />
+                </div>
               ))
             )}
           </div>

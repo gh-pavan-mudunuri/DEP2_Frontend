@@ -330,16 +330,16 @@ const [showRibbons, setShowRibbons] = useState(false);
     } else {
       // Special logic for recurrenceType
       if (name === 'recurrenceType') {
-        setEventData({
-          ...eventData,
-          recurrenceType: value,
-          recurrenceRule: value === 'rule' ? eventData.recurrenceRule : '',
-          customDates: value === 'custom' ? eventData.customDates || [] : [],
-          customFields: value === 'custom' ? JSON.stringify(eventData.customDates || []) : '',
-        });
-      } else if (name === 'category') {
-        setEventData({ ...eventData, category: value });
-      } else {
+  setEventData({
+    ...eventData,
+    recurrenceType: String(value), // <-- Ensure string
+    recurrenceRule: value === 'rule' ? eventData.recurrenceRule : '',
+    customDates: value === 'custom' ? eventData.customDates || [] : [],
+    customFields: value === 'custom' ? JSON.stringify(eventData.customDates || []) : '',
+  });
+} else if (name === 'category') {
+  setEventData({ ...eventData, category: String(value) }); // <-- Ensure string
+} else {
         setEventData({ ...eventData, [name]: value });
       }
     }
@@ -1090,12 +1090,11 @@ formData.append('Price', String(eventData.price ?? '0'));
           value={occ && occ.start ? occ.start : ''}
           onChange={e => {
             setEventData((prev: EventFormData) => {
-              // Deep copy to avoid reference issues
-              const newDates = prev.customDates.map((item: CustomDate, i: number) =>
-                i === idx ? { ...item, start: e.target.value } : { ...item }
-              );
-              return { ...prev, customDates: newDates, customFields: JSON.stringify(newDates) };
-            });
+  const newDates = prev.customDates.map((item: CustomDate, i: number) =>
+    i === idx ? { ...item, start: String(e.target.value) } : { ...item }
+  );
+  return { ...prev, customDates: newDates, customFields: JSON.stringify(newDates) };
+});
           }}
           className="input input-bordered"
           placeholder="Start Date & Time"
@@ -1107,12 +1106,11 @@ formData.append('Price', String(eventData.price ?? '0'));
           disabled={isEditMode}
           onChange={e => {
             setEventData((prev: EventFormData) => {
-              // Deep copy to avoid reference issues
-              const newDates = prev.customDates.map((item: CustomDate, i: number) =>
-                i === idx ? { ...item, end: e.target.value } : { ...item }
-              );
-              return { ...prev, customDates: newDates, customFields: JSON.stringify(newDates) };
-            });
+  const newDates = prev.customDates.map((item: CustomDate, i: number) =>
+    i === idx ? { ...item, start: String(e.target.value) } : { ...item }
+  );
+  return { ...prev, customDates: newDates, customFields: JSON.stringify(newDates) };
+});
           }}
           className="input input-bordered"
           placeholder="End Date & Time"
@@ -1466,7 +1464,7 @@ formData.append('Price', String(eventData.price ?? '0'));
                       type="text"
                       placeholder="Speaker Name"
                       value={speaker.name}
-                      onChange={e => handleSpeakerNameChange(idx, e.target.value)}
+                      onChange={e => handleSpeakerNameChange(idx, String(e.target.value))}
                       className="input input-bordered text-[12px] md:text-[13px] h-7 px-2 py-0.5 rounded mb-0.5 w-full"
                     />
                     <label className="inline-block px-2 py-1 md:px-3 md:py-1.5 mt-1 bg-white border border-gray-400 rounded-md shadow-sm cursor-pointer text-xs md:text-sm font-medium hover:bg-violet-50 hover:border-violet-400 transition-all">
@@ -1519,7 +1517,7 @@ formData.append('Price', String(eventData.price ?? '0'));
                     type="text"
                     placeholder={`Question ${idx + 1}`}
                     value={faq.question}
-                    onChange={e => handleFaqChange(idx, 'question', e.target.value)}
+                    onChange={e => handleFaqChange(idx, 'question', String(e.target.value))}
                     className="input input-bordered text-[12px] md:text-[13px] h-7 px-2 py-0.5 rounded mb-1 w-full"
                   />
                   <textarea

@@ -5,11 +5,18 @@ import EventCard from "../cards/event-card";
 import axios from "axios";
 import { EventInterface } from "@/interfaces/home";
 
+// Interface for the expected API response structure
 interface EventsApiResponse {
   success: boolean;
   data: EventInterface[];
 }
 
+/**
+ * A type-safe function to retrieve the verification timestamp.
+ * It supports both 'adminVerifiedAt' and 'AdminVerifiedAt' property names.
+ * @param e The event object.
+ * @returns The verification date string or null.
+ */
 function getVerifiedAt(e: EventInterface): string | null {
   // Support both adminVerifiedAt and AdminVerifiedAt as string or undefined
   if ("adminVerifiedAt" in e && typeof (e as { adminVerifiedAt?: string }).adminVerifiedAt === "string") {
@@ -32,27 +39,40 @@ export default function ApprovedEvents() {
       setError("");
       try {
         const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-        const res = await axios.get<EventsApiResponse>("https://dep2-backend.onrender.com/api/events", {
+        // Updated API endpoint to the local development server
+        const res = await axios.get<EventsApiResponse>("http://localhost:5274/api/events", {
           headers: token ? { Authorization: `Bearer ${token}` } : {}
         });
+
         if (res.data && res.data.success && Array.isArray(res.data.data)) {
-          // Filter approved events and sort by AdminVerifiedAt desc
+          // 1. Filter events that are verified by an admin
           const approvedRaw = res.data.data.filter((e: EventInterface) => e.isVerifiedByAdmin);
+
+          // 2. [Added] Debugging log to check filtered events and their verification dates
+          console.log('Approved events and their adminVerifiedAt:', approvedRaw.map((e: EventInterface) => ({ id: e.eventId, adminVerifiedAt: getVerifiedAt(e) })));
+
+          // 3. Sort the approved events by verification date in descending order
           const approved = approvedRaw.sort((a: EventInterface, b: EventInterface) => {
             const dateA = getVerifiedAt(a) ? new Date(getVerifiedAt(a)!).getTime() : 0;
             const dateB = getVerifiedAt(b) ? new Date(getVerifiedAt(b)!).getTime() : 0;
+            
+            // Primary sort: newest verified first
             if (dateA !== dateB) return dateB - dateA;
-            // Secondary sort by eventId for stability
+            
+            // Secondary sort for stability: by eventId
             return Number(b.eventId || 0) - Number(a.eventId || 0);
           });
           setEvents(approved);
+
         } else {
           setEvents([]);
           setError("No approved events found.");
         }
-      } catch {
+      } catch (err) { // Catch block now includes the error object for potential logging
         setEvents([]);
         setError("Failed to fetch approved events.");
+        // Optional: log the actual error to the console for more details
+        // console.error("Error fetching events:", err);
       } finally {
         setLoading(false);
       }
@@ -60,6 +80,7 @@ export default function ApprovedEvents() {
     fetchApprovedEvents();
   }, []);
 
+  // The JSX with Tailwind CSS remains unchanged as it was identical in both versions
   return (
     <div className="w-full">
       {loading ? (

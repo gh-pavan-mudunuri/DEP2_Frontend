@@ -15,6 +15,7 @@ export default function AdminEventIncome({ onSelectEvent }: { onSelectEvent: (ev
 
   useEffect(() => {
     setLoading(true);
+    // Kept the original API endpoint from your first file as requested
     api.get("https://dep2-backend.onrender.com/api/admin/event-income-summary")
       .then(res => {
         const incomes: EventIncome[] = Array.isArray(res.data) ? res.data : [];
@@ -45,7 +46,8 @@ export default function AdminEventIncome({ onSelectEvent }: { onSelectEvent: (ev
       ) : (
         <table className="w-full text-sm border">
           <thead>
-            <tr className="bg-gray-100">
+            {/* Updated header style */}
+            <tr className="bg-[#0a174e] text-white">
               <th className="p-2 border">Event Title</th>
               <th className="p-2 border">Total Amount</th>
               <th className="p-2 border">Organizer Income</th>
@@ -55,7 +57,8 @@ export default function AdminEventIncome({ onSelectEvent }: { onSelectEvent: (ev
           </thead>
           <tbody>
             {eventIncomes.map(e => (
-              <tr key={e.eventId}>
+              // Updated body row style
+              <tr key={e.eventId} className="text-[#0a174e]">
                 <td className="p-2 border">{e.eventTitle}</td>
                 <td className="p-2 border">₹{typeof e.totalAmount === "number" && !isNaN(e.totalAmount) ? e.totalAmount : 0}</td>
                 <td className="p-2 border">₹{(((typeof e.totalAmount === "number" && !isNaN(e.totalAmount) ? e.totalAmount : 0) * 0.9).toFixed(2))}</td>

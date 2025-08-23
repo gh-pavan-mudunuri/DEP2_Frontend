@@ -1,7 +1,8 @@
 "use client";
 import { useRef, useEffect, useState } from "react";
+import { FaSpinner } from "react-icons/fa"; // Added for loading icon
 import EventCard from "../cards/event-card";
-import { EventInterface } from "@/interfaces/home";
+import { EventInterface } from "@/interfaces/home"; // Kept original interface
 import axios from "axios";
 import SwipeableCard from "../cards/swipable-card";
 
@@ -11,11 +12,10 @@ interface TrendingEventsProps {
 
 export default function TrendingEvents({ limit }: TrendingEventsProps) {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const scrollAmount = 200;
-  const scrollInterval = 3000;
+  // Removed unused scrollAmount and scrollInterval variables
   const [isPaused, setIsPaused] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
-  const [events, setEvents] = useState<EventInterface[]>([]);
+  const [events, setEvents] = useState<EventInterface[]>([]); // Kept original EventInterface type
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -25,6 +25,7 @@ export default function TrendingEvents({ limit }: TrendingEventsProps) {
       setLoading(true);
       setError("");
       try {
+        // Kept the original production API endpoint
         const res = await axios.get("https://dep2-backend.onrender.com/api/Home/trending");
         if (res.data && res.data.success && Array.isArray(res.data.data)) {
           setEvents(res.data.data);
@@ -63,8 +64,7 @@ export default function TrendingEvents({ limit }: TrendingEventsProps) {
     };
   }, []);
 
-  const handleMouseEnter = () => setIsPaused(true);
-  const handleMouseLeave = () => setIsPaused(false);
+  // Removed handleMouseEnter and handleMouseLeave as auto-scroll is not implemented
 
   // Always enforce event limit for all users and views
   let limitedEvents = events;
@@ -86,52 +86,58 @@ export default function TrendingEvents({ limit }: TrendingEventsProps) {
           View All
         </a>
         {loading ? (
-          <div className="text-gray-500 mb-4">Loading...</div>
+          // Updated loading state with spinner icon and text
+          <div className="flex flex-col items-center justify-center py-8 text-blue-600">
+            <FaSpinner className="animate-spin text-3xl mb-2" />
+            <span>Loading trending events...</span>
+          </div>
         ) : (
           <div className="relative pl-3 w-full">
             {/* Mobile view */}
-            <div className=" sm:hidden w-full flex items-center justify-center">
+            <div className="sm:hidden w-full flex items-center justify-center">
+              {/* Note: The loading state is handled globally above, so nested loading is redundant here */}
               <SwipeableCard
-  items={[...limitedEvents, { __viewAll: true }]}
-  render={event =>
-    "__viewAll" in event && event.__viewAll ? (
-      <div className="flex items-center justify-center h-full min-h-[180px]">
-        <a
-          href="/trending-events"
-          className="flex items-center gap-1 px-4 py-2 rounded-full bg-purple-600 text-white font-semibold hover:bg-purple-700 transition shadow-lg min-w-[220px] justify-center"
-          style={{ whiteSpace: "nowrap", height: "fit-content" }}
-        >
-          View All
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-5 h-5">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-          </svg>
-        </a>
-      </div>
-    ) : (
-      <EventCard event={event as EventInterface} />
-    )
-  }
-/>
+                items={[...limitedEvents, { __viewAll: true }]}
+                render={event =>
+                  "__viewAll" in event && event.__viewAll ? (
+                    <div className="flex items-center justify-center h-full min-h-[180px]">
+                      <a
+                        href="/trending-events"
+                        className="flex items-center gap-1 px-4 py-2 rounded-full bg-purple-600 text-white font-semibold hover:bg-purple-700 transition shadow-lg min-w-[220px] justify-center"
+                        style={{ whiteSpace: "nowrap", height: "fit-content" }}
+                      >
+                        View All
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor" className="w-5 h-5">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                        </svg>
+                      </a>
+                    </div>
+                  ) : (
+                    <EventCard event={event as EventInterface} />
+                  )
+                }
+              />
             </div>
             {/* Desktop/tablet view */}
             <div className="hidden sm:block relative">
               <div
                 ref={scrollRef}
-                className="flex gap-4 overflow-x-auto scroll-smooth rounded-lg no-scrollbar px-2"
+                // Updated with justify-start for alignment
+                className="flex gap-4 justify-start overflow-x-auto scroll-smooth rounded-lg no-scrollbar px-2"
                 style={{ scrollbarWidth: "none" }}
               >
                 {error ? (
                   <div className="text-red-500 p-8">{error}</div>
                 ) : limitedEvents.length === 0 ? (
-                  <div className="text-gray-500 p-8">No trending events found.</div>
+                  // Updated empty state message and styling
+                  <div className="text-gray-500 text-center py-8 w-full">No trending events found.</div>
                 ) : (
                   <>
                     {limitedEvents.map((event, index) => (
                       <div
-                        className="flex-shrink-0"
+                        // Updated class and removed mouse handlers
+                        className="flex items-start"
                         key={event.eventId + "-trending-" + index}
-                        onMouseEnter={handleMouseEnter}
-                        onMouseLeave={handleMouseLeave}
                       >
                         <EventCard event={event} />
                       </div>
@@ -143,7 +149,8 @@ export default function TrendingEvents({ limit }: TrendingEventsProps) {
             {/* Progress bar */}
             <div className="mt-2 h-1 w-full bg-gray-300 rounded-full overflow-hidden">
               <div
-                className="h-full bg-purple-600 transition-all duration-300"
+                // Updated progress bar color to blue
+                className="h-full bg-blue-600 transition-all duration-300"
                 style={{ width: `${scrollProgress}%` }}
               />
             </div>

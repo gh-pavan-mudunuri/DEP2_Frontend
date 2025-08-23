@@ -1,8 +1,11 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import axios, { AxiosError } from "axios";
+import { FaSpinner } from "react-icons/fa"; // Added for the loading spinner
 import TicketCard from "@/components/cards/ticket-card";
 
+// Interface for Registration remains the same from your strict version
 interface Registration {
   id: number;
   eventId: number;
@@ -14,6 +17,7 @@ interface Registration {
   eventTitle?: string;
 }
 
+// Interface for UserData remains the same from your strict version
 interface UserData {
   userId?: number;
   id?: number;
@@ -38,6 +42,7 @@ export default function TicketsPage() {
 
         let uid: number | null = null;
 
+        // Using the robust user ID parsing from your first snippet
         if (userRaw) {
           try {
             const userObj: UserData = JSON.parse(userRaw);
@@ -49,10 +54,11 @@ export default function TicketsPage() {
               null;
             if (uid !== null) setUserId(uid);
           } catch {
-            // If parsing fails, uid remains null
+            // If parsing fails, uid remains null, preventing errors
           }
         }
 
+        // Using the deployed API endpoint from your first snippet
         const res = await axios.get<Registration[]>(
           "https://dep2-backend.onrender.com/api/Registrations",
           {
@@ -62,12 +68,14 @@ export default function TicketsPage() {
 
         const allRegs = res.data || [];
 
+        // Filtering logic remains the same and is type-safe
         setRegistrations(
           uid !== null
             ? allRegs.filter((r: Registration) => r.userId === uid)
             : []
         );
       } catch (err) {
+        // Using the more specific error handling from your first snippet
         const axiosError = err as AxiosError;
         console.error("Error fetching registrations:", axiosError.message);
         setError("Failed to fetch registrations");
@@ -83,8 +91,13 @@ export default function TicketsPage() {
     <div className="p-6 w-full min-h-screen bg-white">
       <h1 className="text-2xl font-bold mb-6">Tickets</h1>
 
+      {/* --- UPDATED PART --- */}
+      {/* Using the improved loading UI from your second snippet */}
       {loading ? (
-        <div>Loading...</div>
+        <div className="flex flex-col items-center justify-center py-8 text-blue-600">
+          <FaSpinner className="animate-spin text-3xl mb-2" />
+          <span>Loading tickets...</span>
+        </div>
       ) : error ? (
         <div className="text-red-500">{error}</div>
       ) : registrations.length === 0 ? (

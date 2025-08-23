@@ -2,6 +2,7 @@
 
 import React, { JSX, useEffect, useState } from "react";
 import axios, { AxiosResponse } from "axios";
+import { FaSpinner } from "react-icons/fa"; // Make sure to import FaSpinner
 import EventCard from "@/components/cards/event-card";
 
 interface Event {
@@ -79,10 +80,13 @@ export default function PastAttendedEventsPage(): JSX.Element {
       <h1 className="text-3xl font-bold mb-6">Past Attended Events</h1>
 
       {loading ? (
-        <div className="text-gray-500 mb-4">Loading...</div>
+        <div className="flex flex-col items-center justify-center py-8 text-blue-600">
+          <FaSpinner className="animate-spin text-3xl mb-2" />
+          <span>Loading events...</span>
+        </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-8 px-4 py-2 w-full overflow-x-auto">
             {events.length === 0 ? (
               <div className="col-span-full text-center text-gray-500">
                 No past attended events found.

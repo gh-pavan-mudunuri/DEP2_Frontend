@@ -79,8 +79,8 @@ export default function SearchBar() {
           type="text"
           value={query}
           onChange={e => {
-            setQuery(e.target.value);
-            if (e.target.value.trim()) setShowPopup(true);
+            setQuery(String(e.target.value));
+            if (String(e.target.value).trim()) setShowPopup(true);
             else setShowPopup(false);
           }}
           placeholder="Search events, organizers, or categories..."

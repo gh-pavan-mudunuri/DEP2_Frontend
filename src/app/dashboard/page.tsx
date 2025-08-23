@@ -23,8 +23,10 @@ export default function Home() {
   return (
     <>
       <IntroSection />
-      <UpcommingEvents />
-      <TrendingEvents />
+      <div className="flex flex-col gap-8 w-full">
+        <UpcommingEvents />
+        <TrendingEvents />
+      </div>
     </>
   );
 }

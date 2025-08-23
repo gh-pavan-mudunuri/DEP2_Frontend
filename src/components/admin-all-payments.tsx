@@ -41,7 +41,7 @@ export default function AdminAllPayments() {
       ) : (
         <table className="w-full text-sm border">
           <thead>
-            <tr className="bg-gray-100">
+            <tr className="bg-[#0a174e] text-white">
               <th className="p-2 border">Payment ID</th>
               <th className="p-2 border">Transaction ID</th>
               <th className="p-2 border">User Email</th>
@@ -53,7 +53,7 @@ export default function AdminAllPayments() {
           </thead>
           <tbody>
             {payments.map(p => (
-              <tr key={p.paymentId}>
+              <tr key={p.paymentId} className="text-[#0a174e]">
                 <td className="p-2 border">{p.paymentId}</td>
                 <td className="p-2 border">{p.transactionId}</td>
                 <td className="p-2 border">{p.userEmail}</td>

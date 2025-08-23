@@ -104,75 +104,165 @@ export default function Footer() {
   return (
     <>
       {/* Footer layout: three columns + categories/rating below */}
-      <footer className="w-full bg-gray-800 text-gray-200 py-6 flex flex-col items-center justify-center">
+      <footer className="w-full bg-[#0a174e] text-gray-200 py-6 flex flex-col items-center justify-center">
         {/* Top row: Need Help, Services, Categories (three columns) */}
-  <div className="w-full max-w-6xl px-2 flex flex-row items-stretch gap-2 mb-8">
-          {/* Left Column: Need Help */}
-          <div className="min-w-[140px] flex flex-col items-start justify-center text-left h-full">
-            <h3 className="font-bold text-base sm:text-lg md:text-xl mb-2 text-yellow-800 text-center" style={{ color: "#c2a74eff" }}>Need Help</h3>
-            <ul className="space-y-2 text-xs sm:text-sm md:text-base mb-4">
-              <li>
-                <button type="button" className="hover:underline text-left w-full bg-transparent border-none p-0 m-0 cursor-pointer focus:outline-none focus:ring-2 focus:ring-violet-400" onClick={() => setShowAbout(true)} aria-haspopup="dialog" aria-expanded={showAbout} aria-controls="footer-about-modal">About Us</button>
-              </li>
-              <li>
-                <button
-                  type="button"
-                  className="hover:underline text-left w-full bg-transparent border-none p-0 m-0 cursor-pointer focus:outline-none focus:ring-2 focus:ring-violet-400 text-xs sm:text-sm md:text-base text-white"
-                  onClick={() => setShowContact(true)}
-                  aria-haspopup="dialog"
-                  aria-expanded={showContact}
-                  aria-controls="footer-contact-modal"
-                >
-                  Contact Us
-                </button>
-              </li>
-              <li>
-                <button type="button" className="hover:underline text-left w-full bg-transparent border-none p-0 m-0 cursor-pointer focus:outline-none focus:ring-2 focus:ring-violet-400" onClick={() => setShowFaqs(true)} aria-haspopup="dialog" aria-expanded={showFaqs} aria-controls="footer-faq-modal">FAQs</button>
-              </li>
-              <li>
-                <button type="button" className="hover:underline text-left w-full bg-transparent border-none p-0 m-0 cursor-pointer focus:outline-none focus:ring-2 focus:ring-violet-400" onClick={() => setShowTerms(true)} aria-haspopup="dialog" aria-expanded={showTerms} aria-controls="footer-terms-modal">Terms of Use</button>
-              </li>
-              <li>
-                <button type="button" className="hover:underline text-left w-full bg-transparent border-none p-0 m-0 cursor-pointer focus:outline-none focus:ring-2 focus:ring-violet-400" onClick={() => setShowPrivacy(true)} aria-haspopup="dialog" aria-expanded={showPrivacy} aria-controls="footer-privacy-modal">Privacy Policy</button>
-              </li>
-            </ul>
+        <div className="w-full max-w-6xl px-2 grid grid-cols-2 gap-6 mb-8
+  sm:flex sm:flex-row sm:items-stretch sm:justify-between sm:gap-1 sm:mb-8 sm:grid-cols-none">
+          {/* Mobile: Stack Need Help and Services in one column only for mobile */}
+          <div className="min-w-0 break-words flex flex-col items-start justify-start text-left h-full w-full mb-0 sm:w-auto sm:mb-0 col-span-1 order-1 sm:order-none p-[26px] sm:p-2">
+            {/* Mobile view: show both blocks stacked */}
+            <div className="flex flex-col gap-6 sm:hidden text-left items-start w-full">
+              {/* Need Help Block */}
+              <div>
+                <h3 className="font-bold text-base sm:text-lg md:text-xl mb-2 text-left" style={{ color: "#FFD700", textAlign: "left" }}>Need Help</h3>
+                <ul className="space-y-2 text-xs sm:text-sm md:text-base mb-4 text-left items-start w-full">
+                  <li>
+                    <button type="button" className="hover:underline text-left w-full bg-transparent border-none p-0 m-0 cursor-pointer focus:outline-none focus:ring-2 focus:ring-violet-400" onClick={() => setShowAbout(true)} aria-haspopup="dialog" aria-expanded={showAbout} aria-controls="footer-about-modal">About Us</button>
+                  </li>
+                  <li>
+                    <button
+                      type="button"
+                      className="hover:underline text-left w-full bg-transparent border-none p-0 m-0 cursor-pointer focus:outline-none focus:ring-2 focus:ring-violet-400 text-xs sm:text-sm md:text-base text-white"
+                      onClick={() => setShowContact(true)}
+                      aria-haspopup="dialog"
+                      aria-expanded={showContact}
+                      aria-controls="footer-contact-modal"
+                    >
+                      Contact Us
+                    </button>
+                  </li>
+                  <li>
+                    <button type="button" className="hover:underline text-left w-full bg-transparent border-none p-0 m-0 cursor-pointer focus:outline-none focus:ring-2 focus:ring-violet-400" onClick={() => setShowFaqs(true)} aria-haspopup="dialog" aria-expanded={showFaqs} aria-controls="footer-faq-modal">FAQs</button>
+                  </li>
+                  <li>
+                    <button type="button" className="hover:underline text-left w-full bg-transparent border-none p-0 m-0 cursor-pointer focus:outline-none focus:ring-2 focus:ring-violet-400" onClick={() => setShowTerms(true)} aria-haspopup="dialog" aria-expanded={showTerms} aria-controls="footer-terms-modal">Terms of Use</button>
+                  </li>
+                  <li>
+                    <button type="button" className="hover:underline text-left w-full bg-transparent border-none p-0 m-0 cursor-pointer focus:outline-none focus:ring-2 focus:ring-violet-400" onClick={() => setShowPrivacy(true)} aria-haspopup="dialog" aria-expanded={showPrivacy} aria-controls="footer-privacy-modal">Privacy Policy</button>
+                  </li>
+                </ul>
+                {/* Contact Us and Follow Us removed for mobile view under Need Help */}
+              </div>
+              {/* Services Block */}
+              <div>
+                <h3 className="font-bold text-base sm:text-lg md:text-xl mb-2 text-left" style={{ color: "#FFD700", textAlign: "left" }}>Services</h3>
+                <ul className="space-y-2 text-xs sm:text-sm md:text-base mb-4 w-full text-left items-start">
+                  <li>
+                    <button className="hover:underline bg-transparent border-none p-0 m-0 text-inherit cursor-pointer focus:outline-none" onClick={() => {
+                      if (typeof window !== "undefined") {
+                        const token = localStorage.getItem("token");
+                        if (token) {
+                          router.push("/event/create-event");
+                        } else {
+                          router.push("/login");
+                        }
+                      }
+                    }}>Create Event</button>
+                  </li>
+                  <li>
+                    <button className="hover:underline bg-transparent border-none p-0 m-0 text-inherit cursor-pointer focus:outline-none" onClick={() => router.push("/upcoming-events")}>Find Event</button>
+                  </li>
+                  <li>
+                    <button type="button" className="hover:underline text-left w-full bg-transparent border-none p-0 m-0 text-inherit cursor-pointer focus:outline-none focus:ring-2 focus:ring-violet-400" onClick={() => setShowPricing(true)} aria-haspopup="dialog" aria-expanded={showPricing} aria-controls="footer-pricing-modal">Fees & Pricings</button>
+                  </li>
+                  <li>
+                    <button type="button" className="hover:underline text-left w-full bg-transparent border-none p-0 m-0 text-inherit cursor-pointer focus:outline-none focus:ring-2 focus:ring-violet-400" onClick={() => setShowOrganizerFeatures(true)} aria-haspopup="dialog" aria-expanded={showOrganizerFeatures} aria-controls="footer-organizer-modal">Organizer Features</button>
+                  </li>
+                  <li>
+                    <button type="button" className="hover:underline text-left w-full bg-transparent border-none p-0 m-0 text-inherit cursor-pointer focus:outline-none focus:ring-2 focus:ring-violet-400" onClick={() => setShowWhyEventSphere(true)} aria-haspopup="dialog" aria-expanded={showWhyEventSphere} aria-controls="footer-why-modal">Why EventSphere</button>
+                  </li>
+                </ul>
+                {/* Ratings below Services */}
+                <div className="flex flex-col items-center md:items-center justify-center gap-2 mt-4 md:mt-0">
+                  <button
+                    className="bg-yellow-200 text-gray-800 px-3 py-1 rounded-lg text-xs font-semibold shadow hover:bg-yellow-300 transition focus:outline-none focus:ring-2 focus:ring-yellow-300 w-full max-w-[180px]"
+                    onClick={() => setShowRatingModal(true)}
+                    aria-haspopup="dialog"
+                    aria-expanded={showRatingModal}
+                    aria-controls="footer-rating-modal"
+                  >
+                    <span className="inline-flex items-center gap-2">
+                      <FaStar className="text-yellow-400 text-xl" />
+                      <span className="text-xs block text-center whitespace-pre-line">Rate Us</span>
+                    </span>
+                  </button>
+                  <div className="text-xs text-gray-700 font-semibold bg-yellow-100 rounded-lg px-3 py-2 shadow flex flex-col items-center w-full max-w-[300px]">
+                    <div className="flex items-center justify-center w-full">
+                      <span>Avg: {avgRating.toFixed(1)} / 5</span>
+                    </div>
+                    <span className="text-gray-500 mt-1 text-center w-full">{ratingCount} ratings</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {/* Desktop view: show only Need Help block in this column */}
+            <div className="hidden sm:block">
+              {/* Need Help Block (desktop) */}
+              <h3 className="font-bold text-base sm:text-lg md:text-xl mb-2 text-left" style={{ color: "#FFD700", textAlign: "left" }}>Need Help</h3>
+              <ul className="space-y-2 text-xs sm:text-sm md:text-base mb-4">
+                <li>
+                  <button type="button" className="hover:underline text-left w-full bg-transparent border-none p-0 m-0 cursor-pointer focus:outline-none focus:ring-2 focus:ring-violet-400" onClick={() => setShowAbout(true)} aria-haspopup="dialog" aria-expanded={showAbout} aria-controls="footer-about-modal">About Us</button>
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    className="hover:underline text-left w-full bg-transparent border-none p-0 m-0 cursor-pointer focus:outline-none focus:ring-2 focus:ring-violet-400 text-xs sm:text-sm md:text-base text-white"
+                    onClick={() => setShowContact(true)}
+                    aria-haspopup="dialog"
+                    aria-expanded={showContact}
+                    aria-controls="footer-contact-modal"
+                  >
+                    Contact Us
+                  </button>
+                </li>
+                <li>
+                  <button type="button" className="hover:underline text-left w-full bg-transparent border-none p-0 m-0 cursor-pointer focus:outline-none focus:ring-2 focus:ring-violet-400" onClick={() => setShowFaqs(true)} aria-haspopup="dialog" aria-expanded={showFaqs} aria-controls="footer-faq-modal">FAQs</button>
+                </li>
+                <li>
+                  <button type="button" className="hover:underline text-left w-full bg-transparent border-none p-0 m-0 cursor-pointer focus:outline-none focus:ring-2 focus:ring-violet-400" onClick={() => setShowTerms(true)} aria-haspopup="dialog" aria-expanded={showTerms} aria-controls="footer-terms-modal">Terms of Use</button>
+                </li>
+                <li>
+                  <button type="button" className="hover:underline text-left w-full bg-transparent border-none p-0 m-0 cursor-pointer focus:outline-none focus:ring-2 focus:ring-violet-400" onClick={() => setShowPrivacy(true)} aria-haspopup="dialog" aria-expanded={showPrivacy} aria-controls="footer-privacy-modal">Privacy Policy</button>
+                </li>
+              </ul>
               {/* Contact Us and Follow Us side by side */}
-              <div className="mt-2 w-full flex flex-row items-center justify-start gap-8">
+              <div className="mt-2 w-full flex flex-col sm:flex-row items-center justify-start gap-4 sm:gap-8">
                 <div>
-                  <h4 className="font-bold mb-2 text-sm sm:text-base md:text-lg" style={{ color: "#c2a74eff" }}>Contact Us</h4>
+                  <h4 className="font-bold mb-2 text-sm sm:text-base md:text-lg" style={{ color: "#FFD700" }}>Contact Us</h4>
                   <div className="flex items-center space-x-4 mt-2">
                     <MdEmail className="text-red-500 bg-white rounded-md p-1 w-8 h-8" />
                     <FaPhone className="text-black bg-white rounded-full p-1 w-8 h-8" />
                   </div>
                 </div>
                 <div>
-                  <h4 className="font-bold mb-2 text-sm sm:text-base md:text-lg" style={{ color: "#c2a74eff" }}>Follow Us</h4>
+                  <h4 className="font-bold mb-2 text-sm sm:text-base md:text-lg" style={{ color: "#FFD700" }}>Follow Us</h4>
                   <div className="flex items-center space-x-4 mt-2">
                     <FaLinkedin className="text-blue-600 bg-white rounded-full p-1 w-8 h-8" />
                     <FaXTwitter className="text-black bg-white rounded-full p-1 w-8 h-8" />
                   </div>
                 </div>
               </div>
+            </div>
           </div>
 
-          {/* Center Column: Services + Follow Us + Contact Us */}
-          <div className="flex-1 min-w-[160px] flex flex-col items-center justify-center text-center h-full">
-            <h3 className="font-bold text-base sm:text-lg md:text-xl mb-2 text-yellow-800 text-center" style={{ color: "#c2a74eff" }}>Services</h3>
-            <ul className="space-y-2 text-xs sm:text-sm md:text-base mb-4 w-auto text-center">
+          {/* Center Column: Services (desktop only) */}
+          <div className="hidden sm:flex min-w-0 break-words flex-col items-start justify-center text-left h-full w-full sm:w-auto sm:mb-0 col-span-1 sm:items-start sm:text-left p-2">
+            <h3 className="font-bold text-base sm:text-lg md:text-xl mb-2 text-left" style={{ color: '#FFD700', textAlign: 'left' }}>Services</h3>
+            <ul className="space-y-2 text-xs sm:text-sm md:text-base mb-4 w-full text-left">
               <li>
                 <button className="hover:underline bg-transparent border-none p-0 m-0 text-inherit cursor-pointer focus:outline-none" onClick={() => {
-                  if (typeof window !== "undefined") {
-                    const token = localStorage.getItem("token");
+                  if (typeof window !== 'undefined') {
+                    const token = localStorage.getItem('token');
                     if (token) {
-                      router.push("/event/create-event");
+                      router.push('/event/create-event');
                     } else {
-                      router.push("/login");
+                      router.push('/login');
                     }
                   }
                 }}>Create Event</button>
               </li>
               <li>
-                <button className="hover:underline bg-transparent border-none p-0 m-0 text-inherit cursor-pointer focus:outline-none" onClick={() => router.push("/upcoming-events")}>Find Event</button>
+                <button className="hover:underline bg-transparent border-none p-0 m-0 text-inherit cursor-pointer focus:outline-none" onClick={() => router.push('/upcoming-events')}>Find Event</button>
               </li>
               <li>
                 <button type="button" className="hover:underline text-left w-full bg-transparent border-none p-0 m-0 text-inherit cursor-pointer focus:outline-none focus:ring-2 focus:ring-violet-400" onClick={() => setShowPricing(true)} aria-haspopup="dialog" aria-expanded={showPricing} aria-controls="footer-pricing-modal">Fees & Pricings</button>
@@ -197,6 +287,8 @@ export default function Footer() {
                   <FaStar className="text-yellow-400" />
                   Rate Us
                 </span>
+
+
               </button>
               <div className="text-xs text-gray-700 font-semibold bg-yellow-100 rounded-full px-3 py-1 shadow flex items-center gap-2">
                 <FaStar className="text-yellow-400" />
@@ -205,22 +297,46 @@ export default function Footer() {
               </div>
             </div>
           </div>
-
-          {/* Right Column: Categories + Ratings */}
-          <div className="min-w-[140px] flex flex-col items-end justify-center h-full">
-            <h3 className="font-bold text-base sm:text-lg md:text-xl mb-2 text-yellow-800 text-center" style={{ color: "#c2a74eff" }}>Categories</h3>
-            <ul className="space-y-2 text-xs sm:text-sm md:text-base">
-              {categories.map((cat) => (
-                <li key={cat}>
-                  <Link href={`/upcoming-events?category=${encodeURIComponent(cat)}`} className="hover:underline">
-                    {cat}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+          {/* Right Column: Categories + Ratings + Contact/Follow Us (mobile only) */}
+          <div className="min-w-0 break-words flex flex-col items-end justify-start h-full w-full sm:w-auto col-span-1 order-3 sm:order-none p-2">
+            <div className="flex flex-col w-full">
+              {/* Categories at the top */}
+              <div className="w-full flex flex-col items-center">
+                <h3 className="font-bold text-base sm:text-lg md:text-xl mb-2 text-right sm:text-center w-full" style={{ color: '#FFD700' }}>
+                  <span className="block text-center sm:text-left mt-[20px] sm:mt-0">Categories</span>
+                </h3>
+                <ul className="space-y-2 text-xs sm:text-sm md:text-base w-50 text-center sm:text-center">
+                  {categories.map((cat) => (
+                    <li key={cat} className="w-full">
+                      <Link href={`/upcoming-events?category=${encodeURIComponent(cat)}`} className="hover:underline block text-left w-full">
+                        {cat}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              {/* Contact Us and Follow Us below Categories */}
+              <div className="flex flex-col gap-4 w-full mt-6 sm:hidden">
+                <div className="flex flex-col items-center w-full">
+                  <h4 className="font-bold mb-2 text-sm" style={{ color: '#FFD700' }}>Contact Us</h4>
+                  <div className="flex items-center justify-center space-x-4 mt-2">
+                    <MdEmail className="text-red-500 bg-white rounded-md p-1 w-8 h-8" />
+                    <FaPhone className="text-black bg-white rounded-full p-1 w-8 h-8" />
+                  </div>
+                </div>
+                <div className="flex flex-col items-center w-full">
+                  <h4 className="font-bold mb-2 text-sm" style={{ color: '#FFD700' }}>Follow Us</h4>
+                  <div className="flex items-center justify-center space-x-4 mt-2">
+                    <FaLinkedin className="text-blue-600 bg-white rounded-full p-1 w-8 h-8" />
+                    <FaXTwitter className="text-black bg-white rounded-full p-1 w-8 h-8" />
+                  </div>
+                </div>
+              </div>
+            </div>
             {/* ...existing code... */}
           </div>
         </div>
+
 
         {/* Copyright */}
         <div className="w-full text-center text-gray-400 font-semibold text-xs sm:text-sm md:text-base mt-10 pb-0">
@@ -270,7 +386,7 @@ export default function Footer() {
               placeholder="Review title (optional)"
               className="border border-yellow-300 rounded px-3 py-2 w-full mb-2 focus:ring-2 focus:ring-yellow-400"
               value={reviewTitle}
-              onChange={(e) => setReviewTitle(e.target.value)}
+              onChange={(e) => setReviewTitle(String(e.target.value))}
             />
             <textarea
               placeholder="Your comments (optional)"

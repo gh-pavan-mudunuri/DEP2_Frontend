@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { createPortal } from "react-dom";
 
 interface PopupMessageProps {
@@ -25,7 +25,7 @@ const PopupMessage: React.FC<PopupMessageProps> = ({ message, type = "success", 
     const portalRoot = document.getElementById("popup-message-root");
     const popupContent = (
       <div
-        className={`mt-4 px-6 py-3 rounded-lg shadow-lg text-white text-center ${bgColor} animate-fade-in`}
+        className={`mt-4 px-6 py-3 rounded-lg shadow-lg text-white text-center max-w-md w-fit mx-auto ${bgColor} animate-fade-in`}
         style={{ pointerEvents: "auto", zIndex: 100 }}
         role="alert"
       >
@@ -39,7 +39,7 @@ const PopupMessage: React.FC<PopupMessageProps> = ({ message, type = "success", 
   // fallback: fixed at top center
   return (
     <div
-      className={`fixed top-6 left-1/2 transform -translate-x-1/2 z-50 px-6 py-3 rounded-lg shadow-lg text-white text-center ${bgColor} animate-fade-in`}
+      className={`fixed top-6 left-1/2 transform -translate-x-1/2 z-[1000] px-6 py-3 rounded-lg shadow-lg text-white text-center max-w-md w-fit mx-auto ${bgColor} animate-fade-in`}
       role="alert"
     >
       {message}

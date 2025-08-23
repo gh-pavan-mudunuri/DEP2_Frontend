@@ -16,7 +16,7 @@ export default function StripeOnboardingStart() {
       const res = await fetch(`https://dep2-backend.onrender.com/api/users/${userId}/stripe-express-account`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(email),
+        body: JSON.stringify({ email }), // Encapsulate email in an object
       });
       const data = await res.json();
       if (data.onboardingUrl) {

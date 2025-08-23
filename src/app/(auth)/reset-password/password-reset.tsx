@@ -30,7 +30,7 @@ export default function PasswordReset(): React.JSX.Element {
   }, [searchParams]);
 
   const handlePasswordChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
+    const value = String(e.target.value);
     setNewPassword(value);
     setMatchError(
       confirmPassword && value !== confirmPassword ? "Passwords do not match." : ""
@@ -38,7 +38,7 @@ export default function PasswordReset(): React.JSX.Element {
   };
 
   const handleConfirmChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
+    const value = String(e.target.value);
     setConfirmPassword(value);
     setMatchError(
       newPassword !== value ? "Passwords do not match." : ""

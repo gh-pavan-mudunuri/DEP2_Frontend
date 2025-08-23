@@ -10,6 +10,7 @@ export interface UserProfile {
   role?: number | string;
   name?: string;
   username?: string;
+  Email?: string;
   email?: string;
   profileImage?: string;
   imageUrl?: string;

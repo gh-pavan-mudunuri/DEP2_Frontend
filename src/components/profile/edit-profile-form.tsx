@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import ConfirmationDialog from '../common/confirmation-dialog';
 import ProfileImage from './profile-image';
 
@@ -10,23 +10,19 @@ interface EditProfileFormProps {
     imageUrl: string;
     imageFile: File | null;
     imagePreview: string;
+    stripeAccountId?: string | null;
   };
   editing: boolean;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onImageChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   onCancel: () => void;
   onSave: (e: React.FormEvent<HTMLFormElement>) => void;
+  onStripeConnect?: () => void;
 }
 
-export default function EditProfileForm({
-  profile,
-  editing,
-  onChange,
-  onImageChange,
-  onCancel,
-  onSave
-}: EditProfileFormProps) {
-  const [showConfirm, setShowConfirm] = useState<boolean>(false);
+export default function EditProfileForm({ profile, editing, onChange, onImageChange, onCancel, onSave, onStripeConnect }: EditProfileFormProps) {
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [showStripePopup, setShowStripePopup] = useState(false);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -36,19 +32,32 @@ export default function EditProfileForm({
   const handleConfirm = () => {
     setShowConfirm(false);
     // Actually submit the form
-    // Create a synthetic submit event for the form
-    const form = document.createElement("form");
-    const event = new Event("submit", { bubbles: true, cancelable: true });
-    onSave(event as unknown as React.FormEvent<HTMLFormElement>);
+    onSave(new Event('submit') as any);
   };
 
   const handleCancel = () => {
     setShowConfirm(false);
   };
 
+  const handleStripeConnectClick = () => {
+    if (profile.stripeAccountId) {
+      setShowStripePopup(true);
+    } else {
+      if (onStripeConnect) onStripeConnect();
+    }
+  };
+
+  const handleStripePopupClose = () => {
+    setShowStripePopup(false);
+  };
+
   return (
-    <>
-      <form onSubmit={handleSubmit} className="max-w-2xl mx-auto mt-10 bg-white rounded-3xl shadow-2xl p-12 md:p-16 flex flex-col md:flex-row gap-0 items-center md:items-start w-full">
+    <div className="max-w-2xl mx-auto mt-10">
+      <h2 className="text-3xl font-extrabold text-[#0a174e] text-center mb-6 tracking-wide" style={{ letterSpacing: '0.04em', textShadow: '0 2px 12px #ffd70088' }}>
+        Edit Profile
+        <span className="block w-16 h-1 mx-auto mt-2 rounded-full" />
+      </h2>
+      <form onSubmit={handleSubmit} className="bg-white rounded-3xl shadow-2xl border-4 border-[#0a174e] p-12 md:p-16 flex flex-col md:flex-row gap-0 items-center md:items-start w-full">
         {/* Left: Profile Image */}
         <div className={`flex flex-col items-center w-full md:w-[38%] mb-6 md:mb-0 md:pr-8`}>
           <ProfileImage imageUrl={profile.imageUrl} imagePreview={profile.imagePreview} />
@@ -73,7 +82,7 @@ export default function EditProfileForm({
               name="name"
               value={profile.name}
               onChange={onChange}
-              className="w-full mt-1 px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-orange-400"
+              className="w-full mt-1 px-3 py-2 border-2 border-[#0a174e] rounded focus:outline-none focus:ring-2 focus:ring-[#ffd700] focus:border-[#ffd700] transition-all bg-white text-[#0a174e] placeholder-gray-400"
               required
             />
           </label>
@@ -83,7 +92,7 @@ export default function EditProfileForm({
               name="email"
               value={profile.email}
               onChange={onChange}
-              className="w-full mt-1 px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-orange-400"
+              className="w-full mt-1 px-3 py-2 border-2 border-[#0a174e] rounded focus:outline-none focus:ring-2 focus:ring-[#ffd700] focus:border-[#ffd700] transition-all bg-white text-[#0a174e] placeholder-gray-400"
               required
             />
           </label>
@@ -93,25 +102,35 @@ export default function EditProfileForm({
               name="phone"
               value={profile.phone}
               onChange={onChange}
-              className="w-full mt-1 px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-orange-400"
+              className="w-full mt-1 px-3 py-2 border-2 border-[#0a174e] rounded focus:outline-none focus:ring-2 focus:ring-[#ffd700] focus:border-[#ffd700] transition-all bg-white text-[#0a174e] placeholder-gray-400"
               required
             />
           </label>
-          <div className="flex gap-3 mt-4">
-            <button
-              type="submit"
-              className="py-2 px-4 rounded bg-green-600 text-white font-bold hover:bg-green-700 transition-all"
-              disabled={editing}
-            >
-              {editing ? 'Saving...' : 'Save Changes'}
-            </button>
+          <div className="flex flex-col gap-4 mt-6 w-full">
+            <div className="flex gap-4 justify-center md:justify-start">
+              <button
+                type="submit"
+                className="py-2 px-6 rounded-xl font-bold text-white bg-gradient-to-r from-[#0a174e] via-[#009688] to-[#ffd700] shadow-lg transition-all duration-200 hover:scale-105 hover:shadow-xl hover:bg-gradient-to-r hover:from-[#3a4a7c] hover:via-[#ffd700] hover:to-[#ffd700] focus:outline-none focus:ring-2 focus:ring-[#ffd700]"
+                disabled={editing}
+              >
+                {editing ? 'Saving...' : 'Save Changes'}
+              </button>
+              <button
+                type="button"
+                className="py-2 px-6 rounded-lg bg-gray-300 text-gray-700 font-bold hover:bg-gray-400 transition-all shadow-sm"
+                onClick={onCancel}
+                disabled={editing}
+              >
+                Cancel
+              </button>
+            </div>
             <button
               type="button"
-              className="py-2 px-4 rounded bg-gray-300 text-gray-700 font-bold hover:bg-gray-400 transition-all"
-              onClick={onCancel}
+              className="py-2 px-6 rounded-xl font-bold text-white bg-[#0a174e] transition-all shadow-sm w-full md:w-auto hover:underline focus:outline-none focus:ring-2 focus:ring-[#ffd700]"
+              onClick={handleStripeConnectClick}
               disabled={editing}
             >
-              Cancel
+              Connect to Stripe
             </button>
           </div>
         </div>
@@ -124,6 +143,14 @@ export default function EditProfileForm({
         confirmText="Save"
         cancelText="Cancel"
       />
-    </>
+      <ConfirmationDialog
+        open={showStripePopup}
+        message="You have already connected to Stripe."
+        onConfirm={handleStripePopupClose}
+        onCancel={handleStripePopupClose}
+        confirmText="OK"
+        cancelText="Close"
+      />
+    </div>
   );
 }

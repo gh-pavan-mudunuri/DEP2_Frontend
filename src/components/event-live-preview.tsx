@@ -19,7 +19,7 @@ function formatDateTime(dateStr?: string) {
   return `${d}, ${t}`;
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://dep2-backend.onrender.com";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5274";
 
 function processDescriptionHtml(html: string | undefined): string {
   if (!html) return '<span style="color:#bbb">[Description]</span>';
@@ -237,9 +237,7 @@ const EventLivePreview: React.FC<EventLivePreviewProps> = ({ event, forceMobileL
                     const today = new Date();
                     today.setHours(0, 0, 0, 0);
                     const futureOccurrences = event.occurrences.filter((occ: Occurrence) => {
-                      if (!occ.startTime) return false;
-                      const start = new Date(occ.startTime);
-                      return !isNaN(start.getTime()) && start >= today;
+const start = new Date(occ.startTime ?? "");                      return !isNaN(start.getTime()) && start >= today;
                     });
                     return (
                       <select

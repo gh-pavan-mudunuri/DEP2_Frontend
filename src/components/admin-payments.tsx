@@ -1,4 +1,3 @@
-
 "use client";
 import { useEffect, useState } from 'react';
 
@@ -46,32 +45,34 @@ export default function AdminPayments({ eventId }: Props) {
       {payments.length === 0 ? (
         <div className="text-gray-500">No payments found for this event.</div>
       ) : (
-        <table className="w-full text-sm border">
-          <thead>
-            <tr className="bg-gray-100">
-              <th className="p-2 border">Payment ID</th>
-              <th className="p-2 border">Transaction ID</th>
-              <th className="p-2 border">User Email</th>
-              <th className="p-2 border">Event Title</th>
-              <th className="p-2 border">Amount</th>
-              <th className="p-2 border">Status</th>
-              <th className="p-2 border">Time</th>
-            </tr>
-          </thead>
-          <tbody>
-            {payments.map(p => (
-              <tr key={p.paymentId}>
-                <td className="p-2 border">{p.paymentId}</td>
-                <td className="p-2 border">{p.transactionId}</td>
-                <td className="p-2 border">{p.userEmail}</td>
-                <td className="p-2 border">{p.eventTitle}</td>
-                <td className="p-2 border">₹{p.amount}</td>
-                <td className="p-2 border">{p.status}</td>
-                <td className="p-2 border">{new Date(p.paymentTime).toLocaleString()}</td>
+        <div className="overflow-x-auto">
+          <table className="min-w-[600px] w-full text-xs sm:text-sm border">
+            <thead>
+              <tr className="bg-[#0a174e] text-white">
+                <th className="p-2 border">Payment ID</th>
+                <th className="p-2 border">Transaction ID</th>
+                <th className="p-2 border">User Email</th>
+                <th className="p-2 border">Event Title</th>
+                <th className="p-2 border">Amount</th>
+                <th className="p-2 border">Status</th>
+                <th className="p-2 border">Time</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {payments.map(p => (
+                <tr key={p.paymentId} className="text-[#0a174e]">
+                  <td className="p-2 border">{p.paymentId}</td>
+                  <td className="p-2 border">{p.transactionId}</td>
+                  <td className="p-2 border">{p.userEmail}</td>
+                  <td className="p-2 border">{p.eventTitle}</td>
+                  <td className="p-2 border">₹{p.amount}</td>
+                  <td className="p-2 border">{p.status}</td>
+                  <td className="p-2 border">{new Date(p.paymentTime).toLocaleString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );

@@ -22,8 +22,10 @@ export default function Home() {
   return (
     <>
       <IntroSection />
-      <TrendingEvents />
-      <UpcommingEvents />
+      <div className="flex flex-col gap-8 w-full">
+        <UpcommingEvents limit={10} />
+        <TrendingEvents limit={10} />
+      </div>
     </>
   );
 }

@@ -1,16 +1,20 @@
 "use client";
+
 import { JSX, useEffect, useState } from "react";
 import axios from "axios";
+import { FaSpinner } from "react-icons/fa"; // Added for the loading animation
 import EventCard from "@/components/cards/event-card";
 import PopupMessage from "@/components/common/popup-message";
 import ConfirmationDialog from "@/components/common/confirmation-dialog";
 import { EventInterface } from "@/interfaces/home";
 
+// Interface for the popup message state
 interface PopupMessageState {
   message: string;
   type?: "success" | "error" | "info";
 }
 
+// Interface for the confirmation dialog state
 interface ConfirmDialogState {
   open: boolean;
   eventId: string | number | null;
@@ -115,30 +119,37 @@ export default function MyEventsPage(): JSX.Element {
       <h1 className="text-3xl font-bold mb-6">My Organized Events</h1>
 
       {loading ? (
-        <div className="text-gray-500 mb-4">Loading...</div>
+        // Updated Loading State UI
+        <div className="flex flex-col items-center justify-center py-8 text-blue-600">
+          <FaSpinner className="animate-spin text-3xl mb-2" />
+          <span>Loading events...</span>
+        </div>
       ) : error ? (
         <div className="text-red-500">{error}</div>
       ) : (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {/* Updated Grid Layout */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-8 px-4 py-2 w-full overflow-x-auto">
             {events.length === 0 ? (
               <div className="col-span-full text-center text-gray-500">
                 You have not organized any events yet.
               </div>
             ) : (
               events.map((event, idx) => (
-                <EventCard
-                  event={event}
-                  key={event.eventId ?? idx}
-                  showActions={true}
-                  hideRegister={true}
-                  onDelete={(eventId: string | number) => {
-                    setConfirmDialog({ open: true, eventId });
-                  }}
-                  onEdit={(event) => {
-                    window.location.href = `/event/${event.eventId}/edit-event`;
-                  }}
-                />
+                // Wrapper for card sizing
+                <div key={event.eventId ?? idx} className="flex justify-center items-center min-w-[260px] max-w-[360px]">
+                  <EventCard
+                    event={event}
+                    showActions={true}
+                    hideRegister={true}
+                    onDelete={(eventId: string | number) => {
+                      setConfirmDialog({ open: true, eventId });
+                    }}
+                    onEdit={(event) => {
+                      window.location.href = `/event/${event.eventId}/edit-event`;
+                    }}
+                  />
+                </div>
               ))
             )}
             {popup && (
@@ -179,6 +190,7 @@ export default function MyEventsPage(): JSX.Element {
             )}
           </div>
 
+          {/* Pagination Controls - No changes needed here but included for completeness */}
           <div className="flex justify-center items-center mt-8 gap-2">
             <button
               className="px-3 py-1 rounded bg-gray-200 text-gray-700 disabled:opacity-50"

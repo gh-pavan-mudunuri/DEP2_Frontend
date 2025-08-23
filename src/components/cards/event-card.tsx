@@ -492,7 +492,7 @@ async function confirmApprove() {
                       e.preventDefault();
                       e.stopPropagation();
                       const organiserEmail = event.organiserEmail || event.organizerEmail || event.OrganizerEmail;
-                      const eventTitle = event.title || event.eventTitle || event.name;
+const eventTitle: string = event.title || event.eventTitle || event.name || "";
                       if (organiserEmail) {
                         window.location.href = `/send-email?to=${encodeURIComponent(organiserEmail)}&event=${encodeURIComponent(eventTitle)}`;
                       } else {

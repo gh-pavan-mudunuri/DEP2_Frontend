@@ -4,6 +4,8 @@ import { useState, FormEvent } from 'react';
 import PopupMessage from '@/components/common/popup-message';
 import { useRouter } from 'next/navigation';
 import axios, { AxiosError } from 'axios';
+import { UserRole } from "@/types/roles";
+import Image from "next/image";
 import { LoginResponse, APIError } from "@/interfaces/auth";
 
 export default function Login() {
@@ -18,70 +20,70 @@ export default function Login() {
   const [loading, setLoading] = useState<boolean>(false);
   const [resetLoading, setResetLoading] = useState<boolean>(false);
 
-  const handleLoginSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
+  const handleLoginSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     setMessage('');
-
-    try {
-      const response = await axios.post<LoginResponse>('https://dep2-backend.onrender.com/api/Auth/login', {
-        email,
-        password,
-      });
-
-      const user = response.data.user;
-      const token = response.data.token;
-
-      localStorage.setItem('token', token);
-      document.cookie = `authToken=${token}; path=/; max-age=86400; SameSite=Lax; Secure`;
-      localStorage.setItem('user', JSON.stringify(user));
-
-      if (typeof user.role !== 'undefined') {
-        document.cookie = `userRole=${user.role}; path=/; max-age=86400; SameSite=Lax; Secure`;
-      }
-
-      setUser(user);
-      setPopupType('success');
-      setMessage('Login successful!');
-      window.dispatchEvent(new Event("userLoggedIn"));
-
-      if (user.role === 1) {
-        router.push('/admin');
-      } else {
-        router.push('/dashboard');
-      }
-    } catch (error) {
-      const err = error as AxiosError<APIError>;
-      console.error('Login error:', err);
-
-      let backendMsg = '';
-
-      if (err.response?.data) {
-        if (typeof err.response.data === 'string') {
-          backendMsg = err.response.data;
-        } else if ('message' in err.response.data && typeof err.response.data.message === 'string') {
-          backendMsg = err.response.data.message;
+    axios.post<LoginResponse>('https://dep2-backend.onrender.com/api/Auth/login', {
+      email: email,
+      password: password
+    })
+      .then(response => {
+        localStorage.setItem('token', response.data.token);
+        document.cookie = `authToken=${response.data.token}; path=/; max-age=86400; SameSite=Lax; Secure`;
+        // Store user info in localStorage for Navbar username
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+        // Set userRole cookie for middleware
+        if (typeof response.data.user.role !== 'undefined') {
+          document.cookie = `userRole=${response.data.user.role}; path=/; max-age=86400; SameSite=Lax; Secure`;
         }
-      }
-
-      if (backendMsg) {
-        if (backendMsg.toLowerCase().includes('email not verified')) {
-          setPopupType('error');
-          setMessage('Your email is not verified. Please check your inbox for the verification link.');
+        setUser(response.data.user);
+        setPopupType('success');
+        setMessage('Login successful!');
+        window.dispatchEvent(new Event("userLoggedIn"));
+        // Redirect based on role
+  if (response.data.user.role === UserRole.Admin) {
+          router.push('/admin');
         } else {
-          setPopupType('error');
-          setMessage(backendMsg);
+          router.push('/dashboard');
         }
-      } else {
+      })
+      .catch((error: AxiosError) => {
+        // Log error for debugging
+        console.error('Login error:', error);
+        let backendMsg = '';
+        if (error.response) {
+          // Try to extract message from various possible locations
+          if (error.response.data) {
+            if (typeof error.response.data === 'string') {
+              backendMsg = error.response.data;
+            } else if (
+              typeof error.response.data === 'object' &&
+              (error.response.data as any).message
+            ) {
+              backendMsg = (error.response.data as any).message;
+            }
+          }
+        }
+        if (backendMsg) {
+          if (backendMsg.toLowerCase().includes('email not verified')) {
+            setPopupType('error');
+            setMessage('Your email is not verified. Please check your inbox for the verification link.');
+          } else {
+            setPopupType('error');
+            setMessage(backendMsg);
+          }
+        } else {
         setPopupType('error');
         setMessage('An unexpected error occurred. Please try again.');
-      }
-    } finally {
-      setLoading(false);
-    }
+        }
+      })
+      .finally(() => {
+        setLoading(false); // Stop loading
+      });
   };
 
-  const handleResetSubmit = async (e: FormEvent<HTMLFormElement>): Promise<void> => {
+  const handleResetSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setResetLoading(true);
     setMessage('');
@@ -91,7 +93,7 @@ export default function Login() {
       await axios.post('https://dep2-backend.onrender.com/api/Auth/forgot-password', { email });
       setPopupType('success');
       setMessage('Password reset email sent!');
-    } catch (error) {
+    } catch (error: unknown) {
       const err = error as AxiosError<APIError>;
       setPopupType('error');
       setMessage(err.response?.data?.message || 'An error occurred. Please try again.');
@@ -100,7 +102,9 @@ export default function Login() {
     }
   };
 
-  const handlePopupClose = (): void => setMessage('');
+
+  // Remove message when popup closes
+  const handlePopupClose = () => setMessage('');
 
   return (
     <>
@@ -113,12 +117,12 @@ export default function Login() {
         />
       )}
 
-      <div className="flex flex-col justify-center items-center">
+      <div className="flex flex-col justify-center items-center" >
+
         <div className="flex justify-center items-center flex-1 relative z-10 w-full">
           <div className="bg-white/80 sm:bg-white shadow-lg rounded-lg flex w-full max-w-xs sm:max-w-md md:max-w-lg backdrop-blur-md">
             <div className="w-full p-3 sm:p-6 z-0">
               <h2 className="text-xl sm:text-2xl md:text-3xl font-bold mb-4 text-center">Login</h2>
-
               {passwordReset ? (
                 <form onSubmit={handleResetSubmit} className="space-y-3">
                   <input
@@ -127,7 +131,7 @@ export default function Login() {
                     className="w-full border px-3 py-2 rounded text-sm sm:text-base"
                     required
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+onChange={(e) => setEmail(String(e.target.value))}
                   />
                   <button
                     type="submit"
@@ -176,7 +180,7 @@ export default function Login() {
                     className="w-full border px-3 py-2 rounded text-sm sm:text-base"
                     required
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+onChange={(e) => setEmail(String(e.target.value))}
                   />
                   <input
                     type="password"
@@ -184,7 +188,7 @@ export default function Login() {
                     className="w-full border px-3 py-2 rounded text-sm sm:text-base"
                     required
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)}
+onChange={(e) => setPassword(String(e.target.value))}
                   />
                   <div className="mb-3 text-xs sm:text-sm text-right">
                     <button
@@ -198,7 +202,8 @@ export default function Login() {
                   </div>
                   <button
                     type="submit"
-                    className="w-full text-white py-2 rounded font-semibold hover:bg-gradient-to-r bg-blue-300 hover:to-blue-700 hover:scale-105 hover:shadow-lg transition-all duration-200 flex items-center justify-center text-base sm:text-lg"
+                    className="w-full text-white py-2 rounded font-semibold hover:bg-gradient-to-r bg-blue-300  hover:to-blue-700 hover:scale-105 hover:shadow-lg transition-all duration-200 flex items-center justify-center text-base sm:text-lg"
+    
                     aria-label="Login"
                     disabled={loading}
                   >
@@ -238,12 +243,12 @@ export default function Login() {
           </div>
         </div>
       </div>
-
       {message && (
         <div className="fixed top-0 left-0 w-full flex justify-center z-50">
           <div
             className={`mt-6 px-8 py-4 min-w-[320px] max-w-[90vw] rounded-lg shadow-lg text-center text-lg font-semibold transition-all duration-300
               ${
+                // Show green for backend success messages, red for errors
                 message.toLowerCase().includes('login successful') ||
                 message.toLowerCase().includes('password reset email sent') ||
                 message.toLowerCase().includes('reset email sent') ||

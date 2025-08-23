@@ -10,6 +10,7 @@ import type {
   Media,
   CustomDate,
 } from "@/interfaces/event-form";
+import axios from "axios";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://dep2-backend.onrender.com";
 
@@ -34,18 +35,11 @@ export default function EditEventPage(): JSX.Element | null {
     setLoading(true);
     const token = localStorage.getItem("token");
 
-    fetch(`${API_URL}/api/events/${eventId}`, {
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
-    })
-      .then(async (res) => {
-        if (!res.ok) {
-          const text = await res.text();
-          console.error("[ERROR] Failed to fetch event:", res.status, text);
-          throw new Error(`Failed to fetch event: ${res.status} ${text}`);
-        }
-        return res.json();
+    axios.get(`${API_URL}/api/events/${eventId}`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
       })
-      .then((data) => {
+      .then((res) => {
+        const data = res.data;
         console.log("[DEBUG] Raw event data from backend:", data.data);
 
         const event = data && typeof data === "object" && data.data ? data.data : data;
@@ -202,5 +196,5 @@ export default function EditEventPage(): JSX.Element | null {
   if (error) return <div>Error: {error}</div>;
   if (!initialData) return <div>No event found.</div>;
 
-  return <EventForm initialData={initialData} isEditMode eventId={eventId} />;
+  return <EventForm initialData={initialData} isEditMode eventId={eventId}  />;
 }

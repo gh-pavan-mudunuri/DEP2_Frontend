@@ -2,9 +2,9 @@
 
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { FaSpinner } from "react-icons/fa"; // Added for the loading animation
 import EventCard from "@/components/cards/event-card";
-import { EventFormData } from "@/interfaces/event-form";
-import { EventInterface } from "@/interfaces/home";
+import { EventInterface } from "@/interfaces/home"; // Kept your original interface for type safety
 
 export default function UpcomingRegisteredEventsPage() {
   const [events, setEvents] = useState<EventInterface[]>([]);
@@ -26,6 +26,7 @@ export default function UpcomingRegisteredEventsPage() {
       }
       if (userId && token) {
         try {
+          // Using the deployed backend URL from your original script
           const res = await axios.get(
             `${process.env.NEXT_PUBLIC_BACKEND_URL || "https://dep2-backend.onrender.com"}/api/Dashboard/current-attending-paged/${userId}?page=${page}&pageSize=${pageSize}`,
             { headers: { Authorization: `Bearer ${token}` } }
@@ -55,10 +56,15 @@ export default function UpcomingRegisteredEventsPage() {
     <div className="p-4">
       <h1 className="text-3xl font-bold mb-6">Upcoming Registered Events</h1>
       {loading ? (
-        <div className="text-gray-500 mb-4">Loading...</div>
+        // Updated loading state with spinner icon and new styles
+        <div className="flex flex-col items-center justify-center py-8 text-blue-600">
+          <FaSpinner className="animate-spin text-3xl mb-2" />
+          <span>Loading events...</span>
+        </div>
       ) : (
         <>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {/* Updated grid container with new responsive classes and styling */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-8 px-4 py-2 w-full overflow-x-auto">
             {events.length === 0 ? (
               <div className="col-span-full text-center text-gray-500">No upcoming registered events found.</div>
             ) : (
@@ -67,6 +73,7 @@ export default function UpcomingRegisteredEventsPage() {
               ))
             )}
           </div>
+          {/* Pagination controls remain the same but will apply to the updated layout */}
           <div className="flex justify-center items-center mt-8 gap-2">
             <button
               className="px-3 py-1 rounded bg-gray-200 text-gray-700 disabled:opacity-50"

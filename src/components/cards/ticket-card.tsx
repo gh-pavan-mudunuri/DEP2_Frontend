@@ -35,7 +35,7 @@ export default function TicketCard({ reg }: TicketCardProps) {
 		>
 			{/* Download icon */}
 			<button
-				className="absolute top-3 right-3 z-30 hover:text-blue-600 transition-colors"
+				className="absolute top-3 right-3 z-30 hover:text-[#ffd700] transition-colors"
 				title="Download Ticket"
 				onClick={async (e) => {
 					e.preventDefault();
@@ -44,10 +44,10 @@ export default function TicketCard({ reg }: TicketCardProps) {
 					}
 				}}
 			>
-				<MdDownloadForOffline className="h-7 w-7 text-black drop-shadow" />
+				<MdDownloadForOffline className="h-7 w-7 text-[#ffd700] drop-shadow" />
 			</button>
 			{/* Header */}
-			<div className="bg-gradient-to-r from-blue-600 to-purple-500 px-6 py-3 text-white text-2xl font-bold tracking-wide text-center">
+			<div className="bg-[#0a174e] px-6 py-3 text-white text-2xl font-bold tracking-wide text-center">
 				{reg.eventTitle || 'Event'}
 			</div>
 			{/* Main content: 2 columns on md+, stacked on mobile */}

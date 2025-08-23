@@ -6,6 +6,7 @@ import axios, { AxiosError } from "axios";
 import Navbar from "@/components/cards/Navbar";
 import PopupMessage from "@/components/common/popup-message";
 
+// Type definition for the popup message state for better type safety
 type PopupType = "success" | "error";
 
 interface PopupState {
@@ -13,6 +14,7 @@ interface PopupState {
   type?: PopupType;
 }
 
+// Interface for the user object stored in localStorage
 interface UserLocalStorage {
   email?: string;
 }
@@ -21,22 +23,26 @@ export default function SendEmailPage() {
   const searchParams = useSearchParams();
   const organiserEmail = searchParams.get("to") || "";
   const eventTitle = searchParams.get("event") || "";
+
+  // State hooks with explicit types
   const [from, setFrom] = useState<string>("");
   const [to, setTo] = useState<string>(organiserEmail);
-  const [subject, setSubject] = useState<string>(eventTitle ? `Regarding: ${eventTitle}` : "");
+  const [subject, setSubject] = useState<string>(
+    eventTitle ? `Regarding: ${eventTitle}` : ""
+  );
   const [body, setBody] = useState<string>("");
   const [sending, setSending] = useState<boolean>(false);
   const [popup, setPopup] = useState<PopupState | null>(null);
 
   useEffect(() => {
-    // Optionally pre-fill 'from' with admin email from localStorage
+    // Pre-fill the 'from' field with the user's email from localStorage
     const userRaw = typeof window !== 'undefined' ? localStorage.getItem('user') : null;
     if (userRaw) {
       try {
         const userObj: UserLocalStorage = JSON.parse(userRaw);
         setFrom(userObj.email || "");
       } catch {
-        // ignore parse errors
+        // Ignore JSON parsing errors silently
       }
     }
   }, []);
@@ -47,6 +53,7 @@ export default function SendEmailPage() {
     setPopup(null);
     try {
       const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+      // Using the deployed backend URL from your original snippet
       await axios.post("https://dep2-backend.onrender.com/api/email/send-to-organiser", {
         from,
         to,
@@ -55,13 +62,17 @@ export default function SendEmailPage() {
       }, {
         headers: token ? { Authorization: `Bearer ${token}` } : {}
       });
+
       setPopup({ message: "Email sent successfully!", type: "success" });
-      setBody("");
+      setBody(""); // Clear the message body on success
     } catch (err) {
+      // Robust error handling to provide specific feedback
       let errorMsg = "Failed to send email.";
       if (axios.isAxiosError(err)) {
+        // Handle Axios-specific errors
         errorMsg = err.response?.data?.message ?? errorMsg;
       } else if (err instanceof Error) {
+        // Handle generic JavaScript errors
         errorMsg = err.message;
       }
       setPopup({ message: errorMsg, type: "error" });
@@ -85,15 +96,15 @@ export default function SendEmailPage() {
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
             <div>
               <label className="block font-semibold mb-1 text-blue-700">From</label>
-              <input type="email" className="w-full border-2 border-blue-100 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300 transition" value={from} onChange={e => setFrom(e.target.value)} required />
+              <input type="email" className="w-full border-2 border-blue-100 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300 transition" value={from} onChange={e => setFrom(String(e.target.value))} required />
             </div>
             <div>
               <label className="block font-semibold mb-1 text-blue-700">To</label>
-              <input type="email" className="w-full border-2 border-blue-100 rounded-lg px-4 py-2 bg-gray-100 cursor-not-allowed" value={to} onChange={e => setTo(e.target.value)} required readOnly />
+              <input type="email" className="w-full border-2 border-blue-100 rounded-lg px-4 py-2 bg-gray-100 cursor-not-allowed" value={to} onChange={e => setTo(String(e.target.value))} required readOnly />
             </div>
             <div>
               <label className="block font-semibold mb-1 text-blue-700">Subject</label>
-              <input type="text" className="w-full border-2 border-blue-100 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300 transition" value={subject} onChange={e => setSubject(e.target.value)} required />
+              <input type="text" className="w-full border-2 border-blue-100 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-300 transition" value={subject} onChange={e => setSubject(String(e.target.value))} required />
             </div>
             <div>
               <label className="block font-semibold mb-1 text-blue-700">Body</label>

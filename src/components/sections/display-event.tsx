@@ -1,6 +1,6 @@
 import React from "react";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://dep2-backend.onrender.com";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5274";
 
 type Speaker = { name: string; imagePreview: string; bio: string; photoUrl?: string };
 type Faq = { question: string; answer: string };
@@ -28,6 +28,10 @@ type EventLivePreviewProps = {
     vibeVideoPreview: string;
     speakers: Speaker[];
     faqs: Faq[];
+    // Added these to support the updated button logic
+    eventId?: string;
+    id?: string;
+    _id?: string;
   };
 };
 
@@ -333,8 +337,9 @@ const DisplayEvent: React.FC<EventLivePreviewProps> = ({
             {eventData.maxAttendees ? eventData.maxAttendees : <span className="text-gray-400">[Not set]</span>}
           </span>
           <button
-            className="ml-4 px-4 py-1.5 rounded bg-blue-600 hover:bg-blue-700 text-white font-semibold text-sm shadow"
-            onClick={() => window.location.href = `/event/register/${eventData.title}`}
+            className="py-2 px-8 rounded-xl shadow-md font-bold tracking-wide text-[#ffd700] bg-[#0a174e] border-2 border-[#ffd700] hover:bg-[#142a5c] hover:text-[#ffd700] hover:border-[#ffd700] hover:underline focus:outline-none focus:ring-4 focus:ring-[#0a174e] text-lg text-center transition-all duration-200 cursor-pointer select-none"
+            onClick={() => window.location.href = `/event/${eventData.eventId || eventData.id || eventData._id}/register`}
+            aria-label="Register for event"
           >
             Register Now
           </button>
