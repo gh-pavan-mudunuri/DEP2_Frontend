@@ -97,9 +97,9 @@ const Video = Node.create({
   parseHTML() {
     return [{ tag: "video" }];
   },
-  renderHTML({ HTMLAttributes }: { HTMLAttributes: Record<string, any> }) {
-    return ["video", mergeAttributes(HTMLAttributes)];
-  },
+  renderHTML({ HTMLAttributes }: { HTMLAttributes: Record<string, unknown> }) {
+  return ["video", mergeAttributes(HTMLAttributes)];
+},
   addCommands() {
     return {
       insertVideo:
@@ -529,7 +529,7 @@ export default function EventForm({
       return;
     }
 
-    let validOccurrences: any[] = [];
+    let validOccurrences: Occurrence[] = [];
     let recurrenceRule = "";
     let customFields = "";
 
@@ -562,10 +562,11 @@ export default function EventForm({
         }
       }
       validOccurrences = eventData.customDates.map((occ) => ({
-        StartTime: new Date(occ.start).toISOString(),
-        EndTime: new Date(occ.end).toISOString(),
-        EventTitle: eventData.title,
-      }));
+    date: occ.start.split("T")[0],
+    startTime: occ.start.split("T")[1] || "",
+    endTime: occ.end.split("T")[1] || "",
+    location: eventData.location || "",
+  }));
       customFields = JSON.stringify(validOccurrences);
     }
 
@@ -680,15 +681,15 @@ export default function EventForm({
         if (setPopup)
           setPopup({ message: "Submission failed: " + error, type: "error" });
       }
-    } catch (error: any) {
-      if (setPopup)
-        setPopup({
-          message:
-            "Submission failed: " +
-            (error?.message || "An unknown error occurred"),
-          type: "error",
-        });
-    } finally {
+    } catch (error) {
+  if (setPopup)
+    setPopup({
+      message:
+        "Submission failed: " +
+        ((error instanceof Error && error.message) ? error.message : "An unknown error occurred"),
+      type: "error",
+    });
+} finally {
       setSubmitting(false);
     }
   };
