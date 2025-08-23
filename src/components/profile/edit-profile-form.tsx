@@ -30,11 +30,10 @@ export default function EditProfileForm({ profile, editing, onChange, onImageCha
   };
 
   const handleConfirm = () => {
-    setShowConfirm(false);
-    // Actually submit the form
-    onSave(new Event('submit') as any);
-  };
-
+  setShowConfirm(false);
+  const fakeEvent = { preventDefault: () => {}, target: null } as unknown as React.FormEvent<HTMLFormElement>;
+  onSave(fakeEvent);
+};
   const handleCancel = () => {
     setShowConfirm(false);
   };

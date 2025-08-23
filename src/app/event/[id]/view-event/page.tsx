@@ -40,7 +40,9 @@ function mapEventData(data: unknown): MappedEvent {
     ? (data as { data: EventFormView }).data
     : (data as EventFormView);
 
-  const arr = (v: any) => (Array.isArray(v) ? v : v ? [v] : []);
+  const arr = <T,>(v: T | T[] | undefined): T[] =>
+    Array.isArray(v) ? v : v ? [v] : [];
+
 
   const speakers: MappedSpeaker[] = arr(event.speakers).map((s: Speaker) => {
     let photoPath = s.photoUrl || "";

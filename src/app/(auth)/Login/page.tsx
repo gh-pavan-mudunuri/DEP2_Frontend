@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, FormEvent } from 'react';
+import { useState, FormEvent, ChangeEvent } from 'react';
 import PopupMessage from '@/components/common/popup-message';
 import { useRouter } from 'next/navigation';
 import axios, { AxiosError } from 'axios';
@@ -31,9 +31,7 @@ export default function Login() {
       .then(response => {
         localStorage.setItem('token', response.data.token);
         document.cookie = `authToken=${response.data.token}; path=/; max-age=86400; SameSite=Lax; Secure`;
-        // Store user info in localStorage for Navbar username
         localStorage.setItem('user', JSON.stringify(response.data.user));
-        // Set userRole cookie for middleware
         if (typeof response.data.user.role !== 'undefined') {
           document.cookie = `userRole=${response.data.user.role}; path=/; max-age=86400; SameSite=Lax; Secure`;
         }
@@ -41,28 +39,24 @@ export default function Login() {
         setPopupType('success');
         setMessage('Login successful!');
         window.dispatchEvent(new Event("userLoggedIn"));
-        // Redirect based on role
-  if (response.data.user.role === UserRole.Admin) {
+        if (response.data.user.role === UserRole.Admin) {
           router.push('/admin');
         } else {
           router.push('/dashboard');
         }
       })
-      .catch((error: AxiosError) => {
-        // Log error for debugging
+      .catch((error: AxiosError<APIError>) => {
         console.error('Login error:', error);
         let backendMsg = '';
         if (error.response) {
-          // Try to extract message from various possible locations
-          if (error.response.data) {
-            if (typeof error.response.data === 'string') {
-              backendMsg = error.response.data;
-            } else if (
-              typeof error.response.data === 'object' &&
-              (error.response.data as any).message
-            ) {
-              backendMsg = (error.response.data as any).message;
-            }
+          if (typeof error.response.data === 'string') {
+            backendMsg = error.response.data;
+          } else if (
+            typeof error.response.data === 'object' &&
+            error.response.data &&
+            'message' in error.response.data
+          ) {
+            backendMsg = error.response.data.message ?? '';
           }
         }
         if (backendMsg) {
@@ -74,12 +68,12 @@ export default function Login() {
             setMessage(backendMsg);
           }
         } else {
-        setPopupType('error');
-        setMessage('An unexpected error occurred. Please try again.');
+          setPopupType('error');
+          setMessage('An unexpected error occurred. Please try again.');
         }
       })
       .finally(() => {
-        setLoading(false); // Stop loading
+        setLoading(false);
       });
   };
 
@@ -93,17 +87,15 @@ export default function Login() {
       await axios.post('https://dep2-backend.onrender.com/api/Auth/forgot-password', { email });
       setPopupType('success');
       setMessage('Password reset email sent!');
-    } catch (error: unknown) {
+    } catch (error) {
       const err = error as AxiosError<APIError>;
       setPopupType('error');
-      setMessage(err.response?.data?.message || 'An error occurred. Please try again.');
+      setMessage(err.response?.data?.message ?? 'An error occurred. Please try again.');
     } finally {
       setResetLoading(false);
     }
   };
 
-
-  // Remove message when popup closes
   const handlePopupClose = () => setMessage('');
 
   return (
@@ -118,7 +110,6 @@ export default function Login() {
       )}
 
       <div className="flex flex-col justify-center items-center" >
-
         <div className="flex justify-center items-center flex-1 relative z-10 w-full">
           <div className="bg-white/80 sm:bg-white shadow-lg rounded-lg flex w-full max-w-xs sm:max-w-md md:max-w-lg backdrop-blur-md">
             <div className="w-full p-3 sm:p-6 z-0">
@@ -131,7 +122,7 @@ export default function Login() {
                     className="w-full border px-3 py-2 rounded text-sm sm:text-base"
                     required
                     value={email}
-onChange={(e) => setEmail(String(e.target.value))}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(String(e.target.value))}
                   />
                   <button
                     type="submit"
@@ -180,7 +171,7 @@ onChange={(e) => setEmail(String(e.target.value))}
                     className="w-full border px-3 py-2 rounded text-sm sm:text-base"
                     required
                     value={email}
-onChange={(e) => setEmail(String(e.target.value))}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(String(e.target.value))}
                   />
                   <input
                     type="password"
@@ -188,7 +179,7 @@ onChange={(e) => setEmail(String(e.target.value))}
                     className="w-full border px-3 py-2 rounded text-sm sm:text-base"
                     required
                     value={password}
-onChange={(e) => setPassword(String(e.target.value))}
+                    onChange={(e: ChangeEvent<HTMLInputElement>) => setPassword(String(e.target.value))}
                   />
                   <div className="mb-3 text-xs sm:text-sm text-right">
                     <button
@@ -203,7 +194,6 @@ onChange={(e) => setPassword(String(e.target.value))}
                   <button
                     type="submit"
                     className="w-full text-white py-2 rounded font-semibold hover:bg-gradient-to-r bg-blue-300  hover:to-blue-700 hover:scale-105 hover:shadow-lg transition-all duration-200 flex items-center justify-center text-base sm:text-lg"
-    
                     aria-label="Login"
                     disabled={loading}
                   >
@@ -248,7 +238,6 @@ onChange={(e) => setPassword(String(e.target.value))}
           <div
             className={`mt-6 px-8 py-4 min-w-[320px] max-w-[90vw] rounded-lg shadow-lg text-center text-lg font-semibold transition-all duration-300
               ${
-                // Show green for backend success messages, red for errors
                 message.toLowerCase().includes('login successful') ||
                 message.toLowerCase().includes('password reset email sent') ||
                 message.toLowerCase().includes('reset email sent') ||
