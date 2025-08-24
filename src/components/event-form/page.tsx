@@ -1,4 +1,5 @@
 "use client";
+import { FaUserCircle } from "react-icons/fa";
 import { EventFormPopupContext } from "./layout";
 import ConfirmationDialog from "../common/confirmation-dialog";
 import dynamic from "next/dynamic";
@@ -771,9 +772,9 @@ export default function EventForm({
         </div>
         <div className="flex flex-col lg:flex-row gap--4 md:gap-8 w-full max-w-full md:max-w-[1400px] mx-auto items-stretch relative min-h-[700px]">
           <div
-            className={`block w-full lg:sticky lg:top-0 lg:h-auto lg:max-h-[90vh] lg:w-[420px] xl:w-[500px] 2xl:w-[600px] z-30`}
-            style={{ alignSelf: "flex-start" }}
-          >
+              className="block w-full lg:w-1/2 min-h-[700px] max-h-[90vh] z-30"
+              style={{ alignSelf: "stretch" }}
+            >
             <form
               className={`flex flex-col gap-4 w-full h-auto max-h-[90vh] bg-white rounded-2xl shadow-lg p-4 ring-4 ring-[#0a174e] border-4 border-[#0a174e] drop-shadow-md overflow-y-auto ${
                 showMobilePreview ? "hidden" : ""
@@ -1672,14 +1673,15 @@ export default function EventForm({
                   >
                     <div className="flex flex-col items-center justify-center gap-1">
                       <div className="w-14 h-14 rounded-full overflow-hidden border-2 bg-gray-100 flex items-center justify-center">
-                        <img
-                          src={
-                            speaker.imagePreview ||
-                            "/images/default-speaker.png"
-                          }
-                          alt="Speaker"
-                          className="object-cover w-full h-full"
-                        />
+                        {speaker.imagePreview ? (
+                          <img
+                            src={speaker.imagePreview}
+                            alt="Speaker"
+                            className="object-cover w-full h-full"
+                          />
+                        ) : (
+                          <FaUserCircle size={56} className="text-gray-400" />
+                        )}
                       </div>
                       <label className="px-2 py-1 bg-white border rounded-md cursor-pointer text-xs hover:bg-violet-50">
                         Choose File
@@ -1842,10 +1844,7 @@ export default function EventForm({
           </div>
 
           <div
-            className={`${
-              showMobilePreview ? "" : "hidden"
-            } lg:block flex-1 min-w-0`}
-          >
+            className={(showMobilePreview ? '' : 'hidden') + ' lg:block w-full lg:w-1/2 min-h-[700px] max-h-[90vh] min-w-0 flex flex-col justify-stretch items-stretch'}>
             <div
               className="relative bg-white/90 rounded-2xl shadow-lg ring-4 ring-yellow-400 w-full max-w-[820px] mx-auto flex flex-col items-center overflow-hidden min-w-0 h-full scrollbar-thin scrollbar-thumb-yellow-400 scrollbar-track-blue-900"
               style={{

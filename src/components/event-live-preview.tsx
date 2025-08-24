@@ -87,7 +87,8 @@ type EventLivePreviewProps = {
     id?: string | number;
     _id?: string | number;
     ticketsBooked?: number;
-    registrationCount?: number;
+  registrationCount?: number;
+  isPreview?: boolean;
   };
 
   /** If true, always use mobile (vertical) layout regardless of screen size */
@@ -376,13 +377,17 @@ const start = new Date(occ.startTime ?? "");                      return !isNaN(
               </div>
               <Link
                 href={`/event/${event.eventId || event.id || event._id}/register`}
-                className="w-full sm:w-auto mt-2 sm:mt-0 sm:ml-6 px-6 py-2 rounded-xl font-bold text-base text-[#ffd700] bg-[#0a174e] border-2 border-[#ffd700] shadow-lg focus:outline-none focus:ring-4 focus:ring-[#0a174e] text-center transition-all duration-150 hover:underline hover:bg-[#142a5c] hover:text-[#ffd700] hover:border-[#ffd700]"
+                className={
+                  `w-full sm:w-auto mt-2 sm:mt-0 sm:ml-6 px-6 py-2 rounded-xl font-bold text-base text-[#ffd700] bg-[#0a174e] border-2 border-[#ffd700] shadow-lg focus:outline-none focus:ring-4 focus:ring-[#0a174e] text-center transition-all duration-150 ${event.isPreview ? 'opacity-60 cursor-not-allowed pointer-events-none' : 'hover:underline hover:bg-[#142a5c] hover:text-[#ffd700] hover:border-[#ffd700]'}`
+                }
                 style={{
                   letterSpacing: '0.04em',
-                  cursor: 'pointer',
+                  cursor: event.isPreview ? 'not-allowed' : 'pointer',
                   display: 'inline-block',
                   textAlign: 'center',
                 }}
+                tabIndex={event.isPreview ? -1 : 0}
+                aria-disabled={event.isPreview ? 'true' : 'false'}
               >
                 Register Now
               </Link>
