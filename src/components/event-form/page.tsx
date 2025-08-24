@@ -402,13 +402,19 @@ export default function EventForm({
   const handleSpeakerNameChange = (idx: number, value: string) => {
     const speakers = [...eventData.speakers];
     speakers[idx].name = value;
-    setEventData({ ...eventData, speakers });
+    // Deduplicate by name and bio
+    const deduped = speakers.filter(s => s.name.trim() || s.bio.trim())
+      .filter((s, i, arr) => arr.findIndex(t => t.name.trim().toLowerCase() === s.name.trim().toLowerCase() && t.bio.trim() === s.bio.trim()) === i);
+    setEventData({ ...eventData, speakers: deduped });
   };
 
   const handleSpeakerBioChange = (idx: number, value: string) => {
     const speakers = [...eventData.speakers];
     speakers[idx].bio = value;
-    setEventData({ ...eventData, speakers });
+    // Deduplicate by name and bio
+    const deduped = speakers.filter(s => s.name.trim() || s.bio.trim())
+      .filter((s, i, arr) => arr.findIndex(t => t.name.trim().toLowerCase() === s.name.trim().toLowerCase() && t.bio.trim() === s.bio.trim()) === i);
+    setEventData({ ...eventData, speakers: deduped });
   };
 
   const handleSpeakerImageChange = (
@@ -420,18 +426,22 @@ export default function EventForm({
       const speakers = [...eventData.speakers];
       speakers[idx].image = file;
       speakers[idx].imagePreview = URL.createObjectURL(file);
-      setEventData({ ...eventData, speakers });
+      // Deduplicate by name and bio
+      const deduped = speakers.filter(s => s.name.trim() || s.bio.trim())
+        .filter((s, i, arr) => arr.findIndex(t => t.name.trim().toLowerCase() === s.name.trim().toLowerCase() && t.bio.trim() === s.bio.trim()) === i);
+      setEventData({ ...eventData, speakers: deduped });
     }
   };
 
   const addSpeaker = () => {
-    setEventData({
-      ...eventData,
-      speakers: [
-        ...eventData.speakers,
-        { name: "", image: null, imagePreview: "", bio: "", photoUrl: "" },
-      ],
-    });
+    const speakers = [
+      ...eventData.speakers,
+      { name: "", image: null, imagePreview: "", bio: "", photoUrl: "" },
+    ];
+    // Deduplicate by name and bio
+    const deduped = speakers.filter(s => s.name.trim() || s.bio.trim())
+      .filter((s, i, arr) => arr.findIndex(t => t.name.trim().toLowerCase() === s.name.trim().toLowerCase() && t.bio.trim() === s.bio.trim()) === i);
+    setEventData({ ...eventData, speakers: deduped });
   };
 
   const removeSpeaker = (idx: number) => {
@@ -483,7 +493,10 @@ export default function EventForm({
     setEventData((prev) => {
       const newFaqs = [...prev.faqs];
       newFaqs[idx][field] = value;
-      return { ...prev, faqs: newFaqs };
+      // Deduplicate by question and answer
+      const deduped = newFaqs.filter(f => f.question.trim() || f.answer.trim())
+        .filter((f, i, arr) => arr.findIndex(t => t.question.trim().toLowerCase() === f.question.trim().toLowerCase() && t.answer.trim() === f.answer.trim()) === i);
+      return { ...prev, faqs: deduped };
     });
   };
 
@@ -1152,9 +1165,12 @@ export default function EventForm({
                         value={occ.start || ""}
                         onChange={(e) => {
                           setEventData((prev) => {
-                            const newDates = [...prev.customDates];
-                            newDates[idx].start = String(e.target.value); // <-- Ensure string
-                            return {
+                            const faqs = [...(prev.faqs || []), { question: "", answer: "" }];
+                            // Deduplicate by question and answer
+                            const deduped = faqs.filter(f => f.question.trim() || f.answer.trim())
+                              .filter((f, i, arr) => arr.findIndex(t => t.question.trim().toLowerCase() === f.question.trim().toLowerCase() && t.answer.trim() === f.answer.trim()) === i);
+                            return { ...prev, faqs: deduped };
+                          });
                               ...prev,
                               customDates: newDates,
                               customFields: JSON.stringify(newDates),
