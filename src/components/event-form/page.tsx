@@ -632,28 +632,35 @@ export default function EventForm({
     if (eventData.image) formData.append("CoverImage", eventData.image);
     if (eventData.vibeVideo) formData.append("VibeVideo", eventData.vibeVideo);
 
-    const speakersToSubmit = eventData.speakers.filter(
-      (s) => s.name.trim() !== ""
-    );
-    formData.append(
-      "Speakers",
-      JSON.stringify(
-        speakersToSubmit.map((s) => ({
-          name: s.name,
-          bio: s.bio,
-          photoUrl: s.photoUrl,
-        }))
-      )
-    );
-    speakersToSubmit.forEach((speaker, idx) => {
+    // Deduplicate speakers by name and bio (ignore empty)
+    const dedupedSpeakers = (eventData.speakers || [])
+      .filter(s => s.name.trim() || s.bio.trim())
+      .filter((s, idx, arr) =>
+        arr.findIndex(t => t.name.trim().toLowerCase() === s.name.trim().toLowerCase() && t.bio.trim() === s.bio.trim()) === idx
+      );
+
+    // Deduplicate FAQs by question and answer (ignore empty)
+    const dedupedFaqs = (eventData.faqs || [])
+      .filter(f => f.question.trim() || f.answer.trim())
+      .filter((f, idx, arr) =>
+        arr.findIndex(t => t.question.trim().toLowerCase() === f.question.trim().toLowerCase() && t.answer.trim() === f.answer.trim()) === idx
+      );
+
+    // Speakers (as JSON, without image files)
+    formData.append('Speakers', JSON.stringify(dedupedSpeakers.map((s) => ({
+      name: s.name,
+      bio: s.bio,
+      photoUrl: s.photoUrl || undefined
+    }))));
+    // Attach speaker images as separate fields
+    dedupedSpeakers.forEach((speaker, idx) => {
       if (speaker.image) {
         formData.append(`speakers[${idx}].image`, speaker.image);
       }
     });
-
-    const faqsToSubmit = eventData.faqs.filter((f) => f.question.trim() !== "");
-    formData.append("Faqs", JSON.stringify(faqsToSubmit));
-    formData.append("Occurrences", JSON.stringify(validOccurrences));
+    // Ensure Faqs is always an array
+    formData.append('Faqs', JSON.stringify(dedupedFaqs));
+    formData.append('Occurrences', JSON.stringify(validOccurrences));
 
     try {
       const token =
