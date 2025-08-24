@@ -64,7 +64,7 @@ if (typeof window !== "undefined") {
   }
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5274";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://dep2-backend.onrender.com";
 
 // Pencil SVG as data URI for cursor
 const pencilCursor =
