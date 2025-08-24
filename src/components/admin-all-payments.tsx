@@ -39,7 +39,7 @@ export default function AdminAllPayments() {
       {payments.length === 0 ? (
         <div className="text-gray-500">No payments found.</div>
       ) : (
-        <table className="w-full text-sm border">
+  <table className="w-full text-sm border bg-blue-2">
           <thead>
             <tr className="bg-[#0a174e] text-white">
               <th className="p-2 border">Payment ID</th>

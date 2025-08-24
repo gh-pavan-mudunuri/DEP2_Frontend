@@ -38,32 +38,32 @@ export default function AdminEventIncome({ onSelectEvent }: { onSelectEvent: (ev
   if (error) return <div className="text-red-500">{error}</div>;
 
   return (
-    <div className="bg-white rounded-xl shadow p-4 mt-4">
+    <div className="bg-blue-2 rounded-xl shadow p-4 mt-4">
       <h2 className="text-lg font-bold mb-3">Event Income Overview</h2>
       <div className="mb-4 text-xl font-semibold text-blue-700">Total EventSphere Income: ₹{totalAdminIncome.toFixed(2)}</div>
       {eventIncomes.length === 0 ? (
         <div className="text-gray-500">No event payments found.</div>
       ) : (
-        <table className="w-full text-sm border">
+  <table className="w-full text-sm border border-black">
           <thead>
             {/* Updated header style */}
             <tr className="bg-[#0a174e] text-white">
-              <th className="p-2 border">Event Title</th>
-              <th className="p-2 border">Total Amount</th>
-              <th className="p-2 border">Organizer Income</th>
-              <th className="p-2 border">EventSphere Commission</th>
-              <th className="p-2 border">Action</th>
+              <th className="p-2 border border-black">Event Title</th>
+              <th className="p-2 border border-black">Total Amount</th>
+              <th className="p-2 border border-black">Organizer Income</th>
+              <th className="p-2 border border-black">EventSphere Commission</th>
+              <th className="p-2 border border-black">Action</th>
             </tr>
           </thead>
           <tbody>
             {eventIncomes.map(e => (
               // Updated body row style
               <tr key={e.eventId} className="text-[#0a174e]">
-                <td className="p-2 border">{e.eventTitle}</td>
-                <td className="p-2 border">₹{typeof e.totalAmount === "number" && !isNaN(e.totalAmount) ? e.totalAmount : 0}</td>
-                <td className="p-2 border">₹{(((typeof e.totalAmount === "number" && !isNaN(e.totalAmount) ? e.totalAmount : 0) * 0.9).toFixed(2))}</td>
-                <td className="p-2 border">₹{(((typeof e.totalAmount === "number" && !isNaN(e.totalAmount) ? e.totalAmount : 0) * 0.1).toFixed(2))} </td>
-                <td className="p-2 border">
+                <td className="p-2 border border-black">{e.eventTitle}</td>
+                <td className="p-2 border border-black">₹{typeof e.totalAmount === "number" && !isNaN(e.totalAmount) ? e.totalAmount : 0}</td>
+                <td className="p-2 border border-black">₹{(((typeof e.totalAmount === "number" && !isNaN(e.totalAmount) ? e.totalAmount : 0) * 0.9).toFixed(2))}</td>
+                <td className="p-2 border border-black">₹{(((typeof e.totalAmount === "number" && !isNaN(e.totalAmount) ? e.totalAmount : 0) * 0.1).toFixed(2))} </td>
+                <td className="p-2 border border-black">
                   <button className="px-3 py-1 bg-blue-600 text-white rounded" onClick={() => onSelectEvent(e.eventId)}>
                     View Payments
                   </button>

@@ -82,26 +82,26 @@ export default function MyEventsPaymentsPage() {
               <div className="text-gray-500">No payments found for this event.</div>
             ) : (
               <div className="overflow-x-auto">
-                <table className="min-w-[600px] w-full text-xs sm:text-sm border">
+                <table className="min-w-[600px] w-full text-xs sm:text-sm border border-black">
                   <thead>
                     <tr className="bg-gray-100">
-                      <th className="p-2 border bg-[#0a174e] text-white">Payment ID</th>
-                      <th className="p-2 border bg-[#0a174e] text-white">User Email</th>
-                      <th className="p-2 border bg-[#0a174e] text-white">Event Title</th>
-                      <th className="p-2 border bg-[#0a174e] text-white">Amount</th>
-                      <th className="p-2 border bg-[#0a174e] text-white">Status</th>
-                      <th className="p-2 border bg-[#0a174e] text-white">Time</th>
+                      <th className="p-2 border border-black bg-[#0a174e] text-white">Payment ID</th>
+                      <th className="p-2 border border-black bg-[#0a174e] text-white">User Email</th>
+                      <th className="p-2 border border-black bg-[#0a174e] text-white">Event Title</th>
+                      <th className="p-2 border border-black bg-[#0a174e] text-white">Amount</th>
+                      <th className="p-2 border border-black bg-[#0a174e] text-white">Status</th>
+                      <th className="p-2 border border-black bg-[#0a174e] text-white">Time</th>
                     </tr>
                   </thead>
                   <tbody>
                     {selectedEvent.payments.map(p => (
                       <tr key={p.paymentId}>
-                        <td className="p-2 border">{p.paymentId}</td>
-                        <td className="p-2 border">{p.userEmail}</td>
-                        <td className="p-2 border">{selectedEvent.eventTitle}</td>
-                        <td className="p-2 border">₹{p.amount}</td>
-                        <td className="p-2 border">{p.status}</td>
-                        <td className="p-2 border">{new Date(p.paymentTime).toLocaleString()}</td>
+                        <td className="p-2 border border-black">{p.paymentId}</td>
+                        <td className="p-2 border border-black">{p.userEmail}</td>
+                        <td className="p-2 border border-black">{selectedEvent.eventTitle}</td>
+                        <td className="p-2 border border-black">₹{p.amount}</td>
+                        <td className="p-2 border border-black">{p.status}</td>
+                        <td className="p-2 border border-black">{new Date(p.paymentTime).toLocaleString()}</td>
                       </tr>
                     ))}
                   </tbody>
