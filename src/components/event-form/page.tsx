@@ -1873,6 +1873,7 @@ export default function EventForm({
                       ...eventData,
                       coverImageUrl: coverPreview || eventData.coverImageUrl,
                       organizerName: eventData.OrganizerName,
+                      isPreview: true,
                     }}
                     forceMobileLayout={true}
                   />
