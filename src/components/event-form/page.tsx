@@ -1171,11 +1171,15 @@ export default function EventForm({
                               .filter((f, i, arr) => arr.findIndex(t => t.question.trim().toLowerCase() === f.question.trim().toLowerCase() && t.answer.trim() === f.answer.trim()) === i);
                             return { ...prev, faqs: deduped };
                           });
-                              ...prev,
-                              customDates: newDates,
-                              customFields: JSON.stringify(newDates),
-                            };
-                          });
+                            setEventData((prev) => {
+                              const newDates = [...prev.customDates];
+                              newDates[idx].start = String(e.target.value);
+                              return {
+                                ...prev,
+                                customDates: newDates,
+                                customFields: JSON.stringify(newDates),
+                              };
+                            });
                         }}
                         className="input input-bordered"
                         placeholder="Start Date & Time"
