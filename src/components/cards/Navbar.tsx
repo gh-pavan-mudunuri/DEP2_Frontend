@@ -490,7 +490,7 @@ export default function Navbar({ forceAdminDashboard = false }: NavbarForceAdmin
               </nav>
 
               {/* Logout and Delete Account */}
-              <div className="flex gap-2 mt-auto">
+               <div className="flex gap-2 mt-auto">
                 <button
                   className="flex-1 px-4 py-2 rounded bg-red-500 text-white font-semibold hover:bg-red-600 transition-colors duration-200"
                   onClick={handleLogout}
@@ -503,8 +503,7 @@ export default function Navbar({ forceAdminDashboard = false }: NavbarForceAdmin
                 >
                   Delete
                 </button>
-               
-              </div> <ConfirmationDialog
+                <ConfirmationDialog
                   open={showDeleteDialog}
                   message="Are you sure you want to delete your account? This action cannot be undone."
                   confirmText="Delete"
@@ -513,16 +512,16 @@ export default function Navbar({ forceAdminDashboard = false }: NavbarForceAdmin
                     setShowDeleteDialog(false);
                     const storedUser = localStorage.getItem("user");
                     const token = localStorage.getItem("token");
-                    let userId: string | number | undefined = undefined;
+                    let userId = null;
                     if (storedUser) {
                       try {
-                        const userObj: UserProfile = JSON.parse(storedUser);
-                        userId = userObj.userId ?? userObj.id ?? userObj.UserId ?? userObj.Id;
+                        const userObj = JSON.parse(storedUser);
+                        userId = userObj.userId || userObj.id || userObj.UserId || userObj.Id;
                       } catch {}
                     }
                     if (userId && token) {
                       try {
-                        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || "https://dep2-backend.onrender.com"}/api/Users/${userId}`, {
+                        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5274"}/api/Users/${userId}`, {
                           method: "DELETE",
                           headers: { 'Authorization': `Bearer ${token}` }
                         });
@@ -540,6 +539,7 @@ export default function Navbar({ forceAdminDashboard = false }: NavbarForceAdmin
                   }}
                   onCancel={() => setShowDeleteDialog(false)}
                 />
+              </div>
             </aside>
           </>
         )}
