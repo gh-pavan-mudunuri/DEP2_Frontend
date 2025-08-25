@@ -112,8 +112,8 @@ function mapEventData(data: unknown): MappedEvent {
     price:
       event.price !== undefined && event.price !== null
         ? event.price
-        : (typeof event === 'object' && event !== null && 'Price' in event && (event as any).Price !== undefined && (event as any).Price !== null)
-          ? (event as any).Price
+        : (typeof event === 'object' && event !== null && 'Price' in event && (event as Record<string, unknown>).Price !== undefined && (event as Record<string, unknown>).Price !== null)
+          ? (event as Record<string, unknown>).Price as number | string
           : 0,
   };
 }
