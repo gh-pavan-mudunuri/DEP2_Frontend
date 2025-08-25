@@ -109,7 +109,12 @@ function mapEventData(data: unknown): MappedEvent {
     vibeVideoUrl,
     description,
     isPaid: event.isPaid ?? false,
-    price: event.price ?? 0,
+    price:
+      event.price !== undefined && event.price !== null
+        ? event.price
+        : event.Price !== undefined && event.Price !== null
+          ? event.Price
+          : 0,
   };
 }
 
