@@ -503,7 +503,8 @@ export default function Navbar({ forceAdminDashboard = false }: NavbarForceAdmin
                 >
                   Delete
                 </button>
-                <ConfirmationDialog
+               
+              </div> <ConfirmationDialog
                   open={showDeleteDialog}
                   message="Are you sure you want to delete your account? This action cannot be undone."
                   confirmText="Delete"
@@ -539,7 +540,6 @@ export default function Navbar({ forceAdminDashboard = false }: NavbarForceAdmin
                   }}
                   onCancel={() => setShowDeleteDialog(false)}
                 />
-              </div>
             </aside>
           </>
         )}
