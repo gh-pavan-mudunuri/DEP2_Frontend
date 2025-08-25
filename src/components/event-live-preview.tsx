@@ -360,7 +360,7 @@ const start = new Date(occ.startTime ?? "");                      return !isNaN(
                 <div className="text-xs font-semibold text-gray-500 uppercase">Ticket Type</div>
                 {event.isPaid ? (
                   <span className="inline-block ml-2 bg-yellow-400 text-white rounded-lg px-4 py-0.5 font-bold text-[16px] tracking-wide shadow-[0_1px_4px_#f59e4222]">Paid - ₹{event.price || '0'}</span>
-                ) : (event.isPaidEvent ? (
+                ) : (typeof event === 'object' && event !== null && 'isPaidEvent' in event && (event as Record<string, unknown>).isPaidEvent === true ? (
                   <span className="inline-block ml-2 bg-yellow-400 text-white rounded-lg px-4 py-0.5 font-bold text-[16px] tracking-wide shadow-[0_1px_4px_#f59e4222]">Paid - ₹{event.price || '0'}</span>
                 ) : (
                   <span className="inline-block ml-2 bg-green-500 text-white rounded-lg px-4 py-0.5 font-bold text-[16px] tracking-wide shadow-[0_1px_4px_#22c55e22]">Free</span>
