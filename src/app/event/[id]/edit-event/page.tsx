@@ -173,7 +173,11 @@ export default function EditEventPage(): JSX.Element | null {
           otherCategory: event.otherCategory || "",
           isPaid: event.isPaidEvent || false,
           price:
-            event.price !== undefined && event.price !== null ? String(event.price) : "",
+            event.price !== undefined && event.price !== null
+              ? String(event.price)
+              : event.Price !== undefined && event.Price !== null
+                ? String(event.Price)
+                : "",
           image: null,
           coverImageUrl,
           vibeVideo: null,

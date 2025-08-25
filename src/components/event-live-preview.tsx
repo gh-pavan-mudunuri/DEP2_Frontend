@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { Occurrence } from "@/interfaces/event-form";
 
@@ -125,7 +126,7 @@ const EventLivePreview: React.FC<EventLivePreviewProps> = ({ event, forceMobileL
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={() => setShowImageModal(false)}>
           <div className="absolute inset-0" />
           <div className="relative z-10 max-w-2xl w-full flex flex-col items-center justify-center">
-            <img src={event.coverImageUrl} alt="Event Banner" className="rounded-2xl shadow-2xl max-h-[80vh] object-contain border-4 border-yellow-300" />
+            <Image src={event.coverImageUrl} alt="Event Banner" width={800} height={400} className="rounded-2xl shadow-2xl max-h-[80vh] object-contain border-4 border-yellow-300" />
             <button className="mt-4 px-6 py-2 bg-yellow-500 text-white rounded-xl font-bold shadow hover:bg-yellow-600" onClick={() => setShowImageModal(false)}>Close</button>
           </div>
         </div>
@@ -163,9 +164,11 @@ const EventLivePreview: React.FC<EventLivePreviewProps> = ({ event, forceMobileL
             <span className="block font-semibold text-gray-700 text-sm md:text-base mb-1">🖼 Event Banner:</span>
             <div className="relative w-full max-h-[180px] md:max-h-[220px] rounded-xl overflow-hidden flex items-center justify-center shadow bg-gradient-to-br from-orange-50 via-white to-indigo-100">
               {event.coverImageUrl ? (
-                <img
+                <Image
                   src={event.coverImageUrl}
                   alt="Event Banner Preview"
+                  width={800}
+                  height={220}
                   className="object-cover w-full h-full transition-transform duration-300 hover:scale-105 cursor-pointer"
                   style={{maxHeight:'220px'}}
                   onClick={() => setShowImageModal(true)}
@@ -357,9 +360,11 @@ const start = new Date(occ.startTime ?? "");                      return !isNaN(
                 <div className="text-xs font-semibold text-gray-500 uppercase">Ticket Type</div>
                 {event.isPaid ? (
                   <span className="inline-block ml-2 bg-yellow-400 text-white rounded-lg px-4 py-0.5 font-bold text-[16px] tracking-wide shadow-[0_1px_4px_#f59e4222]">Paid - ₹{event.price || '0'}</span>
+                ) : (typeof event === 'object' && event !== null && 'isPaidEvent' in event && (event as Record<string, unknown>).isPaidEvent === true ? (
+                  <span className="inline-block ml-2 bg-yellow-400 text-white rounded-lg px-4 py-0.5 font-bold text-[16px] tracking-wide shadow-[0_1px_4px_#f59e4222]">Paid - ₹{event.price || '0'}</span>
                 ) : (
                   <span className="inline-block ml-2 bg-green-500 text-white rounded-lg px-4 py-0.5 font-bold text-[16px] tracking-wide shadow-[0_1px_4px_#22c55e22]">Free</span>
-                )}
+                ))}
               </div>
             </div>
             <div className="flex items-center gap-3 bg-yellow-50 rounded-xl px-4 py-3 shadow-sm">
@@ -449,9 +454,9 @@ const start = new Date(occ.startTime ?? "");                      return !isNaN(
                 <div key={idx} className="flex items-start gap-2 bg-white rounded-xl shadow p-2 border border-orange-100">
                   <div className="w-10 h-10 md:w-12 md:h-12 rounded-full overflow-hidden bg-gray-200 flex items-center justify-center border-2 border-orange-200">
                     {speaker.imagePreview ? (
-                      <img src={speaker.imagePreview} alt={`Speaker ${idx + 1}`} className="w-full h-full object-cover" />
+                      <Image src={speaker.imagePreview} alt={`Speaker ${idx + 1}`} width={80} height={80} className="w-full h-full object-cover" />
                     ) : speaker.photoUrl ? (
-                      <img src={`${API_URL}${speaker.photoUrl}`} alt={`Speaker ${idx + 1}`} className="w-full h-full object-cover" />
+                      <Image src={`${API_URL}${speaker.photoUrl}`} alt={`Speaker ${idx + 1}`} width={80} height={80} className="w-full h-full object-cover" />
                     ) : (
                       <span className="text-gray-400 text-xl">👤</span>
                     )}

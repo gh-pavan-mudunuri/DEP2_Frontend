@@ -120,6 +120,7 @@ export interface EventLivePreviewProps  {
     eventLink?: string;
     category?: string;
     isPaid?: boolean;
+    isPaidEvent?: boolean;
     price?: string | number;
     maxAttendees?: string | number;
     description?: string;
