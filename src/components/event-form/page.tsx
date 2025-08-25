@@ -1,4 +1,5 @@
 "use client";
+import { FaUserCircle } from "react-icons/fa";
 import { EventFormPopupContext } from "./layout";
 import ConfirmationDialog from "../common/confirmation-dialog";
 import dynamic from "next/dynamic";
@@ -64,7 +65,7 @@ if (typeof window !== "undefined") {
   }
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5274";
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "https://dep2-backend.onrender.com";
 
 // Pencil SVG as data URI for cursor
 const pencilCursor =
@@ -402,13 +403,19 @@ export default function EventForm({
   const handleSpeakerNameChange = (idx: number, value: string) => {
     const speakers = [...eventData.speakers];
     speakers[idx].name = value;
-    setEventData({ ...eventData, speakers });
+    // Deduplicate by name and bio
+    const deduped = speakers.filter(s => s.name.trim() || s.bio.trim())
+      .filter((s, i, arr) => arr.findIndex(t => t.name.trim().toLowerCase() === s.name.trim().toLowerCase() && t.bio.trim() === s.bio.trim()) === i);
+    setEventData({ ...eventData, speakers: deduped });
   };
 
   const handleSpeakerBioChange = (idx: number, value: string) => {
     const speakers = [...eventData.speakers];
     speakers[idx].bio = value;
-    setEventData({ ...eventData, speakers });
+    // Deduplicate by name and bio
+    const deduped = speakers.filter(s => s.name.trim() || s.bio.trim())
+      .filter((s, i, arr) => arr.findIndex(t => t.name.trim().toLowerCase() === s.name.trim().toLowerCase() && t.bio.trim() === s.bio.trim()) === i);
+    setEventData({ ...eventData, speakers: deduped });
   };
 
   const handleSpeakerImageChange = (
@@ -420,18 +427,22 @@ export default function EventForm({
       const speakers = [...eventData.speakers];
       speakers[idx].image = file;
       speakers[idx].imagePreview = URL.createObjectURL(file);
-      setEventData({ ...eventData, speakers });
+      // Deduplicate by name and bio
+      const deduped = speakers.filter(s => s.name.trim() || s.bio.trim())
+        .filter((s, i, arr) => arr.findIndex(t => t.name.trim().toLowerCase() === s.name.trim().toLowerCase() && t.bio.trim() === s.bio.trim()) === i);
+      setEventData({ ...eventData, speakers: deduped });
     }
   };
 
   const addSpeaker = () => {
-    setEventData({
-      ...eventData,
-      speakers: [
-        ...eventData.speakers,
-        { name: "", image: null, imagePreview: "", bio: "", photoUrl: "" },
-      ],
-    });
+    const speakers = [
+      ...eventData.speakers,
+      { name: "", image: null, imagePreview: "", bio: "", photoUrl: "" },
+    ];
+    // Deduplicate by name and bio
+    const deduped = speakers.filter(s => s.name.trim() || s.bio.trim())
+      .filter((s, i, arr) => arr.findIndex(t => t.name.trim().toLowerCase() === s.name.trim().toLowerCase() && t.bio.trim() === s.bio.trim()) === i);
+    setEventData({ ...eventData, speakers: deduped });
   };
 
   const removeSpeaker = (idx: number) => {
@@ -483,7 +494,10 @@ export default function EventForm({
     setEventData((prev) => {
       const newFaqs = [...prev.faqs];
       newFaqs[idx][field] = value;
-      return { ...prev, faqs: newFaqs };
+      // Deduplicate by question and answer
+      const deduped = newFaqs.filter(f => f.question.trim() || f.answer.trim())
+        .filter((f, i, arr) => arr.findIndex(t => t.question.trim().toLowerCase() === f.question.trim().toLowerCase() && t.answer.trim() === f.answer.trim()) === i);
+      return { ...prev, faqs: deduped };
     });
   };
 
@@ -632,28 +646,35 @@ export default function EventForm({
     if (eventData.image) formData.append("CoverImage", eventData.image);
     if (eventData.vibeVideo) formData.append("VibeVideo", eventData.vibeVideo);
 
-    const speakersToSubmit = eventData.speakers.filter(
-      (s) => s.name.trim() !== ""
-    );
-    formData.append(
-      "Speakers",
-      JSON.stringify(
-        speakersToSubmit.map((s) => ({
-          name: s.name,
-          bio: s.bio,
-          photoUrl: s.photoUrl,
-        }))
-      )
-    );
-    speakersToSubmit.forEach((speaker, idx) => {
+    // Deduplicate speakers by name and bio (ignore empty)
+    const dedupedSpeakers = (eventData.speakers || [])
+      .filter(s => s.name.trim() || s.bio.trim())
+      .filter((s, idx, arr) =>
+        arr.findIndex(t => t.name.trim().toLowerCase() === s.name.trim().toLowerCase() && t.bio.trim() === s.bio.trim()) === idx
+      );
+
+    // Deduplicate FAQs by question and answer (ignore empty)
+    const dedupedFaqs = (eventData.faqs || [])
+      .filter(f => f.question.trim() || f.answer.trim())
+      .filter((f, idx, arr) =>
+        arr.findIndex(t => t.question.trim().toLowerCase() === f.question.trim().toLowerCase() && t.answer.trim() === f.answer.trim()) === idx
+      );
+
+    // Speakers (as JSON, without image files)
+    formData.append('Speakers', JSON.stringify(dedupedSpeakers.map((s) => ({
+      name: s.name,
+      bio: s.bio,
+      photoUrl: s.photoUrl || undefined
+    }))));
+    // Attach speaker images as separate fields
+    dedupedSpeakers.forEach((speaker, idx) => {
       if (speaker.image) {
         formData.append(`speakers[${idx}].image`, speaker.image);
       }
     });
-
-    const faqsToSubmit = eventData.faqs.filter((f) => f.question.trim() !== "");
-    formData.append("Faqs", JSON.stringify(faqsToSubmit));
-    formData.append("Occurrences", JSON.stringify(validOccurrences));
+    // Ensure Faqs is always an array
+    formData.append('Faqs', JSON.stringify(dedupedFaqs));
+    formData.append('Occurrences', JSON.stringify(validOccurrences));
 
     try {
       const token =
@@ -674,8 +695,10 @@ export default function EventForm({
         const successMessage = isEditMode
           ? "Event updated successfully!"
           : "Event submitted successfully! Connect to Stripe to receive payments in Dashboard.";
-        if (setPopup) setPopup({ message: successMessage, type: "success" });
-        router.push("/dashboard");
+  if (setPopup) setPopup({ message: successMessage, type: "success" });
+        setTimeout(() => {
+          router.push("/dashboard");
+        }, 3000);
       } else {
         const error = await res.text();
         if (setPopup)
@@ -751,9 +774,9 @@ export default function EventForm({
         </div>
         <div className="flex flex-col lg:flex-row gap--4 md:gap-8 w-full max-w-full md:max-w-[1400px] mx-auto items-stretch relative min-h-[700px]">
           <div
-            className={`block w-full lg:sticky lg:top-0 lg:h-auto lg:max-h-[90vh] lg:w-[420px] xl:w-[500px] 2xl:w-[600px] z-30`}
-            style={{ alignSelf: "flex-start" }}
-          >
+              className="block w-full lg:w-1/2 min-h-[700px] max-h-[90vh] z-30"
+              style={{ alignSelf: "stretch" }}
+            >
             <form
               className={`flex flex-col gap-4 w-full h-auto max-h-[90vh] bg-white rounded-2xl shadow-lg p-4 ring-4 ring-[#0a174e] border-4 border-[#0a174e] drop-shadow-md overflow-y-auto ${
                 showMobilePreview ? "hidden" : ""
@@ -1145,14 +1168,21 @@ export default function EventForm({
                         value={occ.start || ""}
                         onChange={(e) => {
                           setEventData((prev) => {
-                            const newDates = [...prev.customDates];
-                            newDates[idx].start = String(e.target.value); // <-- Ensure string
-                            return {
-                              ...prev,
-                              customDates: newDates,
-                              customFields: JSON.stringify(newDates),
-                            };
+                            const faqs = [...(prev.faqs || []), { question: "", answer: "" }];
+                            // Deduplicate by question and answer
+                            const deduped = faqs.filter(f => f.question.trim() || f.answer.trim())
+                              .filter((f, i, arr) => arr.findIndex(t => t.question.trim().toLowerCase() === f.question.trim().toLowerCase() && t.answer.trim() === f.answer.trim()) === i);
+                            return { ...prev, faqs: deduped };
                           });
+                            setEventData((prev) => {
+                              const newDates = [...prev.customDates];
+                              newDates[idx].start = String(e.target.value);
+                              return {
+                                ...prev,
+                                customDates: newDates,
+                                customFields: JSON.stringify(newDates),
+                              };
+                            });
                         }}
                         className="input input-bordered"
                         placeholder="Start Date & Time"
@@ -1645,14 +1675,15 @@ export default function EventForm({
                   >
                     <div className="flex flex-col items-center justify-center gap-1">
                       <div className="w-14 h-14 rounded-full overflow-hidden border-2 bg-gray-100 flex items-center justify-center">
-                        <img
-                          src={
-                            speaker.imagePreview ||
-                            "/images/default-speaker.png"
-                          }
-                          alt="Speaker"
-                          className="object-cover w-full h-full"
-                        />
+                        {speaker.imagePreview ? (
+                          <img
+                            src={speaker.imagePreview}
+                            alt="Speaker"
+                            className="object-cover w-full h-full"
+                          />
+                        ) : (
+                          <FaUserCircle size={56} className="text-gray-400" />
+                        )}
                       </div>
                       <label className="px-2 py-1 bg-white border rounded-md cursor-pointer text-xs hover:bg-violet-50">
                         Choose File
@@ -1815,10 +1846,7 @@ export default function EventForm({
           </div>
 
           <div
-            className={`${
-              showMobilePreview ? "" : "hidden"
-            } lg:block flex-1 min-w-0`}
-          >
+            className={(showMobilePreview ? '' : 'hidden') + ' lg:block w-full lg:w-1/2 min-h-[700px] max-h-[90vh] min-w-0 flex flex-col justify-stretch items-stretch'}>
             <div
               className="relative bg-white/90 rounded-2xl shadow-lg ring-4 ring-yellow-400 w-full max-w-[820px] mx-auto flex flex-col items-center overflow-hidden min-w-0 h-full scrollbar-thin scrollbar-thumb-yellow-400 scrollbar-track-blue-900"
               style={{
@@ -1847,6 +1875,8 @@ export default function EventForm({
                       ...eventData,
                       coverImageUrl: coverPreview || eventData.coverImageUrl,
                       organizerName: eventData.OrganizerName,
+                      vibeVideoUrl: eventData.vibeVideoPreview || eventData.vibeVideoUrl,
+                      isPreview: true,
                     }}
                     forceMobileLayout={true}
                   />

@@ -59,6 +59,7 @@ export interface EventFormData {
   coverImageUrl: string;
   vibeVideo: File | null | string;
   vibeVideoPreview: string;
+  vibeVideoUrl?: string;
   speakers: Speaker[];
   faqs: Faq[];
   occurrences: Occurrence[];
@@ -92,6 +93,7 @@ export interface EventFormView {
   coverImage?: string;
   vibeVideo: string;
   vibeVideoPreview: string;
+  vibeVideoUrl?: string;
   editEventCount: number;
   isVerifiedByAdmin: boolean;
   speakers: Speaker[];

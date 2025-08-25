@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import EventCard from "@/components/cards/event-card";
+import SwipeableCard from "@/components/cards/swipable-card";
 import axios from "axios";
 import { FaSpinner } from "react-icons/fa"; // Added for the updated loading state
 
@@ -52,29 +53,39 @@ export default function TrendingEventsPage() {
   }, []);
 
   return (
-    // Updated background and layout styling (from V2)
-    <div className="min-h-screen bg-gradient-to-b from-[#f5f8ff] to-[#eaf0fa] py-12 flex flex-col items-center w-full">
-      
-      {/* Updated header styling (from V2) */}
+    <div className="min-h-screen bg-blue-2 py-12 flex flex-col items-center w-full">
       <h1 className="text-3xl px-4 font-bold mb-6 text-left w-full max-w-7xl md:max-w-full">
         All Trending Events
       </h1>
-      
       {loading ? (
-        // Updated loading UI with spinner (from V2)
         <div className="flex flex-col items-center justify-center py-8 text-blue-600">
           <FaSpinner className="animate-spin text-3xl mb-2" />
           <span>Loading events...</span>
         </div>
       ) : error ? (
         <div className="text-red-500 mb-4">{error}</div>
+      ) : events.length === 0 ? (
+        <div className="text-gray-500 text-center py-8 w-full">No trending events found.</div>
       ) : (
-        // Updated grid styling (from V2, adjusted slightly for responsiveness)
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-8 px-4 py-2 w-full max-w-7xl">
-          {events.map((event, index) => (
-            <EventCard event={event} key={event.eventId + "-trending-" + index} />
-          ))}
-        </div>
+        <>
+          {/* Mobile view: swipeable cards */}
+          <div className="sm:hidden w-full flex flex-col items-center justify-center space-y-4 px-2" style={{ minHeight: '100%' }}>
+            <SwipeableCard
+              items={events}
+              render={(event, idx) => <EventCard event={event} key={event.eventId + "-trending-" + idx} />}
+            />
+          </div>
+          {/* Desktop/tablet view: grid */}
+          <div className="hidden sm:block w-full">
+            <div className="grid grid-cols-1 xs:grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
+              {events.map((event, index) => (
+                <div key={event.eventId + "-trending-" + index} className="flex justify-center items-center w-full mb-6">
+                  <EventCard event={event} />
+                </div>
+              ))}
+            </div>
+          </div>
+        </>
       )}
     </div>
   );

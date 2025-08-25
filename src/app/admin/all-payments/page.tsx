@@ -6,7 +6,7 @@ import Navbar from "@/components/cards/Navbar";
 export default function AdminAllPaymentsPage() {
 const [selectedEventId, setSelectedEventId] = useState<number | null>(null);
 return (
-<div className="min-h-screen bg-gray-50">
+<div className="min-h-screen bg-blue-2">
 <Navbar />
 <main className="py-10">
 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -18,9 +18,7 @@ Event Payments Dashboard
 An overview of income and payment details for all events.
 </p>
 </header>
-code
-Code
-<div className="bg-white shadow-lg rounded-lg p-6">
+<div className="bg-blue-2 shadow-lg rounded-lg p-6">
         {!selectedEventId ? (
           <AdminEventIncome onSelectEvent={setSelectedEventId} />
         ) : (

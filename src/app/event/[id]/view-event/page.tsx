@@ -81,11 +81,11 @@ function mapEventData(data: unknown): MappedEvent {
   }
   const coverImageUrl = coverPath ? `${API_URL}${coverPath}` : "";
 
-  let vibePath = event.vibeVideo || "";
-  if (vibePath && !vibePath.startsWith("/")) vibePath = "/" + vibePath;
-  if (vibePath.startsWith("/wwwroot/"))
-    vibePath = vibePath.replace("/wwwroot", "");
-  const vibeVideoUrl = vibePath ? `${API_URL}${vibePath}` : "";
+    let vibePath = event.vibeVideoUrl || event.vibeVideo || "";
+    if (vibePath && !vibePath.startsWith("/")) vibePath = "/" + vibePath;
+    if (vibePath.startsWith("/wwwroot/"))
+      vibePath = vibePath.replace("/wwwroot", "");
+    const vibeVideoUrl = vibePath ? `${API_URL}${vibePath}` : "";
 
   function processDescriptionHtml(html: string | undefined): string {
     if (!html) return '<span style="color:#bbb">[Description]</span>';
@@ -337,7 +337,6 @@ const ViewEventPage = () => {
               <EventLivePreview event={event} />
             </div>
           )}
-
           <div className="w-full flex justify-center mt-8">
             {isAdmin && typeof event.isVerifiedByAdmin !== "undefined" ? (
               approved ? (
