@@ -14,42 +14,42 @@ export default function UpcomingRegisteredEventsPage() {
   const [totalCount, setTotalCount] = useState(0);
 
   useEffect(() => {
-    async function fetchEvents() {
-      const storedUser = typeof window !== "undefined" ? localStorage.getItem("user") : null;
-      const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-      let userId = null;
-      if (storedUser) {
-        try {
-          const userObj = JSON.parse(storedUser);
-          userId = userObj.userId || userObj.id || userObj.UserId || userObj.Id;
-        } catch {}
-      }
-      if (userId && token) {
-        try {
-          // Using the deployed backend URL from your original script
-          const res = await axios.get(
-            `${process.env.NEXT_PUBLIC_BACKEND_URL || "https://dep2-backend.onrender.com"}/api/Dashboard/current-attending-paged/${userId}?page=${page}&pageSize=${pageSize}`,
-            { headers: { Authorization: `Bearer ${token}` } }
-          );
-          if (res.data && res.data.success && Array.isArray(res.data.data)) {
-            setEvents(res.data.data);
-            setTotalCount(res.data.totalCount || 0);
-          } else {
-            setEvents([]);
-            setTotalCount(0);
-          }
-        } catch {
+  async function fetchEvents() {
+    const storedUser = typeof window !== "undefined" ? localStorage.getItem("user") : null;
+    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    let userId = null;
+    if (storedUser) {
+      try {
+        const userObj = JSON.parse(storedUser);
+        userId = userObj.userId || userObj.id || userObj.UserId || userObj.Id;
+      } catch {}
+    }
+    if (userId && token) {
+      try {
+        const res = await axios.post(
+          `${process.env.NEXT_PUBLIC_BACKEND_URL || "https://dep2-backend.onrender.com"}/api/Dashboard/current-attending/${userId}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        // The backend returns an array directly, not an object with success/data/totalCount
+        if (Array.isArray(res.data)) {
+          setEvents(res.data);
+          setTotalCount(res.data.length);
+        } else {
           setEvents([]);
           setTotalCount(0);
         }
-      } else {
+      } catch {
         setEvents([]);
         setTotalCount(0);
       }
-      setLoading(false);
+    } else {
+      setEvents([]);
+      setTotalCount(0);
     }
-    fetchEvents();
-  }, [page, pageSize]);
+    setLoading(false);
+  }
+  fetchEvents();
+}, [page, pageSize]);
 
   const totalPages = Math.ceil(totalCount / pageSize);
   return (

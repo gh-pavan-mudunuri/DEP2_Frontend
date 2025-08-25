@@ -68,27 +68,35 @@ export default function RegisterEventPage() {
   });
 
   useEffect(() => {
-    async function fetchEventDetails() {
-      try {
-        const res: AxiosResponse<EventApiResponse> = await axios.get(`https://dep2-backend.onrender.com/api/Events/${id}`);
-        const eventData = res.data?.data;
-        if (eventData) {
-          setTicketPrice(eventData.price ?? 0);
-          setMaxAttendees(typeof eventData.maxAttendees !== 'undefined' ? eventData.maxAttendees ?? null : null);
-          setRegistrationCount(typeof eventData.registrationCount !== 'undefined' ? eventData.registrationCount ?? 0 : 0);
-        } else {
-          setTicketPrice(0);
-          setMaxAttendees(null);
-          setRegistrationCount(0);
-        }
-      } catch {
+  async function fetchEventDetails() {
+    try {
+      let token: string | null = null;
+      if (typeof window !== "undefined") {
+        token = localStorage.getItem("token");
+      }
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      const res: AxiosResponse<EventApiResponse> = await axios.get(
+        `https://dep2-backend.onrender.com/api/Events/${id}`,
+        { headers }
+      );
+      const eventData = res.data?.data;
+      if (eventData) {
+        setTicketPrice(eventData.price ?? 0);
+        setMaxAttendees(typeof eventData.maxAttendees !== 'undefined' ? eventData.maxAttendees ?? null : null);
+        setRegistrationCount(typeof eventData.registrationCount !== 'undefined' ? eventData.registrationCount ?? 0 : 0);
+      } else {
         setTicketPrice(0);
         setMaxAttendees(null);
         setRegistrationCount(0);
       }
+    } catch {
+      setTicketPrice(0);
+      setMaxAttendees(null);
+      setRegistrationCount(0);
     }
-    if (id) fetchEventDetails();
-  }, [id]);
+  }
+  if (id) fetchEventDetails();
+}, [id]);
 
   useEffect(() => {
     if (!tickets || Number(tickets) < 1) {
