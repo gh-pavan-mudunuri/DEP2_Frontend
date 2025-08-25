@@ -18,8 +18,8 @@ export default function UpcomingEventsPage() {
   }, [searchCategory]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#f5f8ff] to-[#eaf0fa]">
-      <div className="flex flex-col items-center">
+    <div className="min-h-screen bg-blue-2">
+      <div className="flex flex-col items-center bg-blue-2">
         <UpcomingEvents
           disableHorizontalScroll
           searchCategory={searchCategory}

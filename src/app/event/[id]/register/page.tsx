@@ -228,8 +228,8 @@ export default function RegisterEventPage() {
   };
 
   return (
-    <div className="relative min-h-screen bg-white border-t-8 border-[#0a174e] flex flex-col items-center justify-center py-2 -mt-8">
-      <div className="max-w-[900px] w-full mx-auto p-2 sm:p-8 bg-white rounded-2xl shadow-2xl relative border border-blue-100">
+    <div className="relative min-h-screen bg-blue-2 border-t-8 border-[#0a174e] flex flex-col items-center justify-center py-2 -mt-8">
+      <div className="max-w-[900px] w-full mx-auto p-2 sm:p-8 bg-blue-50/80 rounded-2xl shadow-2xl relative border border-blue-200 backdrop-blur-md">
         <div className={showTnC ? "blur-sm pointer-events-none select-none" : ""}>
           <h1 className="text-2xl sm:text-3xl font-extrabold mb-6 text-center leading-tight tracking-tight drop-shadow text-[#0a174e] underline">Register for Event</h1>
           <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">

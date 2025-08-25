@@ -695,8 +695,10 @@ export default function EventForm({
         const successMessage = isEditMode
           ? "Event updated successfully!"
           : "Event submitted successfully! Connect to Stripe to receive payments in Dashboard.";
-        if (setPopup) setPopup({ message: successMessage, type: "success" });
-        router.push("/dashboard");
+  if (setPopup) setPopup({ message: successMessage, type: "success" });
+        setTimeout(() => {
+          router.push("/dashboard");
+        }, 3000);
       } else {
         const error = await res.text();
         if (setPopup)
@@ -1873,6 +1875,7 @@ export default function EventForm({
                       ...eventData,
                       coverImageUrl: coverPreview || eventData.coverImageUrl,
                       organizerName: eventData.OrganizerName,
+                      vibeVideoUrl: eventData.vibeVideoPreview || eventData.vibeVideoUrl,
                       isPreview: true,
                     }}
                     forceMobileLayout={true}

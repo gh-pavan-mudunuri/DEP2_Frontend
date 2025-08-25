@@ -149,7 +149,7 @@ export default function UpcommingEvents({
   }
 
   return (
-    <div className={showBackground ? "min-h-screen bg-gradient-to-b from-[#f5f8ff] to-[#eaf0fa] mx-5" : "mx-5"}>
+    <div className={showBackground ? "bg-blue-2 mx-5" : "mx-5"}>
       <div className="mt-10 mb-2 relative">
         <h2 className="text-xl sm:text-2xl md:text-3xl mt-2 mb-3 font-sans font-bold">Upcoming Events:</h2>
         {/* Hide 'View All' button on upcoming-events page (hydration safe) */}
@@ -184,8 +184,8 @@ export default function UpcommingEvents({
             <FaSpinner className="animate-spin text-3xl mb-2" />
             <span>Loading events...</span>
           </div>
-        ) : filteredBySearch.length === 0 && !isLoading && (filters.category || filters.location || filters.paid || filters.recurrence || searchQuery) ? (
-          <div className="text-gray-500 text-center py-8">No events found for the selected filters.</div>
+        ) : filteredBySearch.length === 0 && !isLoading ? (
+          <div className="text-gray-500 text-center py-8 w-full">No upcoming events found.</div>
         ) : disableHorizontalScroll ? (
           <div className="grid grid-cols-1 xs:grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
             {filteredBySearch.map((event, index) => (
