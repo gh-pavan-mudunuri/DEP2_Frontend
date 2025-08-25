@@ -337,13 +337,6 @@ const ViewEventPage = () => {
               <EventLivePreview event={event} />
             </div>
           )}
-
-          {/* Debug: Show video URL if present */}
-          {event?.vibeVideoUrl && (
-            <div className="w-full flex flex-col items-center mt-4 mb-2">
-              <span className="text-xs text-gray-500">Video URL: <code>{event.vibeVideoUrl}</code></span>
-            </div>
-          )}
           <div className="w-full flex justify-center mt-8">
             {isAdmin && typeof event.isVerifiedByAdmin !== "undefined" ? (
               approved ? (
