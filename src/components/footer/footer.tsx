@@ -273,7 +273,7 @@ export default function Footer() {
               </li>
               <li>
                 <strong>How do I create an event?</strong><br />
-                Click on "Create Event" in the navigation or footer, fill in your event details, and publish. You can add speakers, FAQs, recurrence, and more.
+                Click on &quot;Create Event&quot; in the navigation or footer, fill in your event details, and publish. You can add speakers, FAQs, recurrence, and more.
               </li>
               <li>
                 <strong>Can I host both online and offline events?</strong><br />
@@ -289,11 +289,11 @@ export default function Footer() {
               </li>
               <li>
                 <strong>Is there a fee for using EventSphere?</strong><br />
-                Creating free events is always free. For paid events, a small service fee may apply. See "Fees & Pricings" for details.
+                Creating free events is always free. For paid events, a small service fee may apply. See &quote;Fees & Pricings&quote; for details.
               </li>
               <li>
                 <strong>How do I contact support?</strong><br />
-                Use the "Contact Us" section in the footer or email us at support@eventsphere.com.
+                Use the &quote;Contact Us&quote; section in the footer or email us at support@eventsphere.com.
               </li>
             </ul>
           </div>
