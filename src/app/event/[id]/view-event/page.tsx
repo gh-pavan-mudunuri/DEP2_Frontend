@@ -81,11 +81,11 @@ function mapEventData(data: unknown): MappedEvent {
   }
   const coverImageUrl = coverPath ? `${API_URL}${coverPath}` : "";
 
-  let vibePath = event.vibeVideo || "";
-  if (vibePath && !vibePath.startsWith("/")) vibePath = "/" + vibePath;
-  if (vibePath.startsWith("/wwwroot/"))
-    vibePath = vibePath.replace("/wwwroot", "");
-  const vibeVideoUrl = vibePath ? `${API_URL}${vibePath}` : "";
+    let vibePath = event.vibeVideoUrl || event.vibeVideo || "";
+    if (vibePath && !vibePath.startsWith("/")) vibePath = "/" + vibePath;
+    if (vibePath.startsWith("/wwwroot/"))
+      vibePath = vibePath.replace("/wwwroot", "");
+    const vibeVideoUrl = vibePath ? `${API_URL}${vibePath}` : "";
 
   function processDescriptionHtml(html: string | undefined): string {
     if (!html) return '<span style="color:#bbb">[Description]</span>';
@@ -338,6 +338,12 @@ const ViewEventPage = () => {
             </div>
           )}
 
+          {/* Debug: Show video URL if present */}
+          {event?.vibeVideoUrl && (
+            <div className="w-full flex flex-col items-center mt-4 mb-2">
+              <span className="text-xs text-gray-500">Video URL: <code>{event.vibeVideoUrl}</code></span>
+            </div>
+          )}
           <div className="w-full flex justify-center mt-8">
             {isAdmin && typeof event.isVerifiedByAdmin !== "undefined" ? (
               approved ? (
